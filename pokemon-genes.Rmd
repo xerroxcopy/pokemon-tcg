@@ -239,13 +239,25 @@ df_gene <- df |>
 # View(leftover)
 # View(strip_1_test_df)
 # leftover[1,1]
-df_gene <- df_gene |> 
-  select(id, Name, pokemon_name, name_ja, gen_poke, Type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_"), starts_with("meta_"))
+```
+
+# remove pokemon name from original name to extract subgenes
+
+subgene or subpokemon or parasites or decorations or whatever
+
+```{r}
+df_gene <- df_gene |>   
+  rowwise() |> 
+  mutate(poke_deco = str_remove(Name, pattern = paste(pokemon_name))) |> 
+  select(id, Name, pokemon_name, name_ja, poke_deco, gen_poke, Type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_"), starts_with("meta_"))
 ```
 
 ```{r}
 df_gene |> View()
 ```
+
+
+
 
 
 

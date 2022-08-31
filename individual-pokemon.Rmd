@@ -35,35 +35,45 @@ df_count_pokemon <- df_gene |>
   select(-pokemon_name) |> 
   distinct() 
 ```
-#### ggplot_build()を使う方法：
-[use_series()](https://magrittr.tidyverse.org/reference/aliases.html)
 
-```{r}
-df_poke_count_raw <- df |> 
-  group_by(Name) |> 
-  summarise(n = n()) |> 
-  arrange(n) 
-
-p <- df_poke_count_raw |> 
-  ggplot(
-    aes(x = n)
-  ) +
-  stat_ecdf()
-
-ggplot_build(p) |> 
-  use_series(data) |> extract2(1)
-```
 `ecdf()`はX > nである割合であってX >= nである割合ではないのだな
 やりたいこと的には、`n = 1`のときに、1以上のコピーがあるポケカの割合は1になってないとおかしい。n = 1のときに1よりもたくさんのコピーがある割合1 - .32とかを計算してしまっている。同様にn = 58のとき（ピカチュウさん）、X >= 58である割合は 1 / 2425 (2425はユニークなポケモン名の数、`df$Name |> unique() |> length()`)かと思うが、0になってしまっている、つまりX > 58である割合を計算している。
+# ```{r}
+# df$Name |> unique() |> length()
+# 1/ 0.0004123711 
+# ```
+
+## plot ECDF
+
+### full name
+
 ```{r}
-df$Name |> unique() |> length()
-1/ 0.0004123711 
+df_count_full_name |> 
+  ggplot(
+    aes(
+      x = n, 
+      y = ecdf
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+    trans = "log10", 
+    breaks = 10^(0:10)
+  ) +
+  scale_y_continuous(
+    trans = "log10", breaks = 10^(0:-10)) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(size = .3),
+    axis.ticks = element_line(size = .1),
+    aspect.ratio = 1
+  )
 ```
-
-## 
+### poke name
 
 ```{r}
-df_poke_count |> 
+df_count_pokemon |> 
   ggplot(
     aes(
       x = n, 

@@ -299,7 +299,7 @@ df |>
   )
 ```
 
-## highlight mixed types
+## secret cards
 
 ```{r}
 df |> 
@@ -307,7 +307,7 @@ df |>
     aes(
       x = release_date, 
       # y = Type,
-      fill = Type2 == "mixed"
+      fill = is_secret_card
       # fill = colour
     )
   ) +
@@ -320,6 +320,129 @@ df |>
     axis.ticks = element_line(size = .1)
   )
 ```
-復活しうる。継承がカード→カードではないため。
+いろいろなものが復活しうる。継承がカード→カードではないため。
+
+# pokemon genes 
+
+## pokemon gen share
+
+TODO: ビンをMonthにしたい…
+```{r}
+df_gene$release_date[1] |> is.Date()
+df_gene |> 
+  # mutate(release_month = ym(release_date)) |> View()
+  ggplot(
+    aes(x = release_date,
+        group_by = gen_poke |> as.factor(),
+        fill = gen_poke) 
+  ) +
+  geom_bar(
+    colour = "white",
+    size = .2,
+    stat = "bin",
+    # position = "fill",
+    bins = 100
+    ) +
+  theme_minimal() +
+  scale_fill_viridis_c() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+    
+```
+新しいGenがリリースされると一気にそれが多くなるが、しばらくするとかなり偏りがなくなってくる（平衡状態みたいな）。第1世代はそれにしても多い気がするのでバイアスが検出できるかもしれない。
+
+## pokemon number 
+
+```{r}
+# df_gene$id[1] |> is.integer()
+df_gene |> 
+  ggplot(aes(x = release_date, y = id, colour = gen_poke)) +
+  geom_point(size = .1) +
+  geom_vline(xintercept = "2011-03-11" |> as.POSIXct()) +
+  scale_colour_viridis_c() +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+こうやって見ると3.11の直後はあまり余力がなく、ただ新世代はだしたいのでそこに注力したというのがありありと浮かんでくる。・・・と思ったのだが、それ以前からなんかやる気ないね？直後に以前の世代が少ないのもよくわからないし。用意は前からしていただろうから。しばらくして足りないのはわかる。
+
+```{r}
+# df_gene$id[1] |> is.integer()
+df_gene |> 
+  ggplot(aes(x = release_date, y = id, colour = Type2)) +
+  geom_point(size = .1) +
+  # scale_colour_viridis_c() +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+### poke deco
+
+```{r fig.height=8, fig.width=5}
+# df_gene$id[1] |> is.integer()
+df_gene |> 
+  ggplot(aes(x = release_date, y = id, colour = poke_deco)) +
+    geom_point(colour = "grey30") +
+  geom_text(aes(label = poke_deco), size = 2) +
+  # scale_colour_viridis_c() +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+
+
+```{r}
+df_gene |> 
+  ggplot(aes(x = release_date, y = id, colour = poke_deco)) +
+    geom_point(colour = "grey30") +
+  geom_text(aes(label = poke_deco), size = 2) +
+  # scale_colour_viridis_c() +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+
+## id ~ types ~ deco
+
+```{r fig.height=3, fig.width=5}
+df_gene |> 
+  ggplot(aes(x = id, fill = gen_poke |> as.factor())) +
+  geom_bar() +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+  # coord_flip()
+```
+これをランダムにドローしたときと比べてみたい。
+単なる枚数だとかわいい（けど実戦では使われない）弱いたねポケモンが多くなる気がする。それにさらにGXとかが加わって手を変え品を変え再利用する。
+
+リリース直後に多くなるのはミュージシャンのセトリとかでもそうだし、ファーストアルバムが結局みんなに好かれがち（Oasisの「けっきょくRadioheadにはみんなCreepしか期待していない」）というのも似ている。
+リリース直後ご祝儀をモデルに組み込んでみるか。
+すべてリリースごとにわけて、どれくらいで落ち着くか（平衡状態になるか）を見られそう。
 
 

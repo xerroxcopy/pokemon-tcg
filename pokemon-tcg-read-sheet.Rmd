@@ -1,6 +1,6 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output: rmarkdown::github_document
 ---
 
 # library
@@ -16,53 +16,25 @@ library(ggbeeswarm)
 
 # data
 
-## googlesheets4
+## prepare googlesheets4
 
-too slow, don't run
 
+`ss_input` is not used. Downloaded, unmodified version is available at `"./input/Pokemon TCG Spreadsheet V3.25.xlsx"`.
 ```{r}
-ss_input <- "https://docs.google.com/spreadsheets/d/1IkplPAxSxqEW8qIKH_KW3cDp7C261kNZ-AX-AmCxnMY/edit#gid=840081758"
+ss_input <- "https://docs.google.com/spreadsheets/d/1IkplPAxSxqEW8qIKH_KW3cDp7C261kNZ-AX-AmCxnMY/edit#gid=840081758" 
 ss_output <- "https://docs.google.com/spreadsheets/d/1VcVuCtDyKI5oqGsWJPKJGO7y-vIVZge6JrRqrE_kAQY/edit#gid=0"
-gs4_get(ss) # 126 sheets
-sheet_names <- sheet_names(ss_input)
-sheet_names2 <- sheet_names[-1] # remove "Overview" sheet
-
-test <- range_read(ss = ss, sheet = sheet_names2[2], range = "B1:B2")
-test |> pull()
-release_dates <- 
-  sheet_names2 |> 
-  map(~ range_read(ss = ss_input, sheet = .x, range = "B1:B2")) |> 
-  map(~ pull(.x)) # takes time and occasionally throws 429RESOURCE_EXHAUSTED error, but works eventually after several iteration
-
-
-release_dates |> reduce(c) # use reduce() instead of unlist(), cf. https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
-
-# now retrieve the pokemon data
-sheet_list <- map(
-  sheet_names2, 
-  ~ range_read(
-      ss = ss_input,
-      sheet = .x,
-      skip = 3
-    )
-) 
-
-# merge release_dates vector as a repeating column in each of the tibbles in the sheet_list list
-
-# sheet_list2 <-
-#   map2(.x = release_dates,
-#        .y = sheet_list,
-#        .f = omg)
 ```
 
-## use read_xlsx
+## read data
+
+For this scale of data, I'd rather use `read_xlsx()` instead of `googlesheets4::read_sheet()`
 
 ### release dates, series name
 
 ```{r}
 excel_path <- "./input/Pokemon TCG Spreadsheet V3.25.xlsx"
 sheet_names <- excel_sheets(excel_path)
-sheet_names2 <- sheet_names[-1]
+sheet_names2 <- sheet_names[-1] # remove "Overview" sheet
 
 release_dates <- 
   map(
@@ -113,13 +85,13 @@ release_dates_df2 <-
     lead = lead(gen),
     gen = if_else(is.na(gen), lead, gen),
     lead = NULL) 
-View(release_dates_df2)
-
-
+release_dates_df2
 ```
+
 #### release date, main expansion or not, from bulbagarden
 
-[Convert Wiki Tables to CSV](https://wikitable2csv.ggor.de/)を使って、Table Selectorを`.sortable`に設定して[bulbagarden](https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions)のテーブルを入手する。
+Use [Convert Wiki Tables to CSV](https://wikitable2csv.ggor.de/).
+Set the Table Selector to `.sortable` and fetch tables provided by [bulbagarden](https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions)
 |csv no.|content|name|
 |===|===|===|
 |1|Main expansions|`List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_1.csv`|
@@ -153,17 +125,22 @@ series_mcdonalds_df <- read_csv(
   mutate(series_class = "McDonalds Collection",
          `EN cards` = as.character(`EN cards`))
 series_mcdonalds_df
+```
+
+
+```{r}
 series_classification_df <- bind_rows(
   series_main_expansions_df, 
   series_special_expansions_df, 
   series_black_star_promos_df,
   series_pop_series_df,
   series_mcdonalds_df)
+series_classification_df
 ```
 
 #### merge with release dates df
 
-`series_classification_df `と`release_dates_df2`を合体させたい。
+Merge `series_classification_df ` with `release_dates_df2`
 ```{r}
 series_classification_df |> colnames()
 release_dates_df2 |> colnames()
@@ -196,11 +173,12 @@ series_classification_df2 <-
     into = c("cards_total_ja_1", "cards_total_ja_2"),
     fill = "right"
   )
+series_classification_df2
 ```
 
 
 ```{r}
-# separate release dates of Japanese versions that are release as separate series
+# separate release dates of Japanese versions that are released as separate series
 series_classification_df3 <- 
   series_classification_df2 |> 
   mutate(
@@ -226,8 +204,7 @@ series_classification_df3 <-
     ),
     release_date_ja_2 = str_replace(release_date_ja_2, "\\s\\*", "")
   )
-View(series_classification_df3)
-
+series_classification_df3
 ```
 
 
@@ -257,6 +234,7 @@ parse_date_time(
 )
 
 # run
+
 series_classification_df4 <-
   series_classification_df3 |> 
   mutate(
@@ -327,7 +305,11 @@ series_classification_df4 <-
       ) |> 
       parse_date_time(orders = "ybd"),
   )
-series_classification_df4 |> colnames()
+series_classification_df4
+```
+
+
+```{r}
 series_classification_df5 <- 
   series_classification_df4 |> 
   select(
@@ -342,14 +324,11 @@ series_classification_df5 <-
     release_date_ja_1,
     release_date_ja_2,
   )
-series_classification_df5 |> View()
+series_classification_df5
 ```
 
 [Multiple observations per row](https://tidyr.tidyverse.org/articles/pivot.html#multiple-observations-per-row)を参考に、`cards_total_ja`と`release_date_ja`を一気にpivot_longerすることが…できるのでは・・・
 ```{r}
-# 
-# 
-
 series_classification_df6 <-
   series_classification_df5 |> 
   # rowid_to_column("id") |>
@@ -362,8 +341,6 @@ series_classification_df6 <-
     values_drop_na = TRUE
   ) |> 
   select(-ja_variation)
-
-View(series_classification_df6)
 series_classification_df6
 ```
 
@@ -394,6 +371,7 @@ release_dates_df3 <-
     ),
     series = str_replace(series, "Pop", "POP")
   )
+release_dates_df3
 ```
 つぎに、Bulbapediaを母体に一緒にしつつもTrainer KitはBulbapediaのリストにはないため`series_class`に`Trainer Kit`を新設しつつ、`release_date`についてはBulbapediaを優先する。
 ```{r}
@@ -407,16 +385,20 @@ series_release_df1 <- full_join(
       case_when(
         str_detect(series, "Trainer\\sKit") ~ "Trainer Kit", 
         TRUE ~ series_class
-      ),
-    
-  ) 
+      )
+  )
+series_release_df1
+```
+
+
+```{r}
 df_series <- series_release_df1 |> 
   # select(release_date.x, release_date.y) |> 
   mutate(
     # indicate if the series is in V2.35 spreadsheet or 
     # only available on bulbagarden's list
     meta_is_bulba_only = is.na(release_date.y),
-    meta_is_v235_only = is.na(release_date.x),
+    meta_is_v325_only = is.na(release_date.x),
     release_date = 
       case_when(
         is.na(release_date.x) & !is.na(release_date.y) ~ release_date.y,
@@ -434,14 +416,38 @@ df_series <- series_release_df1 |>
         series == "Pokemon GO" ~ "Special Expansion",
         TRUE ~ series_class
       )
-  )
-
-View(df_series)
+  ) |> 
+  select(series_class, series, release_date, cards_total, gen, series_abb,  series_ja, release_date_ja, cards_total_ja, everything() )
+df_series # 157 x 11
 ```
 
+### df_series: colnames explanation
 
-# pokemon data
+```{r}
+df_series |> colnames()
 
+```
+
+|`colname`|`meaning`|str|
+|---|---|---|
+|`series_class`|Retrieved from Bulbagarden. Either `"Main Expansion"`, `"Special Expansion"`, `"Black Star Promo"`, `"Pop Series"`, `"McDonalds Collection"`, or `"Trainer Kit"`.|chr|
+| `series`|The name of the series. "`Neo Genesis`", "`Sun & Moon`" etc. The names are based on the ones listed in Bulbapedia, not the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613).|chr|
+|`release_date`|The release date of the series. The dates are based on the ones listed in Bulbapedia, not the ones on the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613), from which the Bulbapedia's date slightly differ. Release dates with no specific dates are converted to the 1st day of the month, e.g., `May 2003` -> `2003-05-01`.|POSIXct|
+|`cards_total`|the amount of total cards of the series, according to Bulbapedia. The official count is sometimes lower than this. This does not necessarily match the amount of total cards of the series that can be calculated from the card list. The card list is based on V3.25 spreadsheet and the data is not exhaustive.|int|
+|`gen`|generation of the series, from 1-8. This is based on V3.25 spreadsheet and may not match from Bulbapedia's classification (e.g., `Legendary Collection` classified as gen 1 in spreadsheet, gen 2 in Bulbapedia).|int|
+|`series_abb`|from Bulbapedia. might be useful for plotting to avoid overcrowding.|chr|
+|`series_ja`|Name of the series in Japanese version according to Bulbapedia.|chr|
+|`release_date_ja`||POSIXct|
+|`cards_total_ja`||int|
+|`meta_is_bulba_only`|`TRUE` if the series is only from Bulbapedia.|lgl|
+|`meta_is_v325_only`|`TRUE` if the series is only from spreadsheet. "Trainer Kit"s.|lgl|
+
+# card data
+
+
+## read raw
+
+using `sheet_names2` vector (which does not necessarily match the series names provided by Bulbapedia), read the excels.
 ```{r}
 raw_xlsx <- 
   map(
@@ -457,6 +463,9 @@ raw_xlsx <-
 raw_xlsx[[`Mcdonalds Collection 2014`]]
 ```
 
+## convert to df
+
+`raw_xlsx` is still a list. Convert it to df: 
 
 ```{r}
 pokemon_df_list <- 
@@ -482,7 +491,7 @@ everything_df_raw <-
   select(`Set #`, Name, Type, series)
 ```
 
-### Series名をBulbapediaに揃える
+### Match series names to Bulbapedia
 
 ```{r}
 everything_df_bulbanized <- 
@@ -511,7 +520,7 @@ everything_df_bulbanized <-
 
 ### Merge series df & poke df
 
-bulbaに揃えられたので、次にseries_typeとrelease_dateとgen目当てに合体させる
+Now that the series names are Bulbanized, merge these datasets to retrieve `series_type` and `release_date` and  `gen`:
 
 ```{r}
 everything_df_merged <-
@@ -527,18 +536,15 @@ everything_df_merged <-
 everything_df_merged |> 
   summarise(across(everything(), ~ sum(is.na(.))))
 
-View(everything_df_merged)
+everything_df_merged # 15029 x 11
 ```
 
-## fix typos
+## fix typos in Type
 
 "Fightning", "Coloress" etc.
 
 ```{r}
 everything_df_merged |> dim() # 15029 x 10
-# df_pokemon <- 
-#   everything_df_raw |> 
-#   filter(!Type %in% c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM", NA)) # 12349 rows
 ```
 
 
@@ -613,7 +619,7 @@ everything_df_coloured <- everything_df_typo |>
     Type2 = case_when(
       Type %in% mixed_types ~ "mixed",
       TRUE ~ Type),
-    is_pokemon = !Type %in% types_non_pokemon
+    is_pokemon = !Type %in% types_non_pokemon # TODO: 
   ) 
 
 ```
