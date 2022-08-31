@@ -1,0 +1,3 @@
+# doc for knitting
+gs4_auth()
+rmarkdown::render("./pokemon-tcg-read-sheet.Rmd")
