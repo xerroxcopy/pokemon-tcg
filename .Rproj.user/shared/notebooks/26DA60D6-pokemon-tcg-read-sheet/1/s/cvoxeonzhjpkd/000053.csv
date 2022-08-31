@@ -1,0 +1,17 @@
+"0","series_classification_df6 <-
+  series_classification_df5 |> 
+  # rowid_to_column(""id"") |>
+  pivot_longer(
+    !series_class:release_date,
+    # !series_class:release_date, 
+    names_to = c("".value"", ""ja_variation""),
+    names_pattern = ""(.*)_(1|2)"",
+    # names_sep = ""_"", 
+    values_drop_na = TRUE
+  ) |> 
+  select(-ja_variation, -)
+"
+"2","Error: unexpected ')' in:
+""  ) |> 
+  select(-ja_variation, -)""
+"

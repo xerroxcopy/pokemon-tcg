@@ -1,0 +1,28 @@
+"0","everything_df_date <- everything_df_coloured |> 
+  # filter(series %in% c(""EX Trainer Kit 2"", ""Pop Series 9"")) |>
+  mutate(
+    set = 
+      case_when(
+        str_detect(
+          `Set #`,
+          pattern = ""\\d{4}-\\d{2}-\\d{2}""
+        ) ~
+        # use {} to use dot operator more than once,
+        # and use %>% instead of base |> to do so. base pipe doesn't support it
+        ymd(`Set #`) %>%
+          {str_c(month(.), ""/"", day(.))}, # 11086 failed to parse
+        str_detect(
+          `Set #`,
+          pattern = ""\\d{5}.0""
+        ) ~
+        as.character(`Set #`) |> 
+          as.numeric() |>
+          as.Date(origin = ""1899/12/30"") %>%
+          {str_c(month(.), ""/"", day(.))}, # NAs introduced by coersion
+        TRUE ~ `Set #`
+      )
+  ) |> 
+  select(set, everything(), -`Set #`)
+"
+"2","Warning:  11655 failed to parse."
+"2","Warning: NAs introduced by coercion"

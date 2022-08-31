@@ -1,0 +1,302 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# library
+
+```{r}
+library(googlesheets4)
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(readxl)
+library(ggbeeswarm)
+```
+
+# data
+
+## googlesheets4
+
+too slow, don't run
+
+```{r}
+ss <- "https://docs.google.com/spreadsheets/d/1IkplPAxSxqEW8qIKH_KW3cDp7C261kNZ-AX-AmCxnMY/edit#gid=840081758"
+gs4_get(ss) # 126 sheets
+sheet_names <- sheet_names(ss)
+sheet_names2 <- sheet_names[-1] # remove "Overview" sheet
+
+test <- range_read(ss = ss, sheet = sheet_names2[2], range = "B1:B2")
+test |> pull()
+release_dates <- 
+  sheet_names2 |> 
+  map(~ range_read(ss = ss, sheet = .x, range = "B1:B2")) |> 
+  map(~ pull(.x)) # takes time and occasionally throws 429RESOURCE_EXHAUSTED error, but works eventually after several iteration
+
+
+release_dates |> reduce(c) # use reduce() instead of unlist(), cf. https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
+
+# now retrieve the pokemon data
+sheet_list <- map(
+  sheet_names2, 
+  ~ range_read(
+      ss = ss,
+      sheet = .x,
+      skip = 3
+    )
+) 
+
+# merge release_dates vector as a repeating column in each of the tibbles in the sheet_list list
+
+sheet_list2 <-
+  map2(.x = release_dates,
+       .y = sheet_list,
+       .f = omg)
+```
+
+## use read_xlsx
+
+
+### release dates, series name
+
+```{r}
+excel_path <- "./input/Pokemon TCG Spreadsheet V3.25.xlsx"
+sheet_names <- excel_sheets(excel_path)
+sheet_names2 <- sheet_names[-1]
+
+release_dates <- 
+  map(
+    sheet_names2,
+    ~ read_xlsx(
+      excel_path,
+      sheet = .x, 
+      range = "B1:B2"
+    )
+  ) |> 
+  map(~ pull(.x)) |> 
+  reduce(c)
+release_dates_df <- 
+  tibble(
+    series = sheet_names2, 
+    release_date = release_dates
+  )
+release_dates_df
+```
+
+### pokemon data
+```{r}
+raw_xlsx <- 
+  map(
+    sheet_names2,
+    ~ read_xlsx(
+      excel_path,
+      sheet = .x,
+      skip = 3
+    )
+  ) 
+
+raw_xlsx[[1]]
+pokemon_df_list <- 
+  map2(
+    .x = raw_xlsx,
+    .y = sheet_names2,
+    ~ mutate(.data = .x, series = rep(.y, nrow(.x)))
+  ) |> 
+  map(
+    ~ mutate(
+      .data = .x,
+      `Set #` = `Set #` |> as.character() # some are num, some are char
+    )
+  )
+
+# check if they are all char now
+pokemon_df_list[[1]]$`Set #` |> str()
+pokemon_df_list[[2]]$`Set #` |> str()
+
+pokemon_df_raw <- 
+  pokemon_df_list |> 
+  bind_rows() |> 
+  select(`Set #`, Name, Type, series) |> 
+  left_join(release_dates_df, by = "series")
+  
+View(pokemon_df_raw)
+```
+
+## fix typos
+
+"Fightning", "Coloress" etc.
+
+```{r}
+pokemon_df_raw |> dim() #14590 x 5
+pokemon_df_pokemon <- 
+  pokemon_df_raw |> 
+  filter(!Type %in% c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM", NA)) # 12349 rows
+
+# check typos
+
+pokemon_df_pokemon_summarised <- pokemon_df_pokemon |> 
+  group_by(Type) |> 
+  summarise(n = n()) |> 
+  arrange(n |> desc())
+pokemon_df_pokemon$Type |> unique()
+```
+
+TM=わざマシン(technical machine)らしい。なにそれ [ref](https://seesaawiki.jp/w/jester_the_pcg/d/%A5%EF%A5%B6%A5%DE%A5%B7%A5%F3)　ポケモンではないので上の方でOmitしています
+```{r}
+pokemon_df_typo <- pokemon_df_pokemon |> 
+  mutate(
+    Type = recode(Type, 
+      Fightning = "Fighting",
+      FIGHting = "Fighting",
+      Coloress = "Colorless",
+      Colorelss = "Colorless",
+      Normal = "Colorless",
+      Electric = "Lightning",
+      Lightnijg = "Lightning",
+      Lighting = "Lightning"
+    )
+  )
+View(pokemon_df_typo)
+pokemon_type_ranking <- pokemon_df_typo |>
+  group_by(Type) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n))
+major_types <- pokemon_type_ranking |> 
+  filter(n > 100) |> # omit type+type pokemons
+  select(Type) |> 
+  pull()
+```
+
+### color the types
+
+[kawaii](https://pokepalettes.com/)
+[palettetown and pokepal](https://github.com/timcdlucas/palettetown) not so much helpful here
+[r base color sucks](https://bookdown.org/hneth/ds4psy/D-3-apx-colors-basics.html)
+[manually pick colour](https://codepen.io/HunorMarton/details/eWvewo)
+
+
+```{r}
+df <- pokemon_df_typo |> 
+  mutate(
+    colour = recode(
+      Type, 
+      Water = "#80DDFF",
+      Grass= "#80FF82",
+      Psychic = "#361C63",
+      Colorless = "#D1D1D1",
+      Fighting = "#8F441E",
+      Fire = "#FF0F23",
+      Lightning = "#F0C800",
+      Darkness = "#1D1D1B", # black
+      Metal = "#463F43", # silver
+      Dragon = "#ABAD00", # gold
+      Fairy = "#FF4DAF" # purple
+    )
+  )
+colours_named_vector <- 
+  c("Water" = "#80DDFF",
+      "Grass"= "#80FF82",
+      "Psychic" = "#361C63",
+      "Colorless" = "#D1D1D1",
+      "Fighting" = "#8F441E",
+      "Fire" = "#FF0F23",
+      "Lightning" = "#F0C800",
+      "Darkness" = "#1D1D1B", # black
+      "Metal" = "#463F43", # silver
+      "Dragon" = "#ABAD00", # gold
+      "Fairy" = "#FF4DAF" # purple
+    )
+```
+
+# plot types
+
+### geom_count
+
+```{r}
+
+df |> 
+  filter(Type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      y = Type,
+      colour = colour
+    )
+  ) +
+  # geom_quasirandom(groupOnX = FALSE, size = .3,) +
+  geom_count(alpha = .3) +
+  theme_minimal() +
+  scale_colour_identity() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+ggsave("./output/ReleaseDate-TypeCount.png", width = 1500, height = 1000, unit = "px")
+```
+
+### 折れ線
+
+```{r}
+df |> 
+  filter(Type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = Type,
+      fill = Type
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin") +
+  theme_minimal() +
+  scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+ggsave("./output/ReleaseDate-TypeCountArea.png", width = 1500, height = 1000, unit = "px")
+```
+###シェア争い
+
+[make geom_area proportional](https://stackoverflow.com/questions/45438665/create-proportional-geom-area-plot-directly-in-ggplot2)
+```{r}
+df |> 
+  filter(Type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = Type,
+      fill = Type
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+ggsave("./output/ReleaseDate-TypeCountAreaShare.png", width = 1500, height = 1000, unit = "px")
+```
+
+# gen
+
+TODO: add Gen data from "Overview" sheet
+
+```{r}
+release_dates_df |> View()
+release_dates_df |> 
+  mutate(
+    gen = case_when(
+      release_date < ymd("2000-04-02") ~ "1",
+      TRUE ~ "other"
+    )
+  )
+
+```
+

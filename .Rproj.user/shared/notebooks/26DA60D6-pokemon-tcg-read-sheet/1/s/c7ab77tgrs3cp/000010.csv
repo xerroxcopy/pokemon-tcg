@@ -1,0 +1,34 @@
+"0","sheet_write(
+  df_series,
+  ss = ss_output,
+  sheet = ""series_global""
+  )
+"
+"2","The [34mgooglesheets4[39m package is requesting access to your Google account.
+"
+"2","Select a pre-authorised account or enter '0' to obtain a new token.
+"
+"2","Press Esc/Ctrl + C to cancel.
+"
+"1",""
+"1","
+"
+"1","1: frail.aenima@gmail.com"
+"1","
+"
+"1","2: matsui-minoru@aiit.ac.jp"
+"1","
+"
+"1","3: xerroxcopy@gmail.com"
+"1","
+"
+"1",""
+"1","
+"
+"0","3"
+"2","Auto-refreshing stale OAuth token.
+"
+"2","[32m✔[39m Writing to [36mpokemon tcg machine readable spreadsheet[39m.
+"
+"2","[32m✔[39m Writing to sheet [32mseries_global[39m.
+"

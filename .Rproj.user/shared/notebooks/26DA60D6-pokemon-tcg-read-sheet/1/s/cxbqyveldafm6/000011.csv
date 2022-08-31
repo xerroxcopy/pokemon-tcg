@@ -1,0 +1,34 @@
+"0","everything_df_card_no <- everything_df_date |> 
+  mutate(
+    card_number = 
+      case_when(
+        str_detect(set, "".?/.?"") ~
+          str_extract(
+            set, 
+            ""(?<=[:alpha:]{0,3})\\d+(?=[:lower:]{0,1}/)""
+          ) |> 
+          as.integer(),
+        str_detect(set, ""\\d+"") ~
+          str_extract(set, ""\\d+"") |> as.integer(),
+        str_detect(set, ""\\d+$"") ~
+          str_extract(set, ""\\d+$"") |> as.integer(),
+        # str_detect(set, ""[A-Z]+\\d+"") ~
+        #   str_extract(set, ""\\d"")
+        TRUE ~ NA_integer_
+      ),
+    cards_total_official = 
+      if_else(
+        str_detect(set, "".?/.?""),
+        str_extract(
+          set,
+          ""(?<=/[:alpha:]{0,3})\\d+""
+        ) |> 
+        as.integer(),
+        NA_integer_
+      ),
+    is_secret_card =  (card_number > card_total) # !is.na(card_total) &&
+  )
+"
+"2","Error in `$<-.data.frame`(`*tmp*`, ""call_text"", value = c(""dplyr::mutate(...)"",  : 
+  replacement has 8 rows, data has 4
+"
