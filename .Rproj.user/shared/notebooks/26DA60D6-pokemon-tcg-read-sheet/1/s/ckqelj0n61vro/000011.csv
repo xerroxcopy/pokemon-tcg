@@ -1,7 +1,0 @@
-"0","series_classification_df <- bind_rows("
-"0","  series_main_expansions_df, "
-"0","  series_special_expansions_df, "
-"0","  series_black_star_promos_df,"
-"0","  series_pop_series_df,"
-"0","  series_mcdonalds_df)"
-"0","series_classification_df"

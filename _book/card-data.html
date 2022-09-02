@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 card data | Machine Readable Pokémon Get daze</title>
+  <meta name="description" content="2 card data | Machine Readable Pokémon Get daze" />
+  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 card data | Machine Readable Pokémon Get daze" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 card data | Machine Readable Pokémon Get daze" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="import-the-spreadsheets.html"/>
+<link rel="next" href="name-the-final-df-df-and-export.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html"><i class="fa fa-check"></i><b>1</b> Import the spreadsheets</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#library"><i class="fa fa-check"></i><b>1.1</b> library</a></li>
+<li class="chapter" data-level="1.2" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#read-data"><i class="fa fa-check"></i><b>1.2</b> read data</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#release-dates-series-name"><i class="fa fa-check"></i><b>1.2.1</b> release dates, series name</a></li>
+<li class="chapter" data-level="1.2.2" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#df_series-colnames-explanation"><i class="fa fa-check"></i><b>1.2.2</b> df_series: colnames explanation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="card-data.html"><a href="card-data.html"><i class="fa fa-check"></i><b>2</b> card data</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="card-data.html"><a href="card-data.html#read-raw"><i class="fa fa-check"></i><b>2.1</b> read raw</a></li>
+<li class="chapter" data-level="2.2" data-path="card-data.html"><a href="card-data.html#convert-to-df"><i class="fa fa-check"></i><b>2.2</b> convert to df</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="card-data.html"><a href="card-data.html#match-series-names-to-bulbapedia"><i class="fa fa-check"></i><b>2.2.1</b> Match series names to Bulbapedia</a></li>
+<li class="chapter" data-level="2.2.2" data-path="card-data.html"><a href="card-data.html#merge-series-df-poke-df"><i class="fa fa-check"></i><b>2.2.2</b> Merge series df &amp; poke df</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="card-data.html"><a href="card-data.html#fix-typos-in-type"><i class="fa fa-check"></i><b>2.3</b> fix typos in Type</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="card-data.html"><a href="card-data.html#color-the-types"><i class="fa fa-check"></i><b>2.3.1</b> color the types</a></li>
+<li class="chapter" data-level="2.3.2" data-path="card-data.html"><a href="card-data.html#repair-set-numbers-that-are-converted-to-dates"><i class="fa fa-check"></i><b>2.3.2</b> repair set numbers that are converted to Dates</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="card-data.html"><a href="card-data.html#card-number-promo-or-not"><i class="fa fa-check"></i><b>2.4</b> card number, promo or not</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="name-the-final-df-df-and-export.html"><a href="name-the-final-df-df-and-export.html"><i class="fa fa-check"></i><b>3</b> name the final df df, and export</a></li>
+<li class="chapter" data-level="4" data-path="df_names.html"><a href="df_names.html"><i class="fa fa-check"></i><b>4</b> df_names</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="df_names.html"><a href="df_names.html#pokemon-sequencing"><i class="fa fa-check"></i><b>4.1</b> pokemon sequencing</a></li>
+<li class="chapter" data-level="4.2" data-path="df_names.html"><a href="df_names.html#remove-pokemon-name-from-original-name-to-extract-subgenes"><i class="fa fa-check"></i><b>4.2</b> remove pokemon name from original name to extract subgenes</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="plot-types.html"><a href="plot-types.html"><i class="fa fa-check"></i><b>5</b> plot types</a>
+<ul>
+<li class="chapter" data-level="5.0.1" data-path="plot-types.html"><a href="plot-types.html#geom_count"><i class="fa fa-check"></i><b>5.0.1</b> geom_count</a></li>
+<li class="chapter" data-level="5.0.2" data-path="plot-types.html"><a href="plot-types.html#折れ線"><i class="fa fa-check"></i><b>5.0.2</b> 折れ線</a></li>
+<li class="chapter" data-level="5.0.3" data-path="plot-types.html"><a href="plot-types.html#series-type-cards_total-time"><i class="fa fa-check"></i><b>5.0.3</b> series type ~ cards_total~ time</a></li>
+<li class="chapter" data-level="5.1" data-path="plot-types.html"><a href="plot-types.html#シェア争い"><i class="fa fa-check"></i><b>5.1</b> シェア争い</a></li>
+<li class="chapter" data-level="5.2" data-path="plot-types.html"><a href="plot-types.html#proportion-frequency"><i class="fa fa-check"></i><b>5.2</b> proportion, frequency</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="plot-types.html"><a href="plot-types.html#highlight-fairies"><i class="fa fa-check"></i><b>5.2.1</b> highlight fairies</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="plot-types.html"><a href="plot-types.html#secret-cards"><i class="fa fa-check"></i><b>5.3</b> secret cards</a></li>
+<li class="chapter" data-level="5.4" data-path="plot-types.html"><a href="plot-types.html#pokemon-genes"><i class="fa fa-check"></i><b>5.4</b> pokemon genes</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="plot-types.html"><a href="plot-types.html#pokemon-gen-share"><i class="fa fa-check"></i><b>5.4.1</b> pokemon gen share</a></li>
+<li class="chapter" data-level="5.4.2" data-path="plot-types.html"><a href="plot-types.html#pokemon-number"><i class="fa fa-check"></i><b>5.4.2</b> pokemon number</a></li>
+<li class="chapter" data-level="5.4.3" data-path="plot-types.html"><a href="plot-types.html#id-types-deco"><i class="fa fa-check"></i><b>5.4.3</b> id ~ types ~ deco</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="individual-poke.html"><a href="individual-poke.html"><i class="fa fa-check"></i><b>6</b> individual poke</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="individual-poke.html"><a href="individual-poke.html#まずはなにもせずカウント"><i class="fa fa-check"></i><b>6.1</b> まずはなにもせずカウント</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="individual-poke.html"><a href="individual-poke.html#ecdf"><i class="fa fa-check"></i><b>6.1.1</b> ECDF</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="individual-poke.html"><a href="individual-poke.html#plot-ecdf"><i class="fa fa-check"></i><b>6.2</b> plot ECDF</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="individual-poke.html"><a href="individual-poke.html#full-name"><i class="fa fa-check"></i><b>6.2.1</b> full name</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="random-draw.html"><a href="random-draw.html"><i class="fa fa-check"></i><b>7</b> random draw</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Readable Pokémon Get daze</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="card-data" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> card data<a href="card-data.html#card-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="read-raw" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> read raw<a href="card-data.html#read-raw" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>using <code>sheet_names2</code> vector (which does not necessarily match the series names provided by Bulbapedia), read the excels.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="card-data.html#cb34-1" aria-hidden="true" tabindex="-1"></a>raw_xlsx <span class="ot">&lt;-</span> </span>
+<span id="cb34-2"><a href="card-data.html#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb34-3"><a href="card-data.html#cb34-3" aria-hidden="true" tabindex="-1"></a>    sheet_names2,</span>
+<span id="cb34-4"><a href="card-data.html#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">read_xlsx</span>(</span>
+<span id="cb34-5"><a href="card-data.html#cb34-5" aria-hidden="true" tabindex="-1"></a>      excel_path,</span>
+<span id="cb34-6"><a href="card-data.html#cb34-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">sheet =</span> .x,</span>
+<span id="cb34-7"><a href="card-data.html#cb34-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">skip =</span> <span class="dv">3</span>,</span>
+<span id="cb34-8"><a href="card-data.html#cb34-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_types =</span> <span class="st">&quot;text&quot;</span></span>
+<span id="cb34-9"><a href="card-data.html#cb34-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb34-10"><a href="card-data.html#cb34-10" aria-hidden="true" tabindex="-1"></a>  ) </span></code></pre></div>
+</div>
+<div id="convert-to-df" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> convert to df<a href="card-data.html#convert-to-df" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><code>raw_xlsx</code> is still a list. Convert it to df:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="card-data.html#cb35-1" aria-hidden="true" tabindex="-1"></a>pokemon_df_list <span class="ot">&lt;-</span> </span>
+<span id="cb35-2"><a href="card-data.html#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2</span>(</span>
+<span id="cb35-3"><a href="card-data.html#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.x =</span> raw_xlsx,</span>
+<span id="cb35-4"><a href="card-data.html#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.y =</span> sheet_names2,</span>
+<span id="cb35-5"><a href="card-data.html#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">mutate</span>(<span class="at">.data =</span> .x, <span class="at">series =</span> <span class="fu">rep</span>(.y, <span class="fu">nrow</span>(.x)))</span>
+<span id="cb35-6"><a href="card-data.html#cb35-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb35-7"><a href="card-data.html#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb35-8"><a href="card-data.html#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">mutate</span>(</span>
+<span id="cb35-9"><a href="card-data.html#cb35-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">.data =</span> .x,</span>
+<span id="cb35-10"><a href="card-data.html#cb35-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Set #</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Set #</span><span class="st">`</span> <span class="sc">|&gt;</span> <span class="fu">as.character</span>() <span class="co"># some are num, some are char</span></span>
+<span id="cb35-11"><a href="card-data.html#cb35-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-12"><a href="card-data.html#cb35-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-13"><a href="card-data.html#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="co"># bind rows</span></span>
+<span id="cb35-14"><a href="card-data.html#cb35-14" aria-hidden="true" tabindex="-1"></a>everything_df_raw <span class="ot">&lt;-</span> </span>
+<span id="cb35-15"><a href="card-data.html#cb35-15" aria-hidden="true" tabindex="-1"></a>  pokemon_df_list <span class="sc">|&gt;</span> </span>
+<span id="cb35-16"><a href="card-data.html#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb35-17"><a href="card-data.html#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Type)) <span class="sc">|&gt;</span> <span class="co"># remove empty rows</span></span>
+<span id="cb35-18"><a href="card-data.html#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Set #</span><span class="st">`</span>, Name, Type, series)</span></code></pre></div>
+<div id="match-series-names-to-bulbapedia" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Match series names to Bulbapedia<a href="card-data.html#match-series-names-to-bulbapedia" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="card-data.html#cb36-1" aria-hidden="true" tabindex="-1"></a>everything_df_bulbanized <span class="ot">&lt;-</span> </span>
+<span id="cb36-2"><a href="card-data.html#cb36-2" aria-hidden="true" tabindex="-1"></a>  everything_df_raw <span class="sc">|&gt;</span> </span>
+<span id="cb36-3"><a href="card-data.html#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-4"><a href="card-data.html#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> <span class="fu">recode</span>(</span>
+<span id="cb36-5"><a href="card-data.html#cb36-5" aria-hidden="true" tabindex="-1"></a>      series,</span>
+<span id="cb36-6"><a href="card-data.html#cb36-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection 2021</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2021&quot;</span>,</span>
+<span id="cb36-7"><a href="card-data.html#cb36-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Champions Path</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Champion&#39;s Path&quot;</span>,</span>
+<span id="cb36-8"><a href="card-data.html#cb36-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sword and Shield</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Sword &amp; Shield&quot;</span>,</span>
+<span id="cb36-9"><a href="card-data.html#cb36-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sword and Shield Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SWSH Black Star Promos&quot;</span>,</span>
+<span id="cb36-10"><a href="card-data.html#cb36-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sun and Moon</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Sun &amp; Moon&quot;</span>,</span>
+<span id="cb36-11"><a href="card-data.html#cb36-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sun and Moon Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SM Black Star Promos&quot;</span>,</span>
+<span id="cb36-12"><a href="card-data.html#cb36-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Mcdonalds Collection 2015</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2015&quot;</span>,</span>
+<span id="cb36-13"><a href="card-data.html#cb36-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Mcdonalds Collection 2014</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2014&quot;</span>,</span>
+<span id="cb36-14"><a href="card-data.html#cb36-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection 2012</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2012&quot;</span>, <span class="co"># not Mcd!</span></span>
+<span id="cb36-15"><a href="card-data.html#cb36-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">X and Y</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;XY&quot;</span>,</span>
+<span id="cb36-16"><a href="card-data.html#cb36-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">X and Y Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;XY Black Star Promos&quot;</span>,</span>
+<span id="cb36-17"><a href="card-data.html#cb36-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection&quot;</span>,</span>
+<span id="cb36-18"><a href="card-data.html#cb36-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Black and White</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Black &amp; White&quot;</span>, </span>
+<span id="cb36-19"><a href="card-data.html#cb36-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">HeartGold and SoulSilver</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;HeartGold &amp; SoulSilver&quot;</span></span>
+<span id="cb36-20"><a href="card-data.html#cb36-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-21"><a href="card-data.html#cb36-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> <span class="fu">str_replace</span>(series, <span class="st">&quot;Pop&quot;</span>, <span class="st">&quot;POP&quot;</span>)</span>
+<span id="cb36-22"><a href="card-data.html#cb36-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="merge-series-df-poke-df" class="section level3 hasAnchor" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Merge series df &amp; poke df<a href="card-data.html#merge-series-df-poke-df" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Now that the series names are Bulbanized, merge these datasets to retrieve <code>series_type</code> and <code>release_date</code> and <code>series_gen</code>:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="card-data.html#cb37-1" aria-hidden="true" tabindex="-1"></a>df_series_en <span class="ot">&lt;-</span> df_series <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">!</span><span class="fu">ends_with</span>(<span class="st">&quot;_ja&quot;</span>))</span>
+<span id="cb37-2"><a href="card-data.html#cb37-2" aria-hidden="true" tabindex="-1"></a>everything_df_merged <span class="ot">&lt;-</span></span>
+<span id="cb37-3"><a href="card-data.html#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb37-4"><a href="card-data.html#cb37-4" aria-hidden="true" tabindex="-1"></a>    everything_df_bulbanized,</span>
+<span id="cb37-5"><a href="card-data.html#cb37-5" aria-hidden="true" tabindex="-1"></a>    df_series_en,</span>
+<span id="cb37-6"><a href="card-data.html#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;series&quot;</span>)</span>
+<span id="cb37-7"><a href="card-data.html#cb37-7" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb37-8"><a href="card-data.html#cb37-8" aria-hidden="true" tabindex="-1"></a>everything_df_merged <span class="co"># 15029 x 11</span></span></code></pre></div>
+</div>
+</div>
+<div id="fix-typos-in-type" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> fix typos in Type<a href="card-data.html#fix-typos-in-type" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>“Fightning”, “Coloress” etc.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="card-data.html#cb38-1" aria-hidden="true" tabindex="-1"></a>everything_df_merged <span class="sc">|&gt;</span> <span class="fu">dim</span>() <span class="co"># 15029 x 10</span></span></code></pre></div>
+<pre><code>## [1] 15029    11</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="card-data.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check typos</span></span>
+<span id="cb40-2"><a href="card-data.html#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="card-data.html#cb40-3" aria-hidden="true" tabindex="-1"></a>pokemon_df_summarised <span class="ot">&lt;-</span> everything_df_merged <span class="sc">|&gt;</span> </span>
+<span id="cb40-4"><a href="card-data.html#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Type) <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="card-data.html#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb40-6"><a href="card-data.html#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(n <span class="sc">|&gt;</span> <span class="fu">desc</span>())</span>
+<span id="cb40-7"><a href="card-data.html#cb40-7" aria-hidden="true" tabindex="-1"></a>everything_df_raw<span class="sc">$</span>Type <span class="sc">|&gt;</span> <span class="fu">unique</span>()</span></code></pre></div>
+<pre><code>##  [1] &quot;Lightning&quot;          &quot;Psychic&quot;            &quot;Colorless&quot;          &quot;Fire&quot;              
+##  [5] &quot;Grass&quot;              &quot;Trainer&quot;            &quot;Water&quot;              &quot;Metal&quot;             
+##  [9] &quot;Fighting&quot;           &quot;Stadium&quot;            &quot;Energy&quot;             &quot;FIGHting&quot;          
+## [13] &quot;Darkness&quot;           &quot;Tool&quot;               &quot;Fightning&quot;          &quot;Supporter&quot;         
+## [17] &quot;TM&quot;                 &quot;Grass/Darkness&quot;     &quot;Water/Darkness&quot;     &quot;Lightning/Darkness&quot;
+## [21] &quot;Fighting/Darkness&quot;  &quot;Psychic/Darkness&quot;   &quot;Fire/Darkness&quot;      &quot;Psychic/Metal&quot;     
+## [25] &quot;Darkness/Metal&quot;     &quot;Grass/Metal&quot;        &quot;Lightning/Metal&quot;    &quot;Fire/Metal&quot;        
+## [29] &quot;Fighting/Metal&quot;     &quot;Water/Metal&quot;        &quot;Lightnijg&quot;          &quot;Fire/Lightning&quot;    
+## [33] &quot;Lightning/Water&quot;    &quot;Water/Fire&quot;         &quot;Water/Fighting&quot;     &quot;Colorless/Psychic&quot; 
+## [37] &quot;Item&quot;               &quot;Dragon&quot;             &quot;Lighting&quot;           &quot;Fairy&quot;             
+## [41] &quot;Fire/Water&quot;         &quot;Normal&quot;             &quot;Grass/Fire&quot;         &quot;Lightning/Grass&quot;   
+## [45] &quot;Metal/Fighting&quot;     &quot;Fairy/Water&quot;        &quot;Fairy/Psychic&quot;      &quot;Electric&quot;          
+## [49] &quot;Colorelss&quot;          &quot;Coloress&quot;</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="card-data.html#cb42-1" aria-hidden="true" tabindex="-1"></a>everything_df_typo <span class="ot">&lt;-</span> everything_df_merged <span class="sc">|&gt;</span> </span>
+<span id="cb42-2"><a href="card-data.html#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-3"><a href="card-data.html#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type =</span> <span class="fu">recode</span>(Type, </span>
+<span id="cb42-4"><a href="card-data.html#cb42-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">Fightning =</span> <span class="st">&quot;Fighting&quot;</span>,</span>
+<span id="cb42-5"><a href="card-data.html#cb42-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">FIGHting =</span> <span class="st">&quot;Fighting&quot;</span>,</span>
+<span id="cb42-6"><a href="card-data.html#cb42-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">Coloress =</span> <span class="st">&quot;Colorless&quot;</span>,</span>
+<span id="cb42-7"><a href="card-data.html#cb42-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">Colorelss =</span> <span class="st">&quot;Colorless&quot;</span>,</span>
+<span id="cb42-8"><a href="card-data.html#cb42-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">Normal =</span> <span class="st">&quot;Colorless&quot;</span>,</span>
+<span id="cb42-9"><a href="card-data.html#cb42-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">Electric =</span> <span class="st">&quot;Lightning&quot;</span>,</span>
+<span id="cb42-10"><a href="card-data.html#cb42-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">Lightnijg =</span> <span class="st">&quot;Lightning&quot;</span>,</span>
+<span id="cb42-11"><a href="card-data.html#cb42-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">Lighting =</span> <span class="st">&quot;Lightning&quot;</span></span>
+<span id="cb42-12"><a href="card-data.html#cb42-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb42-13"><a href="card-data.html#cb42-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Name =</span> </span>
+<span id="cb42-14"><a href="card-data.html#cb42-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(</span>
+<span id="cb42-15"><a href="card-data.html#cb42-15" aria-hidden="true" tabindex="-1"></a>        Name, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>, <span class="st">&quot; &quot;</span></span>
+<span id="cb42-16"><a href="card-data.html#cb42-16" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> <span class="co"># Garados* δ EX Holon Phantoms 102/110 includes two spaces :(</span></span>
+<span id="cb42-17"><a href="card-data.html#cb42-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Dartix&quot;</span>, <span class="st">&quot;Dartrix&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-18"><a href="card-data.html#cb42-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">sForm</span><span class="sc">\\</span><span class="st">s&quot;</span>, <span class="st">&quot; Forme &quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-19"><a href="card-data.html#cb42-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Melmetal</span><span class="sc">\\</span><span class="st">sV&quot;</span>, <span class="st">&quot;MelmetalV&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-20"><a href="card-data.html#cb42-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Exeggutor</span><span class="sc">\\</span><span class="st">sV&quot;</span>, <span class="st">&quot;ExeggutorV&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-21"><a href="card-data.html#cb42-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Hatternee&quot;</span>, <span class="st">&quot;Hatterene&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-22"><a href="card-data.html#cb42-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Primal KyogreEK&quot;</span>, <span class="st">&quot;Primal KyogreEX&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-23"><a href="card-data.html#cb42-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;StaraptorFCLV.X&quot;</span>, <span class="st">&quot;StaraptorFBLV.X&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb42-24"><a href="card-data.html#cb42-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Sirfetch’d&quot;</span>, <span class="st">&quot;Sirfetch&#39;d&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb42-25"><a href="card-data.html#cb42-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(<span class="st">&quot;Castform</span><span class="sc">\\</span><span class="st">sRain</span><span class="sc">\\</span><span class="st">s&quot;</span>, <span class="st">&quot;Castform Rainy</span><span class="sc">\\</span><span class="st">s&quot;</span>), <span class="co"># </span><span class="al">TODO</span><span class="co">: move this to df typo</span></span>
+<span id="cb42-26"><a href="card-data.html#cb42-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type =</span> <span class="fu">if_else</span>(Name <span class="sc">==</span> <span class="st">&quot;Morty&quot;</span>, <span class="st">&quot;Supporter&quot;</span>, Type), <span class="co"># one of the two Morty incorrectly classified as &quot;Psychic&quot;</span></span>
+<span id="cb42-27"><a href="card-data.html#cb42-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-28"><a href="card-data.html#cb42-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-29"><a href="card-data.html#cb42-29" aria-hidden="true" tabindex="-1"></a>types_non_pokemon <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">&quot;Trainer&quot;</span>, <span class="st">&quot;Energy&quot;</span>, <span class="st">&quot;Supporter&quot;</span>, <span class="st">&quot;Item&quot;</span>, <span class="st">&quot;Stadium&quot;</span>, <span class="st">&quot;Tool&quot;</span>, <span class="st">&quot;TM&quot;</span>)</span>
+<span id="cb42-30"><a href="card-data.html#cb42-30" aria-hidden="true" tabindex="-1"></a>pokemon_type_ranking <span class="ot">&lt;-</span> everything_df_typo <span class="sc">|&gt;</span></span>
+<span id="cb42-31"><a href="card-data.html#cb42-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>Type <span class="sc">%in%</span> types_non_pokemon) <span class="sc">|&gt;</span> </span>
+<span id="cb42-32"><a href="card-data.html#cb42-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Type) <span class="sc">|&gt;</span> </span>
+<span id="cb42-33"><a href="card-data.html#cb42-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb42-34"><a href="card-data.html#cb42-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n))</span>
+<span id="cb42-35"><a href="card-data.html#cb42-35" aria-hidden="true" tabindex="-1"></a>major_types <span class="ot">&lt;-</span> pokemon_type_ranking <span class="sc">|&gt;</span> </span>
+<span id="cb42-36"><a href="card-data.html#cb42-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="co"># omit type+type pokemons</span></span>
+<span id="cb42-37"><a href="card-data.html#cb42-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Type) <span class="sc">|&gt;</span> </span>
+<span id="cb42-38"><a href="card-data.html#cb42-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
+<span id="cb42-39"><a href="card-data.html#cb42-39" aria-hidden="true" tabindex="-1"></a>mixed_types <span class="ot">&lt;-</span> pokemon_type_ranking <span class="sc">|&gt;</span> </span>
+<span id="cb42-40"><a href="card-data.html#cb42-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="co"># select type+type pokemons</span></span>
+<span id="cb42-41"><a href="card-data.html#cb42-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Type) <span class="sc">|&gt;</span> </span>
+<span id="cb42-42"><a href="card-data.html#cb42-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span></code></pre></div>
+<div id="color-the-types" class="section level3 hasAnchor" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> color the types<a href="card-data.html#color-the-types" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><a href="https://pokepalettes.com/">kawaii</a>
+<a href="https://github.com/timcdlucas/palettetown">palettetown and pokepal</a> not so much helpful here
+<a href="https://bookdown.org/hneth/ds4psy/D-3-apx-colors-basics.html">r base color sucks</a>
+<a href="https://codepen.io/HunorMarton/details/eWvewo">manually pick colour</a></p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="card-data.html#cb43-1" aria-hidden="true" tabindex="-1"></a>everything_df_coloured <span class="ot">&lt;-</span> everything_df_typo <span class="sc">|&gt;</span> </span>
+<span id="cb43-2"><a href="card-data.html#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb43-3"><a href="card-data.html#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="fu">recode</span>(</span>
+<span id="cb43-4"><a href="card-data.html#cb43-4" aria-hidden="true" tabindex="-1"></a>      Type, </span>
+<span id="cb43-5"><a href="card-data.html#cb43-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">Water =</span> <span class="st">&quot;#80DDFF&quot;</span>,</span>
+<span id="cb43-6"><a href="card-data.html#cb43-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">Grass =</span> <span class="st">&quot;#80FF82&quot;</span>,</span>
+<span id="cb43-7"><a href="card-data.html#cb43-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">Psychic =</span> <span class="st">&quot;#361C63&quot;</span>,</span>
+<span id="cb43-8"><a href="card-data.html#cb43-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">Colorless =</span> <span class="st">&quot;#D1D1D1&quot;</span>,</span>
+<span id="cb43-9"><a href="card-data.html#cb43-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">Fighting =</span> <span class="st">&quot;#8F441E&quot;</span>,</span>
+<span id="cb43-10"><a href="card-data.html#cb43-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">Fire =</span> <span class="st">&quot;#FF0F23&quot;</span>,</span>
+<span id="cb43-11"><a href="card-data.html#cb43-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">Lightning =</span> <span class="st">&quot;#F0C800&quot;</span>,</span>
+<span id="cb43-12"><a href="card-data.html#cb43-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">Darkness =</span> <span class="st">&quot;#1D1D1B&quot;</span>, <span class="co"># black</span></span>
+<span id="cb43-13"><a href="card-data.html#cb43-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">Metal =</span> <span class="st">&quot;#463F43&quot;</span>, <span class="co"># silver</span></span>
+<span id="cb43-14"><a href="card-data.html#cb43-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">Dragon =</span> <span class="st">&quot;#ABAD00&quot;</span>, <span class="co"># gold</span></span>
+<span id="cb43-15"><a href="card-data.html#cb43-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">Fairy =</span> <span class="st">&quot;#FF4DAF&quot;</span>, <span class="co"># purple</span></span>
+<span id="cb43-16"><a href="card-data.html#cb43-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb43-17"><a href="card-data.html#cb43-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type2 =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-18"><a href="card-data.html#cb43-18" aria-hidden="true" tabindex="-1"></a>      Type <span class="sc">%in%</span> mixed_types <span class="sc">~</span> <span class="st">&quot;mixed&quot;</span>,</span>
+<span id="cb43-19"><a href="card-data.html#cb43-19" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> Type),</span>
+<span id="cb43-20"><a href="card-data.html#cb43-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_pokemon =</span> <span class="sc">!</span>Type <span class="sc">%in%</span> types_non_pokemon <span class="sc">|</span> Name <span class="sc">!=</span> <span class="st">&quot;Buried Fossil&quot;</span> <span class="co"># tricky edge case: Buried Fossil is not a pokemon but Colorless item that can be used like a pokemon.</span></span>
+<span id="cb43-21"><a href="card-data.html#cb43-21" aria-hidden="true" tabindex="-1"></a>  ) </span></code></pre></div>
+<p><em>colours</em></p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="card-data.html#cb44-1" aria-hidden="true" tabindex="-1"></a>colours_named_vector <span class="ot">&lt;-</span> </span>
+<span id="cb44-2"><a href="card-data.html#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Water&quot;</span> <span class="ot">=</span> <span class="st">&quot;#80DDFF&quot;</span>,</span>
+<span id="cb44-3"><a href="card-data.html#cb44-3" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Grass&quot;</span><span class="ot">=</span> <span class="st">&quot;#80FF82&quot;</span>,</span>
+<span id="cb44-4"><a href="card-data.html#cb44-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Psychic&quot;</span> <span class="ot">=</span> <span class="st">&quot;#361C63&quot;</span>,</span>
+<span id="cb44-5"><a href="card-data.html#cb44-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Colorless&quot;</span> <span class="ot">=</span> <span class="st">&quot;#D1D1D1&quot;</span>,</span>
+<span id="cb44-6"><a href="card-data.html#cb44-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Fighting&quot;</span> <span class="ot">=</span> <span class="st">&quot;#8F441E&quot;</span>,</span>
+<span id="cb44-7"><a href="card-data.html#cb44-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Fire&quot;</span> <span class="ot">=</span> <span class="st">&quot;#FF0F23&quot;</span>,</span>
+<span id="cb44-8"><a href="card-data.html#cb44-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Lightning&quot;</span> <span class="ot">=</span> <span class="st">&quot;#F0C800&quot;</span>,</span>
+<span id="cb44-9"><a href="card-data.html#cb44-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Darkness&quot;</span> <span class="ot">=</span> <span class="st">&quot;#1D1D1B&quot;</span>, <span class="co"># black</span></span>
+<span id="cb44-10"><a href="card-data.html#cb44-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Metal&quot;</span> <span class="ot">=</span> <span class="st">&quot;#463F43&quot;</span>, <span class="co"># silver</span></span>
+<span id="cb44-11"><a href="card-data.html#cb44-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Dragon&quot;</span> <span class="ot">=</span> <span class="st">&quot;#ABAD00&quot;</span>, <span class="co"># gold</span></span>
+<span id="cb44-12"><a href="card-data.html#cb44-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Fairy&quot;</span> <span class="ot">=</span> <span class="st">&quot;#FF4DAF&quot;</span>, <span class="co"># purple</span></span>
+<span id="cb44-13"><a href="card-data.html#cb44-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;mixed&quot;</span> <span class="ot">=</span> <span class="st">&quot;black&quot;</span></span>
+<span id="cb44-14"><a href="card-data.html#cb44-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+</div>
+<div id="repair-set-numbers-that-are-converted-to-dates" class="section level3 hasAnchor" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> repair set numbers that are converted to Dates<a href="card-data.html#repair-set-numbers-that-are-converted-to-dates" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>test</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="card-data.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check problems</span></span>
+<span id="cb45-2"><a href="card-data.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;2022-04-22&quot;</span> <span class="sc">|&gt;</span> </span>
+<span id="cb45-3"><a href="card-data.html#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ymd</span>() <span class="sc">%&gt;%</span> <span class="co"># default pipe does not support {} in RHS</span></span>
+<span id="cb45-4"><a href="card-data.html#cb45-4" aria-hidden="true" tabindex="-1"></a>  {<span class="fu">str_c</span>(<span class="fu">month</span>(.), <span class="st">&quot;/&quot;</span>, <span class="fu">day</span>(.))}</span></code></pre></div>
+<pre><code>## [1] &quot;4/22&quot;</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="card-data.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pop series 9 1/17 Garchomp</span></span>
+<span id="cb47-2"><a href="card-data.html#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;44213.0&quot;</span> <span class="sc">|&gt;</span> </span>
+<span id="cb47-3"><a href="card-data.html#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb47-4"><a href="card-data.html#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.Date</span>(<span class="at">origin =</span> <span class="st">&quot;1899/12/30&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># excel date starts from 12/30</span></span>
+<span id="cb47-5"><a href="card-data.html#cb47-5" aria-hidden="true" tabindex="-1"></a>  {<span class="fu">str_c</span>(<span class="fu">month</span>(.), <span class="st">&quot;/&quot;</span>, <span class="fu">day</span>(.))}</span></code></pre></div>
+<pre><code>## [1] &quot;1/17&quot;</code></pre>
+<p>regex: <a href="https://rdrr.io/cran/stringi/man/about_search_regex.html">Rdrr</a></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="card-data.html#cb49-1" aria-hidden="true" tabindex="-1"></a>everything_df_date <span class="ot">&lt;-</span> everything_df_coloured <span class="sc">|&gt;</span> </span>
+<span id="cb49-2"><a href="card-data.html#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter(series %in% c(&quot;EX Trainer Kit 2&quot;, &quot;Pop Series 9&quot;)) |&gt;</span></span>
+<span id="cb49-3"><a href="card-data.html#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb49-4"><a href="card-data.html#cb49-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">set =</span> </span>
+<span id="cb49-5"><a href="card-data.html#cb49-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">case_when</span>(</span>
+<span id="cb49-6"><a href="card-data.html#cb49-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(</span>
+<span id="cb49-7"><a href="card-data.html#cb49-7" aria-hidden="true" tabindex="-1"></a>          <span class="st">`</span><span class="at">Set #</span><span class="st">`</span>,</span>
+<span id="cb49-8"><a href="card-data.html#cb49-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">pattern =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{4}-</span><span class="sc">\\</span><span class="st">d{2}-</span><span class="sc">\\</span><span class="st">d{2}&quot;</span></span>
+<span id="cb49-9"><a href="card-data.html#cb49-9" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">~</span></span>
+<span id="cb49-10"><a href="card-data.html#cb49-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># use {} to use dot operator more than once,</span></span>
+<span id="cb49-11"><a href="card-data.html#cb49-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># and use %&gt;% instead of base |&gt; to do so. base pipe doesn&#39;t support it</span></span>
+<span id="cb49-12"><a href="card-data.html#cb49-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ymd</span>(<span class="st">`</span><span class="at">Set #</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-13"><a href="card-data.html#cb49-13" aria-hidden="true" tabindex="-1"></a>          {<span class="fu">str_c</span>(<span class="fu">month</span>(.), <span class="st">&quot;/&quot;</span>, <span class="fu">day</span>(.))}, <span class="co"># 11086 failed to parse</span></span>
+<span id="cb49-14"><a href="card-data.html#cb49-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(</span>
+<span id="cb49-15"><a href="card-data.html#cb49-15" aria-hidden="true" tabindex="-1"></a>          <span class="st">`</span><span class="at">Set #</span><span class="st">`</span>,</span>
+<span id="cb49-16"><a href="card-data.html#cb49-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">pattern =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{5}.0&quot;</span></span>
+<span id="cb49-17"><a href="card-data.html#cb49-17" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">~</span></span>
+<span id="cb49-18"><a href="card-data.html#cb49-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.character</span>(<span class="st">`</span><span class="at">Set #</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb49-19"><a href="card-data.html#cb49-19" aria-hidden="true" tabindex="-1"></a>          <span class="fu">as.numeric</span>() <span class="sc">|&gt;</span></span>
+<span id="cb49-20"><a href="card-data.html#cb49-20" aria-hidden="true" tabindex="-1"></a>          <span class="fu">as.Date</span>(<span class="at">origin =</span> <span class="st">&quot;1899/12/30&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-21"><a href="card-data.html#cb49-21" aria-hidden="true" tabindex="-1"></a>          {<span class="fu">str_c</span>(<span class="fu">month</span>(.), <span class="st">&quot;/&quot;</span>, <span class="fu">day</span>(.))}, <span class="co"># NAs introduced by coersion</span></span>
+<span id="cb49-22"><a href="card-data.html#cb49-22" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">`</span><span class="at">Set #</span><span class="st">`</span></span>
+<span id="cb49-23"><a href="card-data.html#cb49-23" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb49-24"><a href="card-data.html#cb49-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb49-25"><a href="card-data.html#cb49-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(set, <span class="fu">everything</span>(), <span class="sc">-</span><span class="st">`</span><span class="at">Set #</span><span class="st">`</span>)</span></code></pre></div>
+<pre><code>## Warning: 11655 failed to parse.</code></pre>
+<pre><code>## Warning in as.Date(as.numeric(as.character(`Set #`)), origin = &quot;1899/12/30&quot;): NAs introduced
+## by coercion</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="card-data.html#cb52-1" aria-hidden="true" tabindex="-1"></a>everything_df_date</span></code></pre></div>
+<p>Ignore the warnings. Idk why it warns me that.</p>
+</div>
+</div>
+<div id="card-number-promo-or-not" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> card number, promo or not<a href="card-data.html#card-number-promo-or-not" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><a href="https://stringr.tidyverse.org/articles/regular-expressions">regex stringr</a>
+<a href="https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf">cheat sheet</a> look arounds</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="card-data.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># https://stackoverflow.com/questions/6109882/regex-match-all-characters-between-two-strings</span></span>
+<span id="cb53-2"><a href="card-data.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(&quot;BH233/BH244&quot;, &quot;(?&lt;=[:alpha:]{0,8})\\d+(?=/)&quot;)</span></span>
+<span id="cb53-3"><a href="card-data.html#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(&quot;50a/147&quot;, &quot;(?&lt;=[:alpha:]{0,8})\\d+(?=[:lower:]{0,1}/)&quot;)</span></span>
+<span id="cb53-4"><a href="card-data.html#cb53-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-5"><a href="card-data.html#cb53-5" aria-hidden="true" tabindex="-1"></a>everything_df_card_no <span class="ot">&lt;-</span> everything_df_date <span class="sc">|&gt;</span> </span>
+<span id="cb53-6"><a href="card-data.html#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb53-7"><a href="card-data.html#cb53-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">card_number =</span> </span>
+<span id="cb53-8"><a href="card-data.html#cb53-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">case_when</span>(</span>
+<span id="cb53-9"><a href="card-data.html#cb53-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(set, <span class="st">&quot;.?/.?&quot;</span>) <span class="sc">~</span></span>
+<span id="cb53-10"><a href="card-data.html#cb53-10" aria-hidden="true" tabindex="-1"></a>          <span class="fu">str_extract</span>(</span>
+<span id="cb53-11"><a href="card-data.html#cb53-11" aria-hidden="true" tabindex="-1"></a>            set, </span>
+<span id="cb53-12"><a href="card-data.html#cb53-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;(?&lt;=[:alpha:]{0,3})</span><span class="sc">\\</span><span class="st">d+(?=[:lower:]{0,1}/)&quot;</span></span>
+<span id="cb53-13"><a href="card-data.html#cb53-13" aria-hidden="true" tabindex="-1"></a>          ) <span class="sc">|&gt;</span> </span>
+<span id="cb53-14"><a href="card-data.html#cb53-14" aria-hidden="true" tabindex="-1"></a>          <span class="fu">as.integer</span>(),</span>
+<span id="cb53-15"><a href="card-data.html#cb53-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(set, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+&quot;</span>) <span class="sc">~</span></span>
+<span id="cb53-16"><a href="card-data.html#cb53-16" aria-hidden="true" tabindex="-1"></a>          <span class="fu">str_extract</span>(set, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb53-17"><a href="card-data.html#cb53-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(set, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+$&quot;</span>) <span class="sc">~</span></span>
+<span id="cb53-18"><a href="card-data.html#cb53-18" aria-hidden="true" tabindex="-1"></a>          <span class="fu">str_extract</span>(set, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+$&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb53-19"><a href="card-data.html#cb53-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># str_detect(set, &quot;[A-Z]+\\d+&quot;) ~</span></span>
+<span id="cb53-20"><a href="card-data.html#cb53-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   str_extract(set, &quot;\\d&quot;)</span></span>
+<span id="cb53-21"><a href="card-data.html#cb53-21" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_integer_</span></span>
+<span id="cb53-22"><a href="card-data.html#cb53-22" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb53-23"><a href="card-data.html#cb53-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">cards_total_official =</span> </span>
+<span id="cb53-24"><a href="card-data.html#cb53-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(</span>
+<span id="cb53-25"><a href="card-data.html#cb53-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(set, <span class="st">&quot;.?/.?&quot;</span>),</span>
+<span id="cb53-26"><a href="card-data.html#cb53-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_extract</span>(</span>
+<span id="cb53-27"><a href="card-data.html#cb53-27" aria-hidden="true" tabindex="-1"></a>          set,</span>
+<span id="cb53-28"><a href="card-data.html#cb53-28" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;(?&lt;=/[:alpha:]{0,3})</span><span class="sc">\\</span><span class="st">d+&quot;</span></span>
+<span id="cb53-29"><a href="card-data.html#cb53-29" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
+<span id="cb53-30"><a href="card-data.html#cb53-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.integer</span>(),</span>
+<span id="cb53-31"><a href="card-data.html#cb53-31" aria-hidden="true" tabindex="-1"></a>        <span class="cn">NA_integer_</span></span>
+<span id="cb53-32"><a href="card-data.html#cb53-32" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb53-33"><a href="card-data.html#cb53-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_secret_card =</span>  (card_number <span class="sc">&gt;</span> cards_total_official) <span class="co"># !is.na(card_total) &amp;&amp;</span></span>
+<span id="cb53-34"><a href="card-data.html#cb53-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb53-35"><a href="card-data.html#cb53-35" aria-hidden="true" tabindex="-1"></a>everything_df_card_no2 <span class="ot">&lt;-</span> </span>
+<span id="cb53-36"><a href="card-data.html#cb53-36" aria-hidden="true" tabindex="-1"></a>  everything_df_card_no <span class="sc">|&gt;</span> </span>
+<span id="cb53-37"><a href="card-data.html#cb53-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb53-38"><a href="card-data.html#cb53-38" aria-hidden="true" tabindex="-1"></a>    Name, </span>
+<span id="cb53-39"><a href="card-data.html#cb53-39" aria-hidden="true" tabindex="-1"></a>    series_gen, </span>
+<span id="cb53-40"><a href="card-data.html#cb53-40" aria-hidden="true" tabindex="-1"></a>    series, </span>
+<span id="cb53-41"><a href="card-data.html#cb53-41" aria-hidden="true" tabindex="-1"></a>    release_date, </span>
+<span id="cb53-42"><a href="card-data.html#cb53-42" aria-hidden="true" tabindex="-1"></a>    set, </span>
+<span id="cb53-43"><a href="card-data.html#cb53-43" aria-hidden="true" tabindex="-1"></a>    card_number, </span>
+<span id="cb53-44"><a href="card-data.html#cb53-44" aria-hidden="true" tabindex="-1"></a>    cards_total_official, </span>
+<span id="cb53-45"><a href="card-data.html#cb53-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">starts_with</span>(<span class="st">&quot;is_&quot;</span>),  </span>
+<span id="cb53-46"><a href="card-data.html#cb53-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">everything</span>()</span>
+<span id="cb53-47"><a href="card-data.html#cb53-47" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb53-48"><a href="card-data.html#cb53-48" aria-hidden="true" tabindex="-1"></a>everything_df_card_no2</span></code></pre></div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="import-the-spreadsheets.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="name-the-final-df-df-and-export.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

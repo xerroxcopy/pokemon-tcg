@@ -1,6 +1,0 @@
-"0","  select(-Name) |> 
-  distinct() |> 
-  mutate(ecdf2 = ecdf |> lead(default = 1))
-"
-"2","Error in select(-Name) : object 'Name' not found
-"

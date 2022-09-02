@@ -1,4 +1,4 @@
-R Notebook
+import pokemon spreadsheets
 ================
 
 # library
@@ -13,16 +13,6 @@ library(ggbeeswarm)
 ```
 
 # data
-
-## prepare googlesheets4
-
-`ss_input` is not used. Downloaded, unmodified version is available at
-`"./input/Pokemon TCG Spreadsheet V3.25.xlsx"`.
-
-``` r
-ss_input <- "https://docs.google.com/spreadsheets/d/1IkplPAxSxqEW8qIKH_KW3cDp7C261kNZ-AX-AmCxnMY/edit#gid=840081758" 
-ss_output <- "https://docs.google.com/spreadsheets/d/1VcVuCtDyKI5oqGsWJPKJGO7y-vIVZge6JrRqrE_kAQY/edit#gid=0"
-```
 
 ## read data
 
@@ -674,10 +664,10 @@ series_release_df1
 df_series <- series_release_df1 |> 
   # select(release_date.x, release_date.y) |> 
   mutate(
-    # indicate if the series is in V2.35 spreadsheet or 
+    # indicate if the series is in V3.25 spreadsheet or 
     # only available on bulbagarden's list
     meta_is_bulba_only = is.na(release_date.y),
-    meta_is_v325_only = is.na(release_date.x),
+    meta_is_v325_only = series_class == "Trainer Kit",
     release_date = 
       case_when(
         is.na(release_date.x) & !is.na(release_date.y) ~ release_date.y,
@@ -823,26 +813,6 @@ retrieve `series_type` and `release_date` and `series_gen`:
 
 ``` r
 df_series_en <- df_series |> select(!ends_with("_ja"))
-everything_df_bulbanized$series_gen
-```
-
-    ## Warning: Unknown or uninitialised column: `series_gen`.
-
-    ## NULL
-
-``` r
-df_series_en$series_gen
-```
-
-    ##   [1]  1  1  1  1  1  1  1  2  2  2  2 NA NA  1  2  2  2  2  2  3  3  3  3  3  3
-    ##  [26]  3  3  3  3  3  3  3  3  3  3  4  4  4  4  4  4  4  4  4  4  4  4  4  4 NA
-    ##  [51] NA  5  5  5  5  5  5  5  5  5  5  5  6  6  6  6  6  6  6  6  6  6  6  6  7
-    ##  [76]  7  7  7  7  7  7  7  7  7  7  7  8  8  8  8  8  8  8  8  8  8 NA  2 NA NA
-    ## [101] NA  6 NA  6 NA NA NA  7 NA NA  7  7  7 NA  8  8  8 NA  1  3  3  4  4 NA NA
-    ## [126]  6  7  8 NA NA  3  3  3  3 NA  4 NA  4  4  5  5 NA  6  6 NA NA NA NA  8 NA
-    ## [151]  3  3  4  6  6  6  8
-
-``` r
 everything_df_merged <-
   left_join(
     everything_df_bulbanized,
@@ -908,9 +878,6 @@ everything_df_raw$Type |> unique()
     ## [46] "Fairy/Water"        "Fairy/Psychic"      "Electric"          
     ## [49] "Colorelss"          "Coloress"
 
-TM=わざマシン(technical machine)らしい。なにそれ
-[ref](https://seesaawiki.jp/w/jester_the_pcg/d/%A5%EF%A5%B6%A5%DE%A5%B7%A5%F3)　~~ポケモンではないので上の方でOmitしています~~　後でします
-
 ``` r
 everything_df_typo <- everything_df_merged |> 
   mutate(
@@ -923,7 +890,21 @@ everything_df_typo <- everything_df_merged |>
       Electric = "Lightning",
       Lightnijg = "Lightning",
       Lighting = "Lightning"
-    )
+    ),
+    Name = 
+      str_replace(
+        Name, "\\s+", " "
+      ) |> # Garados* δ EX Holon Phantoms 102/110 includes two spaces :(
+      str_replace("Dartix", "Dartrix") |> 
+      str_replace("\\sForm\\s", " Forme ") |> 
+      str_replace("Melmetal\\sV", "MelmetalV") |> 
+      str_replace("Exeggutor\\sV", "ExeggutorV") |> 
+      str_replace("Hatternee", "Hatterene") |> 
+      str_replace("Primal KyogreEK", "Primal KyogreEX") |> 
+      str_replace("StaraptorFCLV.X", "StaraptorFBLV.X") |>
+      str_replace("Sirfetch’d", "Sirfetch'd") |> 
+      str_replace("Castform\\sRain\\s", "Castform Rainy\\s"), # TODO: move this to df typo
+    Type = if_else(Name == "Morty", "Supporter", Type), # one of the two Morty incorrectly classified as "Psychic"
   )
 
 types_non_pokemon <-  c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM")
@@ -970,7 +951,7 @@ everything_df_coloured <- everything_df_typo |>
     Type2 = case_when(
       Type %in% mixed_types ~ "mixed",
       TRUE ~ Type),
-    is_pokemon = !Type %in% types_non_pokemon # TODO: 
+    is_pokemon = !Type %in% types_non_pokemon | Name != "Buried Fossil" # tricky edge case: Buried Fossil is not a pokemon but Colorless item that can be used like a pokemon.
   ) 
 ```
 
@@ -1016,7 +997,7 @@ test
 
     ## [1] "1/17"
 
-regexについては[koko](https://rdrr.io/cran/stringi/man/about_search_regex.html)
+regex: [Rdrr](https://rdrr.io/cran/stringi/man/about_search_regex.html)
 
 ``` r
 everything_df_date <- everything_df_coloured |> 
@@ -1074,7 +1055,7 @@ everything_df_date
     ## #   ⁴​series_abb
     ## # ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
 
-Warningsはでるけど、きれいにフォーマットできている気がするので大丈夫かなと…。
+Ignore the warnings. Idk why it warns me that.
 
 ## card number, promo or not
 
@@ -1082,7 +1063,7 @@ Warningsはでるけど、きれいにフォーマットできている気がす
 stringr](https://stringr.tidyverse.org/articles/regular-expressions)
 [cheat
 sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf)
-look aroundsが使えそう
+look arounds
 
 ``` r
 # https://stackoverflow.com/questions/6109882/regex-match-all-characters-between-two-strings
@@ -1160,3 +1141,5 @@ everything_df_card_no2
 ``` r
 df <- everything_df_card_no2
 ```
+
+wrangle the `df` further in `pokemon-genes.Rmd` next.

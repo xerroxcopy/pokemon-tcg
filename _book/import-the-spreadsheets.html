@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>1 Import the spreadsheets | Machine Readable Pokémon Get daze</title>
+  <meta name="description" content="1 Import the spreadsheets | Machine Readable Pokémon Get daze" />
+  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="1 Import the spreadsheets | Machine Readable Pokémon Get daze" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="1 Import the spreadsheets | Machine Readable Pokémon Get daze" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="card-data.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html"><i class="fa fa-check"></i><b>1</b> Import the spreadsheets</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#library"><i class="fa fa-check"></i><b>1.1</b> library</a></li>
+<li class="chapter" data-level="1.2" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#read-data"><i class="fa fa-check"></i><b>1.2</b> read data</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#release-dates-series-name"><i class="fa fa-check"></i><b>1.2.1</b> release dates, series name</a></li>
+<li class="chapter" data-level="1.2.2" data-path="import-the-spreadsheets.html"><a href="import-the-spreadsheets.html#df_series-colnames-explanation"><i class="fa fa-check"></i><b>1.2.2</b> df_series: colnames explanation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="card-data.html"><a href="card-data.html"><i class="fa fa-check"></i><b>2</b> card data</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="card-data.html"><a href="card-data.html#read-raw"><i class="fa fa-check"></i><b>2.1</b> read raw</a></li>
+<li class="chapter" data-level="2.2" data-path="card-data.html"><a href="card-data.html#convert-to-df"><i class="fa fa-check"></i><b>2.2</b> convert to df</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="card-data.html"><a href="card-data.html#match-series-names-to-bulbapedia"><i class="fa fa-check"></i><b>2.2.1</b> Match series names to Bulbapedia</a></li>
+<li class="chapter" data-level="2.2.2" data-path="card-data.html"><a href="card-data.html#merge-series-df-poke-df"><i class="fa fa-check"></i><b>2.2.2</b> Merge series df &amp; poke df</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="card-data.html"><a href="card-data.html#fix-typos-in-type"><i class="fa fa-check"></i><b>2.3</b> fix typos in Type</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="card-data.html"><a href="card-data.html#color-the-types"><i class="fa fa-check"></i><b>2.3.1</b> color the types</a></li>
+<li class="chapter" data-level="2.3.2" data-path="card-data.html"><a href="card-data.html#repair-set-numbers-that-are-converted-to-dates"><i class="fa fa-check"></i><b>2.3.2</b> repair set numbers that are converted to Dates</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="card-data.html"><a href="card-data.html#card-number-promo-or-not"><i class="fa fa-check"></i><b>2.4</b> card number, promo or not</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="name-the-final-df-df-and-export.html"><a href="name-the-final-df-df-and-export.html"><i class="fa fa-check"></i><b>3</b> name the final df df, and export</a></li>
+<li class="chapter" data-level="4" data-path="df_names.html"><a href="df_names.html"><i class="fa fa-check"></i><b>4</b> df_names</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="df_names.html"><a href="df_names.html#pokemon-sequencing"><i class="fa fa-check"></i><b>4.1</b> pokemon sequencing</a></li>
+<li class="chapter" data-level="4.2" data-path="df_names.html"><a href="df_names.html#remove-pokemon-name-from-original-name-to-extract-subgenes"><i class="fa fa-check"></i><b>4.2</b> remove pokemon name from original name to extract subgenes</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="plot-types.html"><a href="plot-types.html"><i class="fa fa-check"></i><b>5</b> plot types</a>
+<ul>
+<li class="chapter" data-level="5.0.1" data-path="plot-types.html"><a href="plot-types.html#geom_count"><i class="fa fa-check"></i><b>5.0.1</b> geom_count</a></li>
+<li class="chapter" data-level="5.0.2" data-path="plot-types.html"><a href="plot-types.html#折れ線"><i class="fa fa-check"></i><b>5.0.2</b> 折れ線</a></li>
+<li class="chapter" data-level="5.0.3" data-path="plot-types.html"><a href="plot-types.html#series-type-cards_total-time"><i class="fa fa-check"></i><b>5.0.3</b> series type ~ cards_total~ time</a></li>
+<li class="chapter" data-level="5.1" data-path="plot-types.html"><a href="plot-types.html#シェア争い"><i class="fa fa-check"></i><b>5.1</b> シェア争い</a></li>
+<li class="chapter" data-level="5.2" data-path="plot-types.html"><a href="plot-types.html#proportion-frequency"><i class="fa fa-check"></i><b>5.2</b> proportion, frequency</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="plot-types.html"><a href="plot-types.html#highlight-fairies"><i class="fa fa-check"></i><b>5.2.1</b> highlight fairies</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="plot-types.html"><a href="plot-types.html#secret-cards"><i class="fa fa-check"></i><b>5.3</b> secret cards</a></li>
+<li class="chapter" data-level="5.4" data-path="plot-types.html"><a href="plot-types.html#pokemon-genes"><i class="fa fa-check"></i><b>5.4</b> pokemon genes</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="plot-types.html"><a href="plot-types.html#pokemon-gen-share"><i class="fa fa-check"></i><b>5.4.1</b> pokemon gen share</a></li>
+<li class="chapter" data-level="5.4.2" data-path="plot-types.html"><a href="plot-types.html#pokemon-number"><i class="fa fa-check"></i><b>5.4.2</b> pokemon number</a></li>
+<li class="chapter" data-level="5.4.3" data-path="plot-types.html"><a href="plot-types.html#id-types-deco"><i class="fa fa-check"></i><b>5.4.3</b> id ~ types ~ deco</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="individual-poke.html"><a href="individual-poke.html"><i class="fa fa-check"></i><b>6</b> individual poke</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="individual-poke.html"><a href="individual-poke.html#まずはなにもせずカウント"><i class="fa fa-check"></i><b>6.1</b> まずはなにもせずカウント</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="individual-poke.html"><a href="individual-poke.html#ecdf"><i class="fa fa-check"></i><b>6.1.1</b> ECDF</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="individual-poke.html"><a href="individual-poke.html#plot-ecdf"><i class="fa fa-check"></i><b>6.2</b> plot ECDF</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="individual-poke.html"><a href="individual-poke.html#full-name"><i class="fa fa-check"></i><b>6.2.1</b> full name</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="random-draw.html"><a href="random-draw.html"><i class="fa fa-check"></i><b>7</b> random draw</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Readable Pokémon Get daze</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="import-the-spreadsheets" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> Import the spreadsheets<a href="import-the-spreadsheets.html#import-the-spreadsheets" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="library" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> library<a href="import-the-spreadsheets.html#library" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="import-the-spreadsheets.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(googlesheets4)</span>
+<span id="cb1-2"><a href="import-the-spreadsheets.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="import-the-spreadsheets.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb1-4"><a href="import-the-spreadsheets.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-5"><a href="import-the-spreadsheets.html#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-6"><a href="import-the-spreadsheets.html#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggbeeswarm)</span></code></pre></div>
+</div>
+<div id="read-data" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> read data<a href="import-the-spreadsheets.html#read-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>For this scale of data, I’d rather use <code>read_xlsx()</code> instead of <code>googlesheets4::read_sheet()</code></p>
+<div id="release-dates-series-name" class="section level3 hasAnchor" number="1.2.1">
+<h3><span class="header-section-number">1.2.1</span> release dates, series name<a href="import-the-spreadsheets.html#release-dates-series-name" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="import-the-spreadsheets.html#cb2-1" aria-hidden="true" tabindex="-1"></a>excel_path <span class="ot">&lt;-</span> <span class="st">&quot;./input/Pokemon TCG Spreadsheet V3.25.xlsx&quot;</span></span>
+<span id="cb2-2"><a href="import-the-spreadsheets.html#cb2-2" aria-hidden="true" tabindex="-1"></a>sheet_names <span class="ot">&lt;-</span> <span class="fu">excel_sheets</span>(excel_path)</span>
+<span id="cb2-3"><a href="import-the-spreadsheets.html#cb2-3" aria-hidden="true" tabindex="-1"></a>sheet_names2 <span class="ot">&lt;-</span> sheet_names[<span class="sc">-</span><span class="dv">1</span>] <span class="co"># remove &quot;Overview&quot; sheet</span></span>
+<span id="cb2-4"><a href="import-the-spreadsheets.html#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="import-the-spreadsheets.html#cb2-5" aria-hidden="true" tabindex="-1"></a>release_dates <span class="ot">&lt;-</span> </span>
+<span id="cb2-6"><a href="import-the-spreadsheets.html#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb2-7"><a href="import-the-spreadsheets.html#cb2-7" aria-hidden="true" tabindex="-1"></a>    sheet_names2,</span>
+<span id="cb2-8"><a href="import-the-spreadsheets.html#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">read_xlsx</span>(</span>
+<span id="cb2-9"><a href="import-the-spreadsheets.html#cb2-9" aria-hidden="true" tabindex="-1"></a>      excel_path,</span>
+<span id="cb2-10"><a href="import-the-spreadsheets.html#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">sheet =</span> .x, </span>
+<span id="cb2-11"><a href="import-the-spreadsheets.html#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">range =</span> <span class="st">&quot;B1:B2&quot;</span></span>
+<span id="cb2-12"><a href="import-the-spreadsheets.html#cb2-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-13"><a href="import-the-spreadsheets.html#cb2-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-14"><a href="import-the-spreadsheets.html#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="sc">~</span> <span class="fu">pull</span>(.x)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-15"><a href="import-the-spreadsheets.html#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reduce</span>(c)</span>
+<span id="cb2-16"><a href="import-the-spreadsheets.html#cb2-16" aria-hidden="true" tabindex="-1"></a>release_dates_df <span class="ot">&lt;-</span> </span>
+<span id="cb2-17"><a href="import-the-spreadsheets.html#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb2-18"><a href="import-the-spreadsheets.html#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> sheet_names2, </span>
+<span id="cb2-19"><a href="import-the-spreadsheets.html#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> release_dates</span>
+<span id="cb2-20"><a href="import-the-spreadsheets.html#cb2-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-21"><a href="import-the-spreadsheets.html#cb2-21" aria-hidden="true" tabindex="-1"></a>release_dates_df</span>
+<span id="cb2-22"><a href="import-the-spreadsheets.html#cb2-22" aria-hidden="true" tabindex="-1"></a>overview_series_range <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-23"><a href="import-the-spreadsheets.html#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;D4:D12&quot;</span>,</span>
+<span id="cb2-24"><a href="import-the-spreadsheets.html#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;G4:G11&quot;</span>,</span>
+<span id="cb2-25"><a href="import-the-spreadsheets.html#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;J4:J26&quot;</span>,</span>
+<span id="cb2-26"><a href="import-the-spreadsheets.html#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;M4:M22&quot;</span>,</span>
+<span id="cb2-27"><a href="import-the-spreadsheets.html#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;D31:D43&quot;</span>,</span>
+<span id="cb2-28"><a href="import-the-spreadsheets.html#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;G31:G50&quot;</span>,</span>
+<span id="cb2-29"><a href="import-the-spreadsheets.html#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;J31:J47&quot;</span>,</span>
+<span id="cb2-30"><a href="import-the-spreadsheets.html#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;M31:M46&quot;</span></span>
+<span id="cb2-31"><a href="import-the-spreadsheets.html#cb2-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-32"><a href="import-the-spreadsheets.html#cb2-32" aria-hidden="true" tabindex="-1"></a>series_gen <span class="ot">&lt;-</span> </span>
+<span id="cb2-33"><a href="import-the-spreadsheets.html#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb2-34"><a href="import-the-spreadsheets.html#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">.x =</span> overview_series_range,</span>
+<span id="cb2-35"><a href="import-the-spreadsheets.html#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">read_xlsx</span>(</span>
+<span id="cb2-36"><a href="import-the-spreadsheets.html#cb2-36" aria-hidden="true" tabindex="-1"></a>      excel_path,</span>
+<span id="cb2-37"><a href="import-the-spreadsheets.html#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_names =</span> <span class="st">&quot;series&quot;</span>,</span>
+<span id="cb2-38"><a href="import-the-spreadsheets.html#cb2-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">sheet =</span> <span class="st">&quot;Overview&quot;</span>, </span>
+<span id="cb2-39"><a href="import-the-spreadsheets.html#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">range =</span> .x</span>
+<span id="cb2-40"><a href="import-the-spreadsheets.html#cb2-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-41"><a href="import-the-spreadsheets.html#cb2-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-42"><a href="import-the-spreadsheets.html#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2</span>(</span>
+<span id="cb2-43"><a href="import-the-spreadsheets.html#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">.y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,</span>
+<span id="cb2-44"><a href="import-the-spreadsheets.html#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">mutate</span>(<span class="at">.data =</span> .x, <span class="at">series_gen =</span> <span class="fu">rep</span>(.y, <span class="fu">nrow</span>(.x)))</span>
+<span id="cb2-45"><a href="import-the-spreadsheets.html#cb2-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb2-46"><a href="import-the-spreadsheets.html#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>()</span>
+<span id="cb2-47"><a href="import-the-spreadsheets.html#cb2-47" aria-hidden="true" tabindex="-1"></a>release_dates_df2 <span class="ot">&lt;-</span> </span>
+<span id="cb2-48"><a href="import-the-spreadsheets.html#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(release_dates_df, series_gen, <span class="at">by =</span> <span class="st">&quot;series&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-49"><a href="import-the-spreadsheets.html#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(release_date) <span class="sc">|&gt;</span> </span>
+<span id="cb2-50"><a href="import-the-spreadsheets.html#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-51"><a href="import-the-spreadsheets.html#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">lead =</span> <span class="fu">lead</span>(series_gen),</span>
+<span id="cb2-52"><a href="import-the-spreadsheets.html#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">series_gen =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(series_gen), lead, series_gen),</span>
+<span id="cb2-53"><a href="import-the-spreadsheets.html#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">lead =</span> <span class="cn">NULL</span>) </span>
+<span id="cb2-54"><a href="import-the-spreadsheets.html#cb2-54" aria-hidden="true" tabindex="-1"></a>release_dates_df2</span></code></pre></div>
+<div id="release-date-main-expansion-or-not-from-bulbagarden" class="section level4 hasAnchor" number="1.2.1.1">
+<h4><span class="header-section-number">1.2.1.1</span> release date, main expansion or not, from bulbagarden<a href="import-the-spreadsheets.html#release-date-main-expansion-or-not-from-bulbagarden" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Use <a href="https://wikitable2csv.ggor.de/">Convert Wiki Tables to CSV</a>.
+Set the Table Selector to <code>.sortable</code> and fetch tables provided by <a href="https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions">bulbagarden</a></p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>csv no.</th>
+<th>content</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Main expansions</td>
+<td><code>List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_1.csv</code></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Special expansions</td>
+<td><code>List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_2.csv</code></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Black Star Promos</td>
+<td><code>List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_3.csv</code></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>POP Series</td>
+<td><code>List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_4.csv</code></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>McDonald’s Collections</td>
+<td><code>List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_5.csv</code></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="import-the-spreadsheets.html#cb3-1" aria-hidden="true" tabindex="-1"></a>series_main_expansions_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb3-2"><a href="import-the-spreadsheets.html#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;./input/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_1.csv&quot;</span></span>
+<span id="cb3-3"><a href="import-the-spreadsheets.html#cb3-3" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="import-the-spreadsheets.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">series_class =</span> <span class="st">&quot;Main Expansion&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 95 Columns: 11
+## ── Column specification ─────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (11): EN no., JP no., EN symbol, JP symbol, English name, Japanese name, EN cards, JP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="import-the-spreadsheets.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(series_main_expansions_df)</span></code></pre></div>
+<pre><code>##  [1] &quot;EN no.&quot;          &quot;JP no.&quot;          &quot;EN symbol&quot;       &quot;JP symbol&quot;      
+##  [5] &quot;English name&quot;    &quot;Japanese name&quot;   &quot;EN cards&quot;        &quot;JP cards&quot;       
+##  [9] &quot;EN release date&quot; &quot;JP release date&quot; &quot;Set abb.&quot;        &quot;series_class&quot;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="import-the-spreadsheets.html#cb7-1" aria-hidden="true" tabindex="-1"></a>series_special_expansions_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb7-2"><a href="import-the-spreadsheets.html#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;./input/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_2.csv&quot;</span></span>
+<span id="cb7-3"><a href="import-the-spreadsheets.html#cb7-3" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="import-the-spreadsheets.html#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">series_class =</span> <span class="st">&quot;Special Expansion&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 21 Columns: 9
+## ── Column specification ─────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (9): EN symbol, JP symbol, English name, Japanese name, EN cards, JP cards, EN releas...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="import-the-spreadsheets.html#cb9-1" aria-hidden="true" tabindex="-1"></a>series_black_star_promos_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb9-2"><a href="import-the-spreadsheets.html#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;./input/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_3.csv&quot;</span></span>
+<span id="cb9-3"><a href="import-the-spreadsheets.html#cb9-3" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb9-4"><a href="import-the-spreadsheets.html#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">series_class =</span> <span class="st">&quot;Black Star Promo&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 8 Columns: 9
+## ── Column specification ─────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (8): JP symbol, English name, Japanese name, EN cards, JP cards, EN release date, JP ...
+## lgl (1): EN symbol
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="import-the-spreadsheets.html#cb11-1" aria-hidden="true" tabindex="-1"></a>series_pop_series_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb11-2"><a href="import-the-spreadsheets.html#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;./input/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_4.csv&quot;</span></span>
+<span id="cb11-3"><a href="import-the-spreadsheets.html#cb11-3" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-4"><a href="import-the-spreadsheets.html#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">series_class =</span> <span class="st">&quot;Pop Series&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 11 Columns: 9
+## ── Column specification ─────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (9): EN symbol, JP symbol, English name, Japanese name, EN cards, JP cards, EN releas...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="import-the-spreadsheets.html#cb13-1" aria-hidden="true" tabindex="-1"></a>series_mcdonalds_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb13-2"><a href="import-the-spreadsheets.html#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;./input/List_of_Pok%C3%A9mon_Trading_Card_Game_expansions_5.csv&quot;</span></span>
+<span id="cb13-3"><a href="import-the-spreadsheets.html#cb13-3" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-4"><a href="import-the-spreadsheets.html#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">series_class =</span> <span class="st">&quot;McDonalds Collection&quot;</span>,</span>
+<span id="cb13-5"><a href="import-the-spreadsheets.html#cb13-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">EN cards</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.character</span>(<span class="st">`</span><span class="at">EN cards</span><span class="st">`</span>))</span></code></pre></div>
+<pre><code>## Rows: 11 Columns: 9
+## ── Column specification ─────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (7): JP symbol, English name, Japanese name, JP cards, EN release date, JP release da...
+## dbl (1): EN cards
+## lgl (1): EN symbol
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="import-the-spreadsheets.html#cb15-1" aria-hidden="true" tabindex="-1"></a>series_mcdonalds_df</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="import-the-spreadsheets.html#cb16-1" aria-hidden="true" tabindex="-1"></a>series_classification_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb16-2"><a href="import-the-spreadsheets.html#cb16-2" aria-hidden="true" tabindex="-1"></a>  series_main_expansions_df, </span>
+<span id="cb16-3"><a href="import-the-spreadsheets.html#cb16-3" aria-hidden="true" tabindex="-1"></a>  series_special_expansions_df, </span>
+<span id="cb16-4"><a href="import-the-spreadsheets.html#cb16-4" aria-hidden="true" tabindex="-1"></a>  series_black_star_promos_df,</span>
+<span id="cb16-5"><a href="import-the-spreadsheets.html#cb16-5" aria-hidden="true" tabindex="-1"></a>  series_pop_series_df,</span>
+<span id="cb16-6"><a href="import-the-spreadsheets.html#cb16-6" aria-hidden="true" tabindex="-1"></a>  series_mcdonalds_df)</span>
+<span id="cb16-7"><a href="import-the-spreadsheets.html#cb16-7" aria-hidden="true" tabindex="-1"></a>series_classification_df</span></code></pre></div>
+</div>
+<div id="merge-with-release-dates-df" class="section level4 hasAnchor" number="1.2.1.2">
+<h4><span class="header-section-number">1.2.1.2</span> merge with release dates df<a href="import-the-spreadsheets.html#merge-with-release-dates-df" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Merge <code>series_classification_df</code> with <code>release_dates_df2</code></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="import-the-spreadsheets.html#cb17-1" aria-hidden="true" tabindex="-1"></a>series_classification_df <span class="sc">|&gt;</span> <span class="fu">colnames</span>()</span></code></pre></div>
+<pre><code>##  [1] &quot;EN no.&quot;          &quot;JP no.&quot;          &quot;EN symbol&quot;       &quot;JP symbol&quot;      
+##  [5] &quot;English name&quot;    &quot;Japanese name&quot;   &quot;EN cards&quot;        &quot;JP cards&quot;       
+##  [9] &quot;EN release date&quot; &quot;JP release date&quot; &quot;Set abb.&quot;        &quot;series_class&quot;</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="import-the-spreadsheets.html#cb19-1" aria-hidden="true" tabindex="-1"></a>release_dates_df2 <span class="sc">|&gt;</span> <span class="fu">colnames</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;series&quot;       &quot;release_date&quot; &quot;series_gen&quot;</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="import-the-spreadsheets.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(&quot;October, 2003 - September, 2006 &quot;, &quot;.+(?=\\s-)&quot;)</span></span>
+<span id="cb21-2"><a href="import-the-spreadsheets.html#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(&quot;September 7, 2018 &quot;, &quot;\\s\\*\\s|(?&lt;=[a-z]{3,10}\\s\\d{4})\\s&quot;)</span></span>
+<span id="cb21-3"><a href="import-the-spreadsheets.html#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb21-4"><a href="import-the-spreadsheets.html#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(</span></span>
+<span id="cb21-5"><a href="import-the-spreadsheets.html#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;January, 2003 - February, 2004 February, 2004 - July, 2006&quot;, </span></span>
+<span id="cb21-6"><a href="import-the-spreadsheets.html#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;\\s\\*\\s|(?&lt;=[a-z]{3,13},?\\s\\d{4})\\s(?!-)&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="import-the-spreadsheets.html#cb22-1" aria-hidden="true" tabindex="-1"></a>series_classification_df2 <span class="ot">&lt;-</span> </span>
+<span id="cb22-2"><a href="import-the-spreadsheets.html#cb22-2" aria-hidden="true" tabindex="-1"></a>  series_classification_df <span class="sc">|&gt;</span> </span>
+<span id="cb22-3"><a href="import-the-spreadsheets.html#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb22-4"><a href="import-the-spreadsheets.html#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> <span class="st">`</span><span class="at">English name</span><span class="st">`</span>,</span>
+<span id="cb22-5"><a href="import-the-spreadsheets.html#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">series_ja =</span> <span class="st">`</span><span class="at">Japanese name</span><span class="st">`</span>,</span>
+<span id="cb22-6"><a href="import-the-spreadsheets.html#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">series_abb =</span> <span class="st">`</span><span class="at">Set abb.</span><span class="st">`</span>,</span>
+<span id="cb22-7"><a href="import-the-spreadsheets.html#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cards_total =</span> <span class="st">`</span><span class="at">EN cards</span><span class="st">`</span>,</span>
+<span id="cb22-8"><a href="import-the-spreadsheets.html#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cards_total_ja =</span> <span class="st">`</span><span class="at">JP cards</span><span class="st">`</span>,</span>
+<span id="cb22-9"><a href="import-the-spreadsheets.html#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="st">`</span><span class="at">EN release date</span><span class="st">`</span>,</span>
+<span id="cb22-10"><a href="import-the-spreadsheets.html#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_ja =</span> <span class="st">`</span><span class="at">JP release date</span><span class="st">`</span>,</span>
+<span id="cb22-11"><a href="import-the-spreadsheets.html#cb22-11" aria-hidden="true" tabindex="-1"></a>         ) <span class="sc">|&gt;</span> </span>
+<span id="cb22-12"><a href="import-the-spreadsheets.html#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">EN symbol</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">JP symbol</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">EN no.</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">JP no.</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-13"><a href="import-the-spreadsheets.html#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># separate https://tidyr.tidyverse.org/reference/separate.html</span></span>
+<span id="cb22-14"><a href="import-the-spreadsheets.html#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
+<span id="cb22-15"><a href="import-the-spreadsheets.html#cb22-15" aria-hidden="true" tabindex="-1"></a>    cards_total_ja, </span>
+<span id="cb22-16"><a href="import-the-spreadsheets.html#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;cards_total_ja_1&quot;</span>, <span class="st">&quot;cards_total_ja_2&quot;</span>),</span>
+<span id="cb22-17"><a href="import-the-spreadsheets.html#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb22-18"><a href="import-the-spreadsheets.html#cb22-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-19"><a href="import-the-spreadsheets.html#cb22-19" aria-hidden="true" tabindex="-1"></a>series_classification_df2</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="import-the-spreadsheets.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># separate release dates of Japanese versions that are released as separate series</span></span>
+<span id="cb23-2"><a href="import-the-spreadsheets.html#cb23-2" aria-hidden="true" tabindex="-1"></a>series_classification_df3 <span class="ot">&lt;-</span> </span>
+<span id="cb23-3"><a href="import-the-spreadsheets.html#cb23-3" aria-hidden="true" tabindex="-1"></a>  series_classification_df2 <span class="sc">|&gt;</span> </span>
+<span id="cb23-4"><a href="import-the-spreadsheets.html#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-5"><a href="import-the-spreadsheets.html#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_ja =</span> </span>
+<span id="cb23-6"><a href="import-the-spreadsheets.html#cb23-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_replace</span>(</span>
+<span id="cb23-7"><a href="import-the-spreadsheets.html#cb23-7" aria-hidden="true" tabindex="-1"></a>        release_date_ja,</span>
+<span id="cb23-8"><a href="import-the-spreadsheets.html#cb23-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s</span><span class="sc">\\</span><span class="st">*</span><span class="sc">\\</span><span class="st">s|(?&lt;=[a-z]{3,13},?</span><span class="sc">\\</span><span class="st">s</span><span class="sc">\\</span><span class="st">d{4})</span><span class="sc">\\</span><span class="st">s(?!-)&quot;</span>,</span>
+<span id="cb23-9"><a href="import-the-spreadsheets.html#cb23-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;SEPARATE&quot;</span></span>
+<span id="cb23-10"><a href="import-the-spreadsheets.html#cb23-10" aria-hidden="true" tabindex="-1"></a>      )) <span class="sc">|&gt;</span> </span>
+<span id="cb23-11"><a href="import-the-spreadsheets.html#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
+<span id="cb23-12"><a href="import-the-spreadsheets.html#cb23-12" aria-hidden="true" tabindex="-1"></a>    release_date_ja, </span>
+<span id="cb23-13"><a href="import-the-spreadsheets.html#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;release_date_ja_1&quot;</span>, <span class="st">&quot;release_date_ja_2&quot;</span>),</span>
+<span id="cb23-14"><a href="import-the-spreadsheets.html#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s</span><span class="sc">\\</span><span class="st">*</span><span class="sc">\\</span><span class="st">s|SEPARATE&quot;</span>,</span>
+<span id="cb23-15"><a href="import-the-spreadsheets.html#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;right&quot;</span></span>
+<span id="cb23-16"><a href="import-the-spreadsheets.html#cb23-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb23-17"><a href="import-the-spreadsheets.html#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-18"><a href="import-the-spreadsheets.html#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb23-19"><a href="import-the-spreadsheets.html#cb23-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">everything</span>(), </span>
+<span id="cb23-20"><a href="import-the-spreadsheets.html#cb23-20" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">recode</span>(</span>
+<span id="cb23-21"><a href="import-the-spreadsheets.html#cb23-21" aria-hidden="true" tabindex="-1"></a>        .,</span>
+<span id="cb23-22"><a href="import-the-spreadsheets.html#cb23-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;—&quot;</span> <span class="ot">=</span> <span class="cn">NA_character_</span>, </span>
+<span id="cb23-23"><a href="import-the-spreadsheets.html#cb23-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Ongoing&quot;</span> <span class="ot">=</span> <span class="cn">NA_character_</span>)</span>
+<span id="cb23-24"><a href="import-the-spreadsheets.html#cb23-24" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb23-25"><a href="import-the-spreadsheets.html#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_ja_2 =</span> <span class="fu">str_replace</span>(release_date_ja_2, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s</span><span class="sc">\\</span><span class="st">*&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb23-26"><a href="import-the-spreadsheets.html#cb23-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-27"><a href="import-the-spreadsheets.html#cb23-27" aria-hidden="true" tabindex="-1"></a>series_classification_df3</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="import-the-spreadsheets.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test</span></span>
+<span id="cb24-2"><a href="import-the-spreadsheets.html#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(</span></span>
+<span id="cb24-3"><a href="import-the-spreadsheets.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;From February 9, 2021&quot;, </span></span>
+<span id="cb24-4"><a href="import-the-spreadsheets.html#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;)</span></span>
+<span id="cb24-5"><a href="import-the-spreadsheets.html#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(</span></span>
+<span id="cb24-6"><a href="import-the-spreadsheets.html#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;April - August, 2006&quot;, </span></span>
+<span id="cb24-7"><a href="import-the-spreadsheets.html#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;[:digit:]{4}&quot;)</span></span>
+<span id="cb24-8"><a href="import-the-spreadsheets.html#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(</span></span>
+<span id="cb24-9"><a href="import-the-spreadsheets.html#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;October 13th - November 26th, 2013&quot;, </span></span>
+<span id="cb24-10"><a href="import-the-spreadsheets.html#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;[:digit:]{4}&quot;)</span></span>
+<span id="cb24-11"><a href="import-the-spreadsheets.html#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># str_view_all(</span></span>
+<span id="cb24-12"><a href="import-the-spreadsheets.html#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;September, 2008 - March, 2009&quot;, </span></span>
+<span id="cb24-13"><a href="import-the-spreadsheets.html#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   &quot;[:digit:]{4}&quot;)</span></span>
+<span id="cb24-14"><a href="import-the-spreadsheets.html#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="import-the-spreadsheets.html#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co"># https://lubridate.tidyverse.org/reference/parse_date_time.html</span></span>
+<span id="cb24-16"><a href="import-the-spreadsheets.html#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="import-the-spreadsheets.html#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_date_time</span>(</span>
+<span id="cb24-18"><a href="import-the-spreadsheets.html#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="st">&quot;2021 February 21&quot;</span>,</span>
+<span id="cb24-19"><a href="import-the-spreadsheets.html#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">orders =</span> <span class="st">&quot;ybd&quot;</span></span>
+<span id="cb24-20"><a href="import-the-spreadsheets.html#cb24-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## [1] &quot;2021-02-21 UTC&quot;</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="import-the-spreadsheets.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run</span></span>
+<span id="cb26-2"><a href="import-the-spreadsheets.html#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="import-the-spreadsheets.html#cb26-3" aria-hidden="true" tabindex="-1"></a>series_classification_df4 <span class="ot">&lt;-</span></span>
+<span id="cb26-4"><a href="import-the-spreadsheets.html#cb26-4" aria-hidden="true" tabindex="-1"></a>  series_classification_df3 <span class="sc">|&gt;</span> </span>
+<span id="cb26-5"><a href="import-the-spreadsheets.html#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-6"><a href="import-the-spreadsheets.html#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_month =</span> </span>
+<span id="cb26-7"><a href="import-the-spreadsheets.html#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-8"><a href="import-the-spreadsheets.html#cb26-8" aria-hidden="true" tabindex="-1"></a>        release_date,</span>
+<span id="cb26-9"><a href="import-the-spreadsheets.html#cb26-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;</span></span>
+<span id="cb26-10"><a href="import-the-spreadsheets.html#cb26-10" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-11"><a href="import-the-spreadsheets.html#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_day =</span> </span>
+<span id="cb26-12"><a href="import-the-spreadsheets.html#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-13"><a href="import-the-spreadsheets.html#cb26-13" aria-hidden="true" tabindex="-1"></a>        release_date,</span>
+<span id="cb26-14"><a href="import-the-spreadsheets.html#cb26-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{1,3}(?=,)|[:digit:]{1,3}(?=[:lower:]{2})(?![:lower:]{2},)&quot;</span></span>
+<span id="cb26-15"><a href="import-the-spreadsheets.html#cb26-15" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> <span class="fu">replace_na</span>(<span class="at">replace =</span> <span class="st">&quot;1&quot;</span>),</span>
+<span id="cb26-16"><a href="import-the-spreadsheets.html#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_year =</span> </span>
+<span id="cb26-17"><a href="import-the-spreadsheets.html#cb26-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-18"><a href="import-the-spreadsheets.html#cb26-18" aria-hidden="true" tabindex="-1"></a>        release_date,</span>
+<span id="cb26-19"><a href="import-the-spreadsheets.html#cb26-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{4}&quot;</span></span>
+<span id="cb26-20"><a href="import-the-spreadsheets.html#cb26-20" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-21"><a href="import-the-spreadsheets.html#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> </span>
+<span id="cb26-22"><a href="import-the-spreadsheets.html#cb26-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_c</span>(</span>
+<span id="cb26-23"><a href="import-the-spreadsheets.html#cb26-23" aria-hidden="true" tabindex="-1"></a>        release_date_year, </span>
+<span id="cb26-24"><a href="import-the-spreadsheets.html#cb26-24" aria-hidden="true" tabindex="-1"></a>        release_date_month, </span>
+<span id="cb26-25"><a href="import-the-spreadsheets.html#cb26-25" aria-hidden="true" tabindex="-1"></a>        release_date_day</span>
+<span id="cb26-26"><a href="import-the-spreadsheets.html#cb26-26" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> </span>
+<span id="cb26-27"><a href="import-the-spreadsheets.html#cb26-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">parse_date_time</span>(<span class="at">orders =</span> <span class="st">&quot;ybd&quot;</span>),</span>
+<span id="cb26-28"><a href="import-the-spreadsheets.html#cb26-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_month =</span> </span>
+<span id="cb26-29"><a href="import-the-spreadsheets.html#cb26-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-30"><a href="import-the-spreadsheets.html#cb26-30" aria-hidden="true" tabindex="-1"></a>        release_date_ja_1,</span>
+<span id="cb26-31"><a href="import-the-spreadsheets.html#cb26-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;</span></span>
+<span id="cb26-32"><a href="import-the-spreadsheets.html#cb26-32" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-33"><a href="import-the-spreadsheets.html#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_day =</span> </span>
+<span id="cb26-34"><a href="import-the-spreadsheets.html#cb26-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-35"><a href="import-the-spreadsheets.html#cb26-35" aria-hidden="true" tabindex="-1"></a>        release_date_ja_1,</span>
+<span id="cb26-36"><a href="import-the-spreadsheets.html#cb26-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{1,3}(?=,)|[:digit:]{1,3}(?=[:lower:]{2})(?![:lower:]{2},)&quot;</span></span>
+<span id="cb26-37"><a href="import-the-spreadsheets.html#cb26-37" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> <span class="fu">replace_na</span>(<span class="at">replace =</span> <span class="st">&quot;1&quot;</span>),</span>
+<span id="cb26-38"><a href="import-the-spreadsheets.html#cb26-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_year =</span> </span>
+<span id="cb26-39"><a href="import-the-spreadsheets.html#cb26-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-40"><a href="import-the-spreadsheets.html#cb26-40" aria-hidden="true" tabindex="-1"></a>        release_date_ja_1,</span>
+<span id="cb26-41"><a href="import-the-spreadsheets.html#cb26-41" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{4}&quot;</span></span>
+<span id="cb26-42"><a href="import-the-spreadsheets.html#cb26-42" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-43"><a href="import-the-spreadsheets.html#cb26-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_ja_1 =</span> </span>
+<span id="cb26-44"><a href="import-the-spreadsheets.html#cb26-44" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_c</span>(</span>
+<span id="cb26-45"><a href="import-the-spreadsheets.html#cb26-45" aria-hidden="true" tabindex="-1"></a>        release_date_year, </span>
+<span id="cb26-46"><a href="import-the-spreadsheets.html#cb26-46" aria-hidden="true" tabindex="-1"></a>        release_date_month, </span>
+<span id="cb26-47"><a href="import-the-spreadsheets.html#cb26-47" aria-hidden="true" tabindex="-1"></a>        release_date_day</span>
+<span id="cb26-48"><a href="import-the-spreadsheets.html#cb26-48" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> </span>
+<span id="cb26-49"><a href="import-the-spreadsheets.html#cb26-49" aria-hidden="true" tabindex="-1"></a>      <span class="fu">parse_date_time</span>(<span class="at">orders =</span> <span class="st">&quot;ybd&quot;</span>),</span>
+<span id="cb26-50"><a href="import-the-spreadsheets.html#cb26-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_month =</span> </span>
+<span id="cb26-51"><a href="import-the-spreadsheets.html#cb26-51" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-52"><a href="import-the-spreadsheets.html#cb26-52" aria-hidden="true" tabindex="-1"></a>        release_date_ja_2,</span>
+<span id="cb26-53"><a href="import-the-spreadsheets.html#cb26-53" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;</span></span>
+<span id="cb26-54"><a href="import-the-spreadsheets.html#cb26-54" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-55"><a href="import-the-spreadsheets.html#cb26-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_day =</span> </span>
+<span id="cb26-56"><a href="import-the-spreadsheets.html#cb26-56" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-57"><a href="import-the-spreadsheets.html#cb26-57" aria-hidden="true" tabindex="-1"></a>        release_date_ja_2,</span>
+<span id="cb26-58"><a href="import-the-spreadsheets.html#cb26-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{1,3}(?=,)|[:digit:]{1,3}(?=[:lower:]{2})(?![:lower:]{2},)&quot;</span></span>
+<span id="cb26-59"><a href="import-the-spreadsheets.html#cb26-59" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> <span class="fu">replace_na</span>(<span class="at">replace =</span> <span class="st">&quot;1&quot;</span>),</span>
+<span id="cb26-60"><a href="import-the-spreadsheets.html#cb26-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_year =</span> </span>
+<span id="cb26-61"><a href="import-the-spreadsheets.html#cb26-61" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_extract</span>(</span>
+<span id="cb26-62"><a href="import-the-spreadsheets.html#cb26-62" aria-hidden="true" tabindex="-1"></a>        release_date_ja_2,</span>
+<span id="cb26-63"><a href="import-the-spreadsheets.html#cb26-63" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;[:digit:]{4}&quot;</span></span>
+<span id="cb26-64"><a href="import-the-spreadsheets.html#cb26-64" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb26-65"><a href="import-the-spreadsheets.html#cb26-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date_ja_2 =</span> </span>
+<span id="cb26-66"><a href="import-the-spreadsheets.html#cb26-66" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_c</span>(</span>
+<span id="cb26-67"><a href="import-the-spreadsheets.html#cb26-67" aria-hidden="true" tabindex="-1"></a>        release_date_year, </span>
+<span id="cb26-68"><a href="import-the-spreadsheets.html#cb26-68" aria-hidden="true" tabindex="-1"></a>        release_date_month, </span>
+<span id="cb26-69"><a href="import-the-spreadsheets.html#cb26-69" aria-hidden="true" tabindex="-1"></a>        release_date_day</span>
+<span id="cb26-70"><a href="import-the-spreadsheets.html#cb26-70" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span> </span>
+<span id="cb26-71"><a href="import-the-spreadsheets.html#cb26-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">parse_date_time</span>(<span class="at">orders =</span> <span class="st">&quot;ybd&quot;</span>),</span>
+<span id="cb26-72"><a href="import-the-spreadsheets.html#cb26-72" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-73"><a href="import-the-spreadsheets.html#cb26-73" aria-hidden="true" tabindex="-1"></a>series_classification_df4</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="import-the-spreadsheets.html#cb27-1" aria-hidden="true" tabindex="-1"></a>series_classification_df5 <span class="ot">&lt;-</span> </span>
+<span id="cb27-2"><a href="import-the-spreadsheets.html#cb27-2" aria-hidden="true" tabindex="-1"></a>  series_classification_df4 <span class="sc">|&gt;</span> </span>
+<span id="cb27-3"><a href="import-the-spreadsheets.html#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb27-4"><a href="import-the-spreadsheets.html#cb27-4" aria-hidden="true" tabindex="-1"></a>    series_class,</span>
+<span id="cb27-5"><a href="import-the-spreadsheets.html#cb27-5" aria-hidden="true" tabindex="-1"></a>    series,</span>
+<span id="cb27-6"><a href="import-the-spreadsheets.html#cb27-6" aria-hidden="true" tabindex="-1"></a>    series_abb,</span>
+<span id="cb27-7"><a href="import-the-spreadsheets.html#cb27-7" aria-hidden="true" tabindex="-1"></a>    series_ja,</span>
+<span id="cb27-8"><a href="import-the-spreadsheets.html#cb27-8" aria-hidden="true" tabindex="-1"></a>    cards_total,</span>
+<span id="cb27-9"><a href="import-the-spreadsheets.html#cb27-9" aria-hidden="true" tabindex="-1"></a>    release_date,</span>
+<span id="cb27-10"><a href="import-the-spreadsheets.html#cb27-10" aria-hidden="true" tabindex="-1"></a>    cards_total_ja_1,</span>
+<span id="cb27-11"><a href="import-the-spreadsheets.html#cb27-11" aria-hidden="true" tabindex="-1"></a>    cards_total_ja_2,</span>
+<span id="cb27-12"><a href="import-the-spreadsheets.html#cb27-12" aria-hidden="true" tabindex="-1"></a>    release_date_ja_1,</span>
+<span id="cb27-13"><a href="import-the-spreadsheets.html#cb27-13" aria-hidden="true" tabindex="-1"></a>    release_date_ja_2,</span>
+<span id="cb27-14"><a href="import-the-spreadsheets.html#cb27-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb27-15"><a href="import-the-spreadsheets.html#cb27-15" aria-hidden="true" tabindex="-1"></a>series_classification_df5</span></code></pre></div>
+<p><a href="https://tidyr.tidyverse.org/articles/pivot.html#multiple-observations-per-row">Multiple observations per row</a>を参考に、<code>cards_total_ja</code>と<code>release_date_ja</code>を一気にpivot_longerすることが…できるのでは・・・</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="import-the-spreadsheets.html#cb28-1" aria-hidden="true" tabindex="-1"></a>series_classification_df6 <span class="ot">&lt;-</span></span>
+<span id="cb28-2"><a href="import-the-spreadsheets.html#cb28-2" aria-hidden="true" tabindex="-1"></a>  series_classification_df5 <span class="sc">|&gt;</span> </span>
+<span id="cb28-3"><a href="import-the-spreadsheets.html#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rowid_to_column(&quot;id&quot;) |&gt;</span></span>
+<span id="cb28-4"><a href="import-the-spreadsheets.html#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb28-5"><a href="import-the-spreadsheets.html#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span>series_class<span class="sc">:</span>release_date,</span>
+<span id="cb28-6"><a href="import-the-spreadsheets.html#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># !series_class:release_date, </span></span>
+<span id="cb28-7"><a href="import-the-spreadsheets.html#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">&quot;.value&quot;</span>, <span class="st">&quot;ja_variation&quot;</span>),</span>
+<span id="cb28-8"><a href="import-the-spreadsheets.html#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_pattern =</span> <span class="st">&quot;(.*)_(1|2)&quot;</span>,</span>
+<span id="cb28-9"><a href="import-the-spreadsheets.html#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># names_sep = &quot;_&quot;, </span></span>
+<span id="cb28-10"><a href="import-the-spreadsheets.html#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_drop_na =</span> <span class="cn">TRUE</span></span>
+<span id="cb28-11"><a href="import-the-spreadsheets.html#cb28-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb28-12"><a href="import-the-spreadsheets.html#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ja_variation)</span>
+<span id="cb28-13"><a href="import-the-spreadsheets.html#cb28-13" aria-hidden="true" tabindex="-1"></a>series_classification_df6</span></code></pre></div>
+</div>
+<div id="join" class="section level4 hasAnchor" number="1.2.1.3">
+<h4><span class="header-section-number">1.2.1.3</span> join<a href="import-the-spreadsheets.html#join" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>表記ゆれや数日程度の<code>release_date</code>のずれがある。基本的にBulbapediaのものにあわせる
+sheet名もそれに伴って書き換えなければいけないが、仕方ない</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="import-the-spreadsheets.html#cb29-1" aria-hidden="true" tabindex="-1"></a>release_dates_df3 <span class="ot">&lt;-</span></span>
+<span id="cb29-2"><a href="import-the-spreadsheets.html#cb29-2" aria-hidden="true" tabindex="-1"></a>  release_dates_df2 <span class="sc">|&gt;</span> </span>
+<span id="cb29-3"><a href="import-the-spreadsheets.html#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-4"><a href="import-the-spreadsheets.html#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> <span class="fu">recode</span>(</span>
+<span id="cb29-5"><a href="import-the-spreadsheets.html#cb29-5" aria-hidden="true" tabindex="-1"></a>      series,</span>
+<span id="cb29-6"><a href="import-the-spreadsheets.html#cb29-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection 2021</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2021&quot;</span>,</span>
+<span id="cb29-7"><a href="import-the-spreadsheets.html#cb29-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Champions Path</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Champion&#39;s Path&quot;</span>,</span>
+<span id="cb29-8"><a href="import-the-spreadsheets.html#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sword and Shield</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Sword &amp; Shield&quot;</span>,</span>
+<span id="cb29-9"><a href="import-the-spreadsheets.html#cb29-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sword and Shield Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SWSH Black Star Promos&quot;</span>,</span>
+<span id="cb29-10"><a href="import-the-spreadsheets.html#cb29-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sun and Moon</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Sun &amp; Moon&quot;</span>,</span>
+<span id="cb29-11"><a href="import-the-spreadsheets.html#cb29-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Sun and Moon Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SM Black Star Promos&quot;</span>,</span>
+<span id="cb29-12"><a href="import-the-spreadsheets.html#cb29-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Mcdonalds Collection 2015</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2015&quot;</span>,</span>
+<span id="cb29-13"><a href="import-the-spreadsheets.html#cb29-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Mcdonalds Collection 2014</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2014&quot;</span>,</span>
+<span id="cb29-14"><a href="import-the-spreadsheets.html#cb29-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection 2012</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection 2012&quot;</span>, <span class="co"># not Mcd!</span></span>
+<span id="cb29-15"><a href="import-the-spreadsheets.html#cb29-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">X and Y</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;XY&quot;</span>,</span>
+<span id="cb29-16"><a href="import-the-spreadsheets.html#cb29-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">X and Y Promos</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;XY Black Star Promos&quot;</span>,</span>
+<span id="cb29-17"><a href="import-the-spreadsheets.html#cb29-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">McDonalds Collection</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;McDonald&#39;s Collection&quot;</span>,</span>
+<span id="cb29-18"><a href="import-the-spreadsheets.html#cb29-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Black and White</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Black &amp; White&quot;</span>, </span>
+<span id="cb29-19"><a href="import-the-spreadsheets.html#cb29-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">HeartGold and SoulSilver</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;HeartGold &amp; SoulSilver&quot;</span></span>
+<span id="cb29-20"><a href="import-the-spreadsheets.html#cb29-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb29-21"><a href="import-the-spreadsheets.html#cb29-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">series =</span> <span class="fu">str_replace</span>(series, <span class="st">&quot;Pop&quot;</span>, <span class="st">&quot;POP&quot;</span>)</span>
+<span id="cb29-22"><a href="import-the-spreadsheets.html#cb29-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-23"><a href="import-the-spreadsheets.html#cb29-23" aria-hidden="true" tabindex="-1"></a>release_dates_df3</span></code></pre></div>
+<p>つぎに、Bulbapediaを母体に一緒にしつつもTrainer KitはBulbapediaのリストにはないため<code>series_class</code>に<code>Trainer Kit</code>を新設しつつ、<code>release_date</code>についてはBulbapediaを優先する。</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="import-the-spreadsheets.html#cb30-1" aria-hidden="true" tabindex="-1"></a>series_release_df1 <span class="ot">&lt;-</span> <span class="fu">full_join</span>(</span>
+<span id="cb30-2"><a href="import-the-spreadsheets.html#cb30-2" aria-hidden="true" tabindex="-1"></a>  series_classification_df6, </span>
+<span id="cb30-3"><a href="import-the-spreadsheets.html#cb30-3" aria-hidden="true" tabindex="-1"></a>  release_dates_df3,</span>
+<span id="cb30-4"><a href="import-the-spreadsheets.html#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;series&quot;</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb30-5"><a href="import-the-spreadsheets.html#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-6"><a href="import-the-spreadsheets.html#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-7"><a href="import-the-spreadsheets.html#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">series_class =</span> </span>
+<span id="cb30-8"><a href="import-the-spreadsheets.html#cb30-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">case_when</span>(</span>
+<span id="cb30-9"><a href="import-the-spreadsheets.html#cb30-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_detect</span>(series, <span class="st">&quot;Trainer</span><span class="sc">\\</span><span class="st">sKit&quot;</span>) <span class="sc">~</span> <span class="st">&quot;Trainer Kit&quot;</span>, </span>
+<span id="cb30-10"><a href="import-the-spreadsheets.html#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> series_class</span>
+<span id="cb30-11"><a href="import-the-spreadsheets.html#cb30-11" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb30-12"><a href="import-the-spreadsheets.html#cb30-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-13"><a href="import-the-spreadsheets.html#cb30-13" aria-hidden="true" tabindex="-1"></a>series_release_df1</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="import-the-spreadsheets.html#cb31-1" aria-hidden="true" tabindex="-1"></a>df_series <span class="ot">&lt;-</span> series_release_df1 <span class="sc">|&gt;</span> </span>
+<span id="cb31-2"><a href="import-the-spreadsheets.html#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select(release_date.x, release_date.y) |&gt; </span></span>
+<span id="cb31-3"><a href="import-the-spreadsheets.html#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-4"><a href="import-the-spreadsheets.html#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># indicate if the series is in V3.25 spreadsheet or </span></span>
+<span id="cb31-5"><a href="import-the-spreadsheets.html#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># only available on bulbagarden&#39;s list</span></span>
+<span id="cb31-6"><a href="import-the-spreadsheets.html#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">meta_is_bulba_only =</span> <span class="fu">is.na</span>(release_date.y),</span>
+<span id="cb31-7"><a href="import-the-spreadsheets.html#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">meta_is_v325_only =</span> series_class <span class="sc">==</span> <span class="st">&quot;Trainer Kit&quot;</span>,</span>
+<span id="cb31-8"><a href="import-the-spreadsheets.html#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> </span>
+<span id="cb31-9"><a href="import-the-spreadsheets.html#cb31-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">case_when</span>(</span>
+<span id="cb31-10"><a href="import-the-spreadsheets.html#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">is.na</span>(release_date.x) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(release_date.y) <span class="sc">~</span> release_date.y,</span>
+<span id="cb31-11"><a href="import-the-spreadsheets.html#cb31-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb31-12"><a href="import-the-spreadsheets.html#cb31-12" aria-hidden="true" tabindex="-1"></a>        <span class="sc">!</span><span class="fu">is.na</span>(release_date.x) <span class="sc">&amp;</span> <span class="fu">is.na</span>(release_date.y) <span class="sc">~</span> release_date.x,</span>
+<span id="cb31-13"><a href="import-the-spreadsheets.html#cb31-13" aria-hidden="true" tabindex="-1"></a>        release_date.x <span class="sc">==</span> release_date.y <span class="sc">~</span> release_date.x,</span>
+<span id="cb31-14"><a href="import-the-spreadsheets.html#cb31-14" aria-hidden="true" tabindex="-1"></a>        release_date.x <span class="sc">!=</span> release_date.y <span class="sc">~</span> release_date.x,</span>
+<span id="cb31-15"><a href="import-the-spreadsheets.html#cb31-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># TRUE ~ NA_Date_</span></span>
+<span id="cb31-16"><a href="import-the-spreadsheets.html#cb31-16" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb31-17"><a href="import-the-spreadsheets.html#cb31-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">release_date.x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb31-18"><a href="import-the-spreadsheets.html#cb31-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">release_date.y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb31-19"><a href="import-the-spreadsheets.html#cb31-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">cards_total =</span> cards_total <span class="sc">|&gt;</span> <span class="fu">as.character</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb31-20"><a href="import-the-spreadsheets.html#cb31-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">cards_total_ja =</span> cards_total <span class="sc">|&gt;</span> <span class="fu">as.character</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb31-21"><a href="import-the-spreadsheets.html#cb31-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">series_class =</span> <span class="fu">case_when</span>(</span>
+<span id="cb31-22"><a href="import-the-spreadsheets.html#cb31-22" aria-hidden="true" tabindex="-1"></a>        series <span class="sc">==</span> <span class="st">&quot;Pokemon GO&quot;</span> <span class="sc">~</span> <span class="st">&quot;Special Expansion&quot;</span>,</span>
+<span id="cb31-23"><a href="import-the-spreadsheets.html#cb31-23" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> series_class</span>
+<span id="cb31-24"><a href="import-the-spreadsheets.html#cb31-24" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb31-25"><a href="import-the-spreadsheets.html#cb31-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb31-26"><a href="import-the-spreadsheets.html#cb31-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(series_class, series, release_date, cards_total, series_gen, series_abb,  series_ja, release_date_ja, cards_total_ja, <span class="fu">everything</span>() )</span>
+<span id="cb31-27"><a href="import-the-spreadsheets.html#cb31-27" aria-hidden="true" tabindex="-1"></a>df_series <span class="co"># 157 x 11</span></span></code></pre></div>
+</div>
+</div>
+<div id="df_series-colnames-explanation" class="section level3 hasAnchor" number="1.2.2">
+<h3><span class="header-section-number">1.2.2</span> df_series: colnames explanation<a href="import-the-spreadsheets.html#df_series-colnames-explanation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="import-the-spreadsheets.html#cb32-1" aria-hidden="true" tabindex="-1"></a>df_series <span class="sc">|&gt;</span> <span class="fu">colnames</span>()</span></code></pre></div>
+<pre><code>##  [1] &quot;series_class&quot;       &quot;series&quot;             &quot;release_date&quot;       &quot;cards_total&quot;       
+##  [5] &quot;series_gen&quot;         &quot;series_abb&quot;         &quot;series_ja&quot;          &quot;release_date_ja&quot;   
+##  [9] &quot;cards_total_ja&quot;     &quot;meta_is_bulba_only&quot; &quot;meta_is_v325_only&quot;</code></pre>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>colname</code></th>
+<th><code>meaning</code></th>
+<th>str</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>series_class</code></td>
+<td>Retrieved from Bulbagarden. Either <code>"Main Expansion"</code>, <code>"Special Expansion"</code>, <code>"Black Star Promo"</code>, <code>"Pop Series"</code>, <code>"McDonalds Collection"</code>, or <code>"Trainer Kit"</code>.</td>
+<td>chr</td>
+</tr>
+<tr class="even">
+<td><code>series</code></td>
+<td>The name of the series. “<code>Neo Genesis</code>”, “<code>Sun &amp; Moon</code>” etc. The names are based on the ones listed in Bulbapedia, not the <a href="https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613">V3.25 spreadsheet</a>.</td>
+<td>chr</td>
+</tr>
+<tr class="odd">
+<td><code>release_date</code></td>
+<td>The release date of the series. The dates are based on the ones listed in Bulbapedia, not the ones on the <a href="https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613">V3.25 spreadsheet</a>, from which the Bulbapedia’s date slightly differ. Release dates with no specific dates are converted to the 1st day of the month, e.g., <code>May 2003</code> -&gt; <code>2003-05-01</code>.</td>
+<td>POSIXct</td>
+</tr>
+<tr class="even">
+<td><code>cards_total</code></td>
+<td>the amount of total cards of the series, according to Bulbapedia. The official count is sometimes lower than this. This does not necessarily match the amount of total cards of the series that can be calculated from the card list. The card list is based on V3.25 spreadsheet and the data is not exhaustive.</td>
+<td>int</td>
+</tr>
+<tr class="odd">
+<td><code>series_gen</code></td>
+<td>generation of the series, from 1-8. This is based on V3.25 spreadsheet and may not match from Bulbapedia’s classification (e.g., <code>Legendary Collection</code> classified as series_gen 1 in spreadsheet, series_gen 2 in Bulbapedia).</td>
+<td>int</td>
+</tr>
+<tr class="even">
+<td><code>series_abb</code></td>
+<td>from Bulbapedia. might be useful for plotting to avoid overcrowding.</td>
+<td>chr</td>
+</tr>
+<tr class="odd">
+<td><code>series_ja</code></td>
+<td>Name of the series in Japanese version according to Bulbapedia.</td>
+<td>chr</td>
+</tr>
+<tr class="even">
+<td><code>release_date_ja</code></td>
+<td></td>
+<td>POSIXct</td>
+</tr>
+<tr class="odd">
+<td><code>cards_total_ja</code></td>
+<td></td>
+<td>int</td>
+</tr>
+<tr class="even">
+<td><code>meta_is_bulba_only</code></td>
+<td><code>TRUE</code> if the series is only from Bulbapedia.</td>
+<td>lgl</td>
+</tr>
+<tr class="odd">
+<td><code>meta_is_v325_only</code></td>
+<td><code>TRUE</code> if the series is only from spreadsheet. “Trainer Kit”s.</td>
+<td>lgl</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="card-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

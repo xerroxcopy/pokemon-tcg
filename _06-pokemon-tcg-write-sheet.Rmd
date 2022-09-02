@@ -1,0 +1,50 @@
+# Export and Publish
+
+## RData
+
+```{r}
+save(df, df_gene, df_series, ss_input, ss_output, files, excel_path, path, file = paste0("./data/", Sys.Date(), "-dataframes.RData"))
+load("./data/2022-09-02-dataframes.RData")
+```
+
+
+## prepare googlesheets4
+
+`ss_input` is not used. Downloaded, unmodified excel copy is available at `"./input/Pokemon TCG Spreadsheet V3.25.xlsx"`.
+```{r}
+ss_input <- "https://docs.google.com/spreadsheets/d/1IkplPAxSxqEW8qIKH_KW3cDp7C261kNZ-AX-AmCxnMY/edit#gid=840081758" 
+ss_output <- "https://docs.google.com/spreadsheets/d/1VcVuCtDyKI5oqGsWJPKJGO7y-vIVZge6JrRqrE_kAQY/edit#gid=0"
+```
+
+## write to Google Spreadsheet
+```{r}
+gs4_auth()
+
+sheet_write( # df_names from pokemon-genes.Rmd
+  df_names,
+  ss = ss_output,
+  sheet = "pokemon_name_list"
+  )
+
+sheet_write(
+  df_series,
+  ss = ss_output,
+  sheet = "series_global"
+  )
+sheet_write(
+  df, 
+  ss = ss_output,
+  sheet = "cards"
+  )
+sheet_write(
+  df_gene, 
+  ss = ss_output,
+  sheet = "cards: pokemon"
+  )
+sheet_write(
+  release_dates_df2, 
+  ss = ss_output,
+  sheet = "releases"
+  )
+```
+

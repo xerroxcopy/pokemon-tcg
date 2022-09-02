@@ -1,0 +1,27 @@
+---
+title: "Machine Readable Pokémon Get daze"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+---
+# how to knit this book
+
+[source](https://gedevan-aleksizde.github.io/rmarkdown-cookbook/bookdown.html)
+
+## library
+
+```{r message=FALSE}
+library(googlesheets4)
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(readxl)
+library(ggbeeswarm)
+```
+
+## data
+
+```{r}
+load("./data/2022-09-02-dataframes.RData")
+```
+
+
