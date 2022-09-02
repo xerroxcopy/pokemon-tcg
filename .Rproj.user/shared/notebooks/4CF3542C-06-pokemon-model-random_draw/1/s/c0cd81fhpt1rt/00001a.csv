@@ -1,0 +1,8 @@
+"0","# random_draw_df1 |> str()
+# random_draw_df1 |> View()
+series_gen_df3$cards_total |> na.omit() |> sum()
+"
+"1","[1]"
+"1"," 57870"
+"1","
+"

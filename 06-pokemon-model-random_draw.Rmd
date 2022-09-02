@@ -38,8 +38,10 @@ series_gen_df2 <- map_dfr(
     .data = series_gen_df, 
     game_gen = 
       case_when(
-        release_date < game_gen_df |> filter(game_gen == .x+1) |> extract("game_release_date") |> pull() 
-        ~ .x
+        release_date < game_gen_df |> filter(game_gen == .x+1) |> extract("game_release_date") |> pull() &
+        release_date > game_gen_df |> filter(game_gen == .x) |> extract("game_release_date") |> pull()
+        ~ .x,
+        TRUE ~ NA_integer_
       ),
     # game_gen_ja = 
     #   case_when(
@@ -48,6 +50,9 @@ series_gen_df2 <- map_dfr(
     #   )
     ) |> filter(!is.na(game_gen))
   ) 
+series_gen_df2
+series_gen_df2 |> filter(series == "Dragon Vault")
+series_gen_df2$cards_total |> na.omit() |> sum()
 ```
 
 Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
@@ -177,34 +182,28 @@ floor()
 
 random_draw_df1 <- series_gen_df3 |>
   filter(!is.na(cards_total)) |> 
-  # rowwise() |>
   mutate(
     random_draw = 
-      runif(
-        n = cards_total,
-        min = 1,
-        max = pokemon_cumulative_n + 1
-        ) |> 
-      floor()
+      map2( # rowwise() does not work...?
+        .x = cards_total,
+        .y = pokemon_cumulative_n,
+        ~ runif(
+          n = .x,
+          min = 1,
+          max = .y + 1
+        ) |> floor()
+      )
   )
-random_draw_df1 |> str()
-random_draw_df1$random_draw[1]
+# random_draw_df1 |> str()
+# random_draw_df1 |> View()
+series_gen_df3$cards_total |> na.omit() |> sum()
 ```
+### unnest now
 
-
+[Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
 ```{r}
-series_gen_df4 <- 
-  series_gen_df3 |> 
-  filter(!is.na(cards_total))
-
-map2(
-  .x = series_gen_df4$cards_total,
-  .y = series_gen_df4$pokemon_cumulative_n,
-  ~ runif(
-    n = .x,
-    min = 1,
-    max = .y + 1
-  ) |> floor()
-) 
+random_draw_df1 |> 
+  unnest_longer(random_draw)
+  
 ```
 
