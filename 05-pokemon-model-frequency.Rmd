@@ -23,11 +23,14 @@ df_count_full_name <- df_gene |>
   select(-Name) |> 
   distinct()
 
+
+df_gene |> View()
 df_count_pokemon <- df_gene |> 
+  filter(!is.na(id)) |> 
   group_by(pokemon_name) |> 
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
-  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
   select(-pokemon_name) |> 
   distinct() 
 ```
@@ -74,11 +77,15 @@ df_count_pokemon |>
   ) +
   geom_point() +
   scale_x_continuous(
+    limits = c(1, 130),
     trans = "log10", 
     breaks = 10^(0:10)
   ) +
   scale_y_continuous(
-    trans = "log10", breaks = 10^(0:-10)) +
+    limits = c(0.001, 1),
+    trans = "log10", 
+    breaks = 10^(0:-10)
+    ) +
   theme_minimal() +
   theme(
     panel.grid = element_blank(),

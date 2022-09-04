@@ -1,3 +1,0 @@
-A Minimal bookdown document
-================
-

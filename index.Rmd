@@ -16,12 +16,14 @@ library(magrittr)
 library(lubridate)
 library(readxl)
 library(ggbeeswarm)
+library(gganimate)
+library(scales)
 ```
 
 ## data
 
 ```{r}
-load("./data/2022-09-02-dataframes.RData")
+load("./data/2022-09-03-dataframes.RData")
 ```
 
 

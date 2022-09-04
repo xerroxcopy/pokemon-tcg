@@ -1,16 +1,5 @@
-"0",""
-"0","df_count_full_name <- df_gene |> "
-"0","  group_by(Name) |> "
-"0","  summarise(n = n()) |> "
-"0","  arrange(desc(n)) |> "
-"0","  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>"
-"0","  select(-Name) |> "
-"0","  distinct()"
-"0",""
-"0","df_count_pokemon <- df_gene |> "
-"0","  group_by(pokemon_name) |> "
-"0","  summarise(n = n()) |> "
-"0","  arrange(desc(n)) |> "
-"0","  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>"
-"0","  select(-pokemon_name) |> "
-"0","  distinct() "
+"0","  select(-pokemon_name) |> 
+  distinct() 
+"
+"2","Error in select(-pokemon_name) : object 'pokemon_name' not found
+"
