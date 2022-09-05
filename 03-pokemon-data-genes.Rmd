@@ -206,7 +206,8 @@ subgene or subpokemon or parasites or decorations or whatever
 df_gene <- df_gene |>   
   rowwise() |> 
   mutate(pokemon_deco = str_remove(Name, pattern = paste(pokemon_name))) |> 
-  select(id, Name, pokemon_name, name_ja, pokemon_deco, pokemon_gen, Type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_"), starts_with("meta_"))
+  select(id, Name, pokemon_name, name_ja, pokemon_deco, pokemon_gen, Type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_"), starts_with("meta_")) |> 
+  ungroup()
 ```
 
 ```{r}

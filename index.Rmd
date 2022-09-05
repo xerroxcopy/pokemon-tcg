@@ -23,6 +23,8 @@ library(gganimate)
 library(paletteer)
 library(scales)
 library(palmerpenguins)
+library(umap)
+library(ggrepel)
 knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 3,
                       fig.height = 2)
