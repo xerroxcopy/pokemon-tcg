@@ -36,8 +36,6 @@ df_series2$pokemon_data_count |> na.omit() |> sum()
 series_gen_df <- df_series2 |> 
   select(series_gen, series, release_date, cards_total, pokemon_data_count) |> 
   distinct()
-series_gen_df |> View()
-
 series_gen_df2 <- map_dfr(
   .x = 1:8, 
   ~ mutate(
@@ -62,36 +60,7 @@ series_gen_df2$pokemon_data_count |> na.omit() |> sum() # 15029
 ```
 
 Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
-
-
-```{r}
-df_gene |> 
-  ggplot(aes(x = release_date, y = id, colour = pokemon_gen)) +
-    geom_rect(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xmin = game_release_date, xmax = game_end_date, fill = game_gen |> as.factor()),
-    ymin = -Inf, ymax = Inf, 
-    inherit.aes = FALSE,
-    alpha = .5
-  ) +
-  geom_count(alpha = .3,  stroke = .1) +
-  geom_count(data = df_gene |> filter(series_class == "Black Star Promo"), colour = "black") +
-  scale_colour_viridis_c(option = "C") +
-  # scale_fill_viridis_c() +
-  scale_fill_viridis_d(option = "C") +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1),
-    plot.background = element_rect(fill = "white")
-  )
-ggsave("./output/blackstar-promo-release-date-problem.png", width = 3000, height = 2000, unit = "px")
-```
-
 "Black Star Promo"がおかしいことがわかる。
-
-
 Generationをrectじゃなくて線にしてみましょう
 ```{r}
 df_gene |> 
@@ -115,16 +84,13 @@ df_gene |>
   geom_count(aes( fill = pokemon_gen), pch = 21, alpha = .5, data = df_gene |> filter(series_class == "Black Star Promo"), colour = "black") +
   # scale_colour_viridis_d(option = "C") +
   scale_fill_viridis_c() +
-  scale_colour_viridis_d(option = "D") +
+  scale_size_area(guide = "none") +
+  scale_colour_viridis_d(option = "D", guide = "none") +
   scale_y_continuous(limits = c(0, NA)) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1),
-    plot.background = element_rect(fill = "white")
-  )
-ggsave("./output/blackstar-promo-release-date-problem.png", width = 3000, height = 2000, unit = "px")
+  theme_pokemon
+# ggsave("./output/blackstar-promo-release-date-problem.png", width = 3000, height = 2000, unit = "px")
+ggsave("./output/emp_release-date.svg", width = 166, height = 60, unit = "mm")
+
 ```
 とりあえず問題があることはわかったものの治さずともとりあえずランダムドローはできるのでやってみる。
 
@@ -343,13 +309,7 @@ random_draw_df2 |>
   scale_fill_viridis_c() +
   scale_colour_viridis_d(option = "D") +
   scale_y_continuous(limits = c(0, NA)) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1),
-    plot.background = element_rect(fill = "white")
-  )
+  theme_pokemon
 ```
 
 ## temporal change over time
@@ -369,7 +329,7 @@ release_dates <- df_series2 |>
 release_dates |> min() # 1999 Jan
 release_dates |> max()# 2022 Sep
 # months_seq <- seq(as.Date("2009-01-01"), length = 166, by = "months")
-years_seq <- seq(as.Date("2010-01-01"), length = 14, by = "years")
+years_seq <- seq(as.Date("2009-01-01"), length = 15, by = "years")
 ```
 
 この`release_dates`で`for`を回して、これ以下のデータでフィルタしていく。
@@ -380,7 +340,6 @@ years_seq <- seq(as.Date("2010-01-01"), length = 14, by = "years")
 ```{r}
 sim_random_df_small # 10 runs
 df_gene # `Name` = group by distinct names, `pokemon_name` = group by distinct pokemons. 
-
 # initialize
 temporal_change_cumulative_df <- tibble(
   n = integer(),
@@ -389,7 +348,7 @@ temporal_change_cumulative_df <- tibble(
   until_date = Date()
 )
 # run length(months_seq)
-for (i in 1:length(years_seq)) {
+for (i in 2:length(years_seq)) {
   sim_random_df_small_until_threshold_date <-
     sim_random_df_small |> 
     filter(release_date <= years_seq[i])
@@ -444,70 +403,75 @@ plot
 ```{r}
 temporal_change_cumulative_df |> 
   ggplot(aes(x = n,y = ecdf, group = paste(until_date, run), colour = until_date)) +
-  geom_line(alpha = 1, size = 1) +
+  geom_line(alpha = 1, size = .15/.751) +
   # geom_point( alpha = 1, size = .1) +
   scale_x_continuous(
-     expand = c(0,0),
+     expand = c(0.1,0),
     # limits = c(1, 10000),
     trans = "log10", 
     breaks = 10^(0:10)
   ) +
   scale_y_continuous(
-    expand = c(0,0),
+    expand = c(0.1,0),
     # limits = c(0.0001, 1),
     trans = "log10", 
     breaks = 10^c(0, -3),
     labels = trans_format("log10", math_format(10^.x))
     ) +
-  scale_colour_viridis_c(trans = "date") + 
+  scale_colour_paletteer_c("ggthemes::Blue-Green Sequential", trans = "date") + 
   facet_wrap(vars(condition)) +
-  # facet_grid(
-  #   rows = vars(until_date),
-  #   cols = vars(condition)
-  # ) +
-  theme_minimal(base_size = 64) +
+  theme_minimal(base_size = 6) +
   theme(
     panel.grid = element_blank(),
     legend.position = "none",
     # panel.background = element_rect(size = .4),
     axis.line = element_line(
-      size = .1/.751
+      size = .15/.751
       ),
     axis.text = element_text(size = 6),
     axis.ticks = element_line(),
     aspect.ratio = 1,
     plot.background = element_rect(fill = "white", colour = NA)
   )
-ggsave("./output/temporal-change-cumulative.png", width = 150, height = 75, unit = "mm", dpi = 600)
-ggsave("./output/temporal-change-cumulative.pdf", width = 250, height = 250, unit = "mm")
-ggsave("./output/temporal-change-cumulative.svg", width = 250, height = 250, unit = "mm")
+ggsave("./output/temporal-change-cumulative.png", width = 75, height = 30, unit = "mm", dpi = 600)
+ggsave("./output/temporal-change-cumulative.pdf", width = 75, height = 30, unit = "mm")
+
 
 ```
+
 ### temporal change, yearly
-### temporal change, cumulative
+
 
 ```{r}
 sim_random_df_small # 10 runs
 df_gene # `Name` = group by distinct names, `pokemon_name` = group by distinct pokemons. 
 
 # initialize
-temporal_change_cumulative_df <- tibble(
+temporal_change_yearly_df <- tibble(
   n = integer(),
   ecdf = double(),
   run = integer(),
-  until_date = Date()
+  year = Date()
 )
 # run length(months_seq)
-for (i in 1:length(months_seq)) {
-  sim_random_df_small_until_threshold_date <-
+for (i in 1:(length(years_seq) - 1)) {
+  sim_random_df_small_yearly <-
     sim_random_df_small |> 
-    filter(release_date < months_seq[i])
-  emp_df_until_threshold_date <- df_gene |> 
+    filter(
+      release_date <= years_seq[i+1] 
+      & 
+      release_date > years_seq[i]
+    )
+  emp_df_yearly <- df_gene |> 
     filter(!is.na(id)) |> 
-    filter(release_date < months_seq[i])
+    filter( 
+      release_date <= years_seq[i+1] 
+      & 
+      release_date > years_seq[i]
+    )
   
   sim_df <- 
-    sim_random_df_small_until_threshold_date |> 
+    sim_random_df_small_yearly |> 
     group_by(run, id) |> 
     mutate(n = n()) |> 
     ungroup() |> 
@@ -521,7 +485,7 @@ for (i in 1:length(months_seq)) {
       condition = rep("simulations", nrow(.))
     )
   emp_long_df <- 
-    emp_df_until_threshold_date |> 
+    emp_df_yearly |> 
     group_by(Name) |> 
     summarise(n = n()) |> 
     arrange(desc(n)) |> 
@@ -530,7 +494,7 @@ for (i in 1:length(months_seq)) {
     distinct() %>%
     mutate(condition = rep("card name", nrow(.)))
   emp_poke_df <- 
-    emp_df_until_threshold_date |> 
+    emp_df_yearly |> 
     group_by(id) |> 
     summarise(n = n()) |> 
     arrange(desc(n)) |> 
@@ -540,19 +504,21 @@ for (i in 1:length(months_seq)) {
     mutate(condition = rep("pokemon name", nrow(.)))
   merge_df <- bind_rows(sim_df, emp_long_df, emp_poke_df) %>%
     mutate(
-      until_date = rep(months_seq[i], nrow(.))
+      year = rep(years_seq[i], nrow(.))
     )
-  temporal_change_cumulative_df <- bind_rows(temporal_change_cumulative_df, merge_df)
+  temporal_change_yearly_df <- bind_rows(temporal_change_yearly_df, merge_df)
+    cat(i, ", ")
+
 } # 1min?
-temporal_change_cumulative_df |> dim() # 71780 x 5
+temporal_change_yearly_df |> dim() # 885 x 5
 
 ```
 
 plot
 
 ```{r}
-temporal_change_cumulative_df |> 
-  ggplot(aes(x = n,y = ecdf, group = until_date, colour = until_date)) +
+temporal_change_yearly_df |> 
+  ggplot(aes(x = n,y = ecdf, group = year, colour = year)) +
 
   geom_line(alpha = 1, size = .1) +
   geom_point( alpha = 1, size = .1) +
@@ -566,7 +532,7 @@ temporal_change_cumulative_df |>
     trans = "log10", 
     breaks = 10^(0:-10)
     ) +
-  scale_colour_viridis_c() + 
+  scale_colour_viridis_c(trans = "date") + 
   facet_wrap(vars(condition)) +
   theme_minimal() +
   theme(

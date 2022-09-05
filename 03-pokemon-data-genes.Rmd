@@ -117,8 +117,10 @@ df_gene <- df |>
     into = c("nm", "team_buddy1", "team_buddy2")
            ) |> 
   mutate(
-    is_ex = str_detect(nm, "\\sex$|EX$|\\sex"),
-    nm = str_replace(nm, "\\sex$|EX$|\\sex", ""),
+    is_extra = str_detect(nm, "\\sex$|\\sex"),
+    nm = str_replace(nm, "\\sex$|\\sex", ""),
+    is_ex = str_detect(nm, "EX$"),
+    nm = str_replace(nm, "EX$", ""),
     has_master = str_detect(nm, "^.+\\'s\\s"),
     master = str_extract(nm, "^.+(?=\\'s\\s)"),
     nm = str_replace(nm, "^.+\\'s\\s", ""),

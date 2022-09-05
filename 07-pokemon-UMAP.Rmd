@@ -1,0 +1,50 @@
+# UMAP 
+
+```{r}
+library(umap)
+df_gene |> colnames()
+```
+
+## make all available genes into true/false or quantitative data
+```{r}
+# interval(df_gene$release_date[1], df_gene$release_date[2400]) |> 
+  # int_length()
+df1 <- df_gene |> 
+  ungroup() |> 
+  filter(!is.na(id)) |> 
+  mutate(
+    seconds_since_first_release =
+      interval(release_date |> min(), release_date) |> int_length(),
+    time_since_first_release_standardized = seconds_since_first_release / seconds_since_first_release |> max()
+  ) %>%
+  # select(Type2, master, forme_variant) |> 
+  mutate(
+    master = replace_na(master, "no_master"),
+    forme_variant = replace_na(forme_variant, "no_forme_variant")
+  ) |> 
+  # mutate(Type2 = as.factor(Type2)) %>%
+  rowid_to_column() %>%
+  mutate(
+    T_Type2 = rep(1, nrow(.)),
+    T_forme_variant = rep(1, nrow(.)),
+    T_master = rep(1, nrow(.))
+  ) |>  
+  pivot_wider(
+    names_from = Type2,
+    values_from = T_Type2,
+    values_fill = 0
+  ) |> 
+  pivot_wider(
+    names_from = master,
+    values_from = T_master,
+    values_fill = 0
+  ) |> 
+  pivot_wider(
+    names_from = forme_variant,
+    values_from = T_forme_variant,
+    values_fill = 0
+  ) |> 
+  select(time_since_first_release_standardized, Name, id, pokemon_gen, series_gen, starts_with("is"))
+  df1
+```
+

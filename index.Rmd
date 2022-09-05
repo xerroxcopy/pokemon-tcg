@@ -1,7 +1,9 @@
 ---
 title: "Machine Readable Pokémon Get daze"
 site: bookdown::bookdown_site
-output: bookdown::gitbook
+output: 
+  html_document
+  bookdown::gitbook
 ---
 # how to knit this book
 
@@ -9,7 +11,8 @@ output: bookdown::gitbook
 
 ## library
 
-```{r message=FALSE}
+```{r setup, include = FALSE, message=FALSE}
+# install.packages(c("googlesheets4", "tidyverse", "magrittr", "lubridate", "readxl", "ggbeeswarm", "gganimate", "scales"))
 library(googlesheets4)
 library(tidyverse)
 library(magrittr)
@@ -17,13 +20,62 @@ library(lubridate)
 library(readxl)
 library(ggbeeswarm)
 library(gganimate)
+library(paletteer)
 library(scales)
+library(palmerpenguins)
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.width = 3,
+                      fig.height = 2)
+```
+```{r}
+grDevices::dev.size()
 ```
 
 ## data
 
 ```{r}
-load("./data/2022-09-03-dataframes.RData")
+load("./data/2022-09-05-dataframes.RData")
 ```
 
+## plot style
+```{r }
+theme_pokemon <- 
+  theme_minimal(base_size = 6) +
+  theme(
+    line = element_line(size = .15/.751, colour = "black"),
+    text = element_text(size = 6, colour = "black"),
+    title = element_text(size = 6, colour = "black"),
+    panel.grid = element_blank(),
+    axis.line = element_line(),
+    axis.text = element_text(size = 6, colour = "black"),
+    axis.ticks = element_line(),
+    plot.background = element_rect(fill = "white", colour = NA),
+    strip.text = element_text(size = 6),
+    legend.text = element_text(size = 6)
+  )
+```
+
+```{r}
+penguins |> 
+  ggplot(aes(x = bill_length_mm ,y = bill_depth_mm, group = species, colour = body_mass_g)) +
+  geom_line(alpha = 1) +
+  # geom_point(size = .15/.751/2) +
+  scale_x_continuous(
+   
+  ) +
+  scale_y_continuous(
+    breaks = c(15, 17.5, 20),
+    labels = c(15, " ", 20),
+    minor_breaks = c(17.5)
+    ) +
+  scale_colour_paletteer_c("ggthemes::Blue-Green Sequential") +
+  facet_grid(
+    cols = vars(species),
+    rows = vars(sex)
+  ) + 
+  theme_pokemon 
+ggsave("./output/plot_example.svg", width = 166/2, height = 110/2, unit = "mm")
+grDevices::dev.size()
+# ggedit(p1)
+```
 

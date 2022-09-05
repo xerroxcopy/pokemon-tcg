@@ -1,5 +1,0 @@
-"0","  select(-pokemon_name) |> 
-  distinct() 
-"
-"2","Error in select(-pokemon_name) : object 'pokemon_name' not found
-"

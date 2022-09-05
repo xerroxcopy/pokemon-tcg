@@ -3,8 +3,9 @@
 ## RData
 
 ```{r}
-save(df, df_gene, df_series, df_series2, df_names, df_game_gen, ss_input, ss_output, files, excel_path, path, file = paste0("./data/", Sys.Date(), "-dataframes.RData"))
-load("./data/2022-09-03-dataframes.RData")
+save(df, df_gene, df_series, df_series2, df_names, df_game_gen, ss_input, ss_output, files, excel_path, path, theme_pokemon,
+     file = paste0("./data/", Sys.Date(), "-dataframes.RData"))
+load("./data/2022-09-05-dataframes.RData")
 ```
 
 
