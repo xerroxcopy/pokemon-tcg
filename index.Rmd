@@ -23,7 +23,7 @@ library(gganimate)
 library(paletteer)
 library(scales)
 library(palmerpenguins)
-library(umap)
+library(uwot)
 library(ggrepel)
 knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 3,
@@ -42,7 +42,7 @@ load("./data/2022-09-05-dataframes.RData")
 ## plot style
 ```{r }
 theme_pokemon <- 
-  theme_minimal(base_size = 6) +
+  theme_minimal(base_size = 6, base_family = "Helvetica") +
   theme(
     line = element_line(size = .15/.751, colour = "black"),
     text = element_text(size = 6, colour = "black"),

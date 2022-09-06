@@ -1,0 +1,24 @@
+# UMAP transition
+
+
+2014年までにリリースされたポケモンだけでUMAP、みたいなのを毎年分やる
+
+```{r}
+years_seq <- seq(as.Date("2009-01-01"), length = 15, by = "years")
+
+umap_transition <- umap_input_factor_id |> 
+  as.data.frame() |> 
+  map2(
+    .y = years_seq,
+    ~ filter(
+      .data = .x,
+      <.y
+      )
+  )
+  uwot::umap(verbose = TRUE, 
+    n_threads = 6,
+    metric = list("euclidean" = umap_input_factor_cols[1:2],
+                  "categorical" = umap_input_factor_cols[3:42])
+  )
+```
+
