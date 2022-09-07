@@ -69,7 +69,7 @@ df_umap |> colnames()
 ### plot
 
 ```{r}
-df_umap |> 
+p_emp_umap_pokemon_gen <- df_umap |> 
   ggplot(aes(x = x, y = y, fill = release_date)) +
   geom_point( 
   data= df_umap |> select(-pokemon_gen),
@@ -103,8 +103,9 @@ df_umap |>
   theme_pokemon +
   theme(
     aspect.ratio = 1,
-    legend.key.height = unit(1, units = "mm"),
-    legend.key.width = unit(1, units = "mm")
+    legend.position = "none"
+    # legend.key.height = unit(1, units = "mm"),
+    # legend.key.width = unit(1, units = "mm")
   )
 ggsave("./output/emp_umap_factor_id.svg", width = 166, height = 35, unit = "mm")
 ```

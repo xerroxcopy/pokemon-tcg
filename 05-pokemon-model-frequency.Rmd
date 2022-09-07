@@ -14,7 +14,31 @@ df_poke_count_raw <- df |>
 [負うた子に教えられて浅瀬を渡る](https://qiita.com/xerroxcopy/items/b79635ef3dbcc29644c6)
 
 ```{r}
-# name + type. 
+# pokemon name.
+df_count_pokemon <- df_gene |> 
+  filter(!is.na(id)) |> 
+  group_by(pokemon_name) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
+  select(-pokemon_name) |> 
+  distinct() |> 
+  mutate(condition = "pokémon name") |> 
+  arrange(desc(n))
+
+
+# card name. 
+df_count_full_name <- df_gene |> 
+  group_by(Name) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  select(-Name) |> 
+  distinct() |> 
+  mutate(condition = "card name")
+
+
+# card name + type. 
 # distinguish pokemons with the same name, but with different types
 df_count_full_name_type <- df_gene |> 
   mutate(name_type = paste(Name, Type)) |> 
@@ -25,26 +49,19 @@ df_count_full_name_type <- df_gene |>
   select(-name_type) |> 
   distinct() |> 
   mutate(condition = "card name + type")
-  
-df_count_full_name <- df_gene |> 
-  group_by(Name) |> 
+
+# advanced:
+# full name, but remove deco tsuki cards
+# count only the cards named "Pikachu" for pikachu.
+df_count_full_name_remove_decorated <- df_gene |> 
+  filter(Name == pokemon_name) |> 
+  group_by(Name) |> # same as grouping by pokemon_name since Name == pokemon_name
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
   mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
   select(-Name) |> 
   distinct() |> 
-  mutate(condition = "card name")
-df_count_pokemon <- df_gene |> 
-  filter(!is.na(id)) |> 
-  group_by(pokemon_name) |> 
-  summarise(n = n()) |> 
-  arrange(desc(n)) |> 
-  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
-  select(-pokemon_name) |> 
-  distinct() |> 
-  mutate(condition = "pokémon name")
-df_count_pokemon
-df_count_full_name
+  mutate(condition = "card name, remove decorated")
 ```
 
 `ecdf()`はX > nである割合であってX >= nである割合ではないのだな
@@ -74,7 +91,8 @@ p_count_full_name_type <- df_count_full_name_type |>
 ### full name
 
 ```{r}
-p_count_full_name <- df_count_full_name |>
+# p_count_full_name <- 
+  df_count_full_name |>
   ggplot(aes(x = n, y = ecdf)) +
   geom_point() +
   scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
@@ -87,10 +105,31 @@ p_count_full_name <- df_count_full_name |>
   )
 
 ```
+
+### full name, remove decorated
+
+```{r}
+df_count_full_name_remove_decorated |>
+  ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+
+```
+・・・あんま変わらんな！！
+
+
 ### poke name
 
 ```{r}
-p_count <- df_count_pokemon |> 
+
+df_count_pokemon |> 
  ggplot(aes(x = n, y = ecdf)) +
   geom_point() +
   scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
@@ -102,4 +141,5 @@ p_count <- df_count_pokemon |>
     aspect.ratio = 1
   )
 ```
+
 
