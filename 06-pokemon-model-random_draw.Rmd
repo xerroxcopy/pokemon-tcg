@@ -5,95 +5,6 @@ df_series |>
   colnames()
 ```
 
-```{r}
-df_game_gen <- 
-  tribble(
-    ~game_gen, ~game_release_date, ~game_release_date_ja, ~pokemon_n_new,
-    1,         "1998-09-28",   "1996-02-27", 151,
-    2,         "2000-10-15",   "1999-11-21", 100,
-    3,         "2003-03-15",   "2002-11-21", 135, # https://bulbapedia.bulbagarden.net/wiki/Generation_III
-    4,         "2007-04-22",   "2006-09-28", 107, # https://bulbapedia.bulbagarden.net/wiki/Generation_IV
-    5,         "2011-03-04",   "2010-09-18", 156, 
-    6,         "2013-10-12",   "2013-10-12", 72,
-    7,         "2016-11-18",   "2016-11-18", 88, # 81+5+2=88
-    8,         "2019-11-15",   "2019-11-15", 96, # 89+7
-    9,         "2022-11-18",   "2022-11-18", NA_integer_
-    ) |> 
-  mutate(
-    across(starts_with("game_release"), as.Date),
-    game_end_date = lead(game_release_date),
-    pokemon_cumulative_n = cumsum(pokemon_n_new)
-  )
-df_series2$cards_total |> na.omit() |> sum() # 15186
-df_gene |> nrow() # 15029
-
-df_series2$pokemon_data_count |> na.omit() |> sum()
-# df_game_gen |> filter(game_gen == 1) |> extract("release_date") |> pull()
-```
-
-
-```{r}
-series_gen_df <- df_series2 |> 
-  select(series_gen, series, release_date, cards_total, pokemon_data_count) |> 
-  distinct()
-series_gen_df2 <- map_dfr(
-  .x = 1:8, 
-  ~ mutate(
-    .data = series_gen_df, 
-    game_gen = 
-      case_when(
-        release_date < df_game_gen |> filter(game_gen == .x+1) |> extract("game_release_date") |> pull() &
-        release_date > df_game_gen |> filter(game_gen == .x) |> extract("game_release_date") |> pull()
-        ~ .x,
-        TRUE ~ NA_integer_
-      ),
-    # game_gen_ja = 
-    #   case_when(
-    #     release_date < df_game_gen |> filter(game_gen == .x+1) |> extract("release_date_ja") |> pull() 
-    #     ~ .x
-    #   )
-    ) |> filter(!is.na(game_gen))
-  ) 
-series_gen_df2
-series_gen_df2 |> filter(series == "Dragon Vault")
-series_gen_df2$pokemon_data_count |> na.omit() |> sum() # 15029
-```
-
-Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
-"Black Star Promo"がおかしいことがわかる。
-Generationをrectじゃなくて線にしてみましょう
-```{r}
-df_gene |> 
-  ggplot(aes(x = release_date, y = id)) +
-  geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date, colour = game_gen |> as.factor()),
-    linetype = "dashed"
-  ) +
-  geom_text(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(label =as.roman(game_gen), x = game_release_date, colour = game_gen |> as.factor()),
-    y = -10,
-    size = 2,
-    hjust = 0,
-    vjust = 1,
-    nudge_x = 100,
-    # nudge_y = -1000
-  ) +
-  geom_count(aes( fill = pokemon_gen), pch = 21, alpha = .3,  stroke = .1) +
-  geom_count(aes( fill = pokemon_gen), pch = 21, alpha = .5, data = df_gene |> filter(series_class == "Black Star Promo"), colour = "black") +
-  # scale_colour_viridis_d(option = "C") +
-  scale_fill_viridis_c() +
-  scale_size_area(guide = "none") +
-  scale_colour_viridis_d(option = "D", guide = "none") +
-  scale_y_continuous(limits = c(0, NA)) +
-  theme_pokemon
-# ggsave("./output/blackstar-promo-release-date-problem.png", width = 3000, height = 2000, unit = "px")
-ggsave("./output/emp_release-date.svg", width = 166, height = 60, unit = "mm")
-
-```
-とりあえず問題があることはわかったものの治さずともとりあえずランダムドローはできるのでやってみる。
-
 ## Random draw
 
 ここでの目的は、株式会社ポケモンのデザイナーの思考パターンをランダムでどこまで模せるかを調べること。そのためにはいくつかのpresumptionが必要になる。まず、あるタイムステップ（具体的には`release_date`のどこか）`t = t_n`で、すでにリリースされているポケモンのゲーム・すでに公開されているポケモンのリストがあるとする。`t_n`においてリリースする枚数は興味がないので、すでに決定しているとする（`release_date`における`total_cards`に相当する）。そのとき、デザイナーは次のように適当にポケモンを選ぶことが考えられる：
@@ -113,12 +24,12 @@ nested dfでやるかmatrixでやるかはたまたdfでやるか。毎回popula
 series_gen_df3 <- series_gen_df2 |> 
   left_join(df_game_gen |> select(game_gen, pokemon_cumulative_n), by = "game_gen") |> 
   filter(!is.na(pokemon_data_count))
-series_gen_df3
+# series_gen_df3
 ```
 [Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
 ```{r}
 
-sim_random_df_small <- tibble(
+sim_random_df <- tibble(
   series_gen = integer(),
   series = character(),
   release_date = Date(),
@@ -129,7 +40,7 @@ sim_random_df_small <- tibble(
   id = integer(), 
   run = integer()
 )
-simulation_runs <- 10
+simulation_runs <- 1000
 
 for (simulation_run in 1:simulation_runs) {
   single_sim_result_df <- series_gen_df3 |>
@@ -146,109 +57,11 @@ for (simulation_run in 1:simulation_runs) {
     run = rep(simulation_run, nrow(series_gen_df3))
   ) |> 
   unnest_longer(id)
-  sim_random_df_small <- bind_rows(sim_random_df_small, single_sim_result_df)
-} # .5sec for 1000 runs
+  sim_random_df <- bind_rows(sim_random_df, single_sim_result_df)
+} #  5min? for 1000 runs
+sim_random_df |> dim() # 15029000 x 9
 ```
-### unnest now
 
-
-```{r}
-
-sim_random_df |> colnames()
-sim_random_df |> dim() # 1000 runs, 15million rows
-```
-### frequency distribution of 1000 runs
-
-```{r}
-df_count_pokemon_random_draw <- sim_random_df |> 
-  group_by(run, id) |> 
-  mutate(n = n()) |> 
-  ungroup() |> 
-  group_by(run) |> 
-  arrange(desc(n)) |>
-  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
-  select(run, n, ecdf) |> 
-  distinct() |> 
-  ungroup()
-df_count_pokemon_random_draw_mean <- df_count_pokemon_random_draw |> 
-  group_by(n) |> 
-  summarise(mean_ecdf = mean(ecdf))
-df_count_pokemon_random_draw |> 
-  # filter(run == 3) 
-  ggplot(
-    aes(
-      x = n, 
-      y = ecdf
-    )
-  ) +
-  geom_line(aes(group = run), alpha = .01, size = .1) +
-  geom_point(aes(group = run), alpha = .01, size = .1) +
-  geom_line(
-    data = df_count_pokemon_random_draw_mean,
-    aes(y = mean_ecdf),
-    colour = "red"
-  ) +
-  scale_x_continuous(
-    limits = c(1, 130),
-    trans = "log10", 
-    breaks = 10^(0:10)
-  ) +
-  scale_y_continuous(
-    limits = c(0.001, 1),
-    trans = "log10", 
-    breaks = 10^(0:-10)
-    ) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(size = .3),
-    axis.ticks = element_line(size = .1),
-    aspect.ratio = 1
-  )
-ggsave("./output/random-draw-1000runs.png", width = 3000, height = 2000, unit = "px")
-
-```
-### compare with empirical data
-
-```{r}
-df_count_pokemon_random_draw # simulation 
-df_count_pokemon # empirical
-df1 <- df_count_pokemon_random_draw %>%
-  mutate(condition = rep("simulation", nrow(x = .)))
-df2 <- df_count_pokemon %>%
-  mutate(condition = rep("empirical", nrow(x = .)))
-df_compare_empirical_simulation1 <- bind_rows(df1, df2)
-
-df_compare_empirical_simulation1 |> 
-    ggplot(
-    aes(
-      x = n, 
-      y = ecdf,
-      colour = condition
-    )
-  ) +
-  geom_point() +
-  scale_x_continuous(
-    # limits = c(1, 130),
-    trans = "log10",
-    breaks = 10^(0:10)
-  ) +
-  scale_y_continuous(
-    # limits = c(0.001, 1),
-    trans = "log10",
-    breaks = 10^(0:-10)
-    ) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(size = .3),
-    axis.ticks = element_line(size = .1),
-    aspect.ratio = 1
-  )
-
-
-
-```
 
 ### compare gen histogram 
 
@@ -261,65 +74,28 @@ df_empirical_count_id <-
   mutate(
     condition = rep("empirical", nrow(.))
   )
-random_draw_df2_gen <- 
-  random_draw_df2 |> 
-  left_join(df_names, by = "id") |> 
-  group_by(id) |> 
-  summarise(n = n()) %>%
+sim_random_count_pokemon_df <- 
+  sim_random_df |> 
+  # left_join(df_names, by = "id") |> 
+  group_by(id, run) |> 
+  summarise(n = n()) |> 
+  ungroup() %>%
   mutate(
     condition = rep("simulation", nrow(.))
   )
-bind_rows(df_empirical_count_id, random_draw_df2_gen) |>
-  ggplot(aes(x = id, y = n, colour = condition)) +
-  geom_point(alpha = .3) 
-```
-### まんべんなくとられているか
-
-nrow()でかんたんにわかる。empiricalは、現時点で905全ポケモンのうち903ポケが登場したことがある。
-ランダムのシミュレーションを何度もまわせば、この時点でこれくらいの数のポケモンが少なくとも一度ポケカになったということがわかるはず。そことどれくらいずれるのだろうか。
-
-### 多様性はどうか
-
-1年くらいのウィンドウをずらしていって、なんとかの多様性を測る。個体数とVariant数が一致しないので難しいのだが…。個体数がでればなぁ　試合なら出るか。
-
-### plot ~ t
-
-```{r}
-random_draw_df2 |> 
-  ggplot(aes(x = release_date, y = id)) +
-  geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date, colour = game_gen |> as.factor()),
-    linetype = "dashed"
-  ) +
-  geom_text(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(label =as.roman(game_gen), x = game_release_date, colour = game_gen |> as.factor()),
-    y = -10,
-    size = 2,
-    hjust = 0,
-    vjust = 1,
-    nudge_x = 100,
-    # nudge_y = -1000
-  ) +
-  geom_count( alpha = .3,  stroke = .1)
-  geom_count(aes( fill = pokemon_gen), pch = 21, alpha = .3,  stroke = .1) +
-  geom_count(aes( fill = pokemon_gen), pch = 21, alpha = .5, data = df_gene |> filter(series_class == "Black Star Promo"), colour = "black") +
-  # scale_colour_viridis_d(option = "C") +
-  scale_fill_viridis_c() +
-  scale_colour_viridis_d(option = "D") +
-  scale_y_continuous(limits = c(0, NA)) +
+sim_random_count_pokemon_df |> 
+  filter(run < 10) |> 
+  ggplot(aes(x = id, y = n)) +
+  geom_jitter(alpha = .1, size = .2, colour = "grey40") +
+  geom_vline()
+  geom_point(data = df_empirical_count_id, size = 1, alpha = .5, colour = "orange") +
   theme_pokemon
+  # scale_colour_viridis_c() +
+  # scale_y_continuous(trans=  "log10")
 ```
 
-## temporal change over time
 
-
-10simとNameとpokemon_nameの推移を並べて、`release_date`ごとにどう変わっていったかをアニメーションにしてみる。
-{gganimate}は使えない気がするので、地味にpngで連番でだすかなぁ
-
-と思ったが、やっぱり毎月などの等間隔のほうがいい気がしてきた。
-
+## emp pokemon_name vs sim pokemon_name, cumulative, yearly, 5y interval.
 ```{r}
 release_dates <- df_series2 |> 
   filter(!is.na(pokemon_data_count)) |> 
@@ -329,16 +105,15 @@ release_dates <- df_series2 |>
 release_dates |> min() # 1999 Jan
 release_dates |> max()# 2022 Sep
 # months_seq <- seq(as.Date("2009-01-01"), length = 166, by = "months")
-years_seq <- seq(as.Date("2009-01-01"), length = 15, by = "years")
+years_seq <- seq(as.Date("1999-01-01"), length = 25, by = "years") # NOT 2009!!
 ```
 
 この`release_dates`で`for`を回して、これ以下のデータでフィルタしていく。
 
-
-### temporal change, cumulative
+### filter dfs until specific year (~2000, ~2014, etc.), merge them
 
 ```{r}
-sim_random_df_small # 10 runs
+sim_random_df # 1000 runs
 df_gene # `Name` = group by distinct names, `pokemon_name` = group by distinct pokemons. 
 # initialize
 temporal_change_cumulative_df <- tibble(
@@ -348,16 +123,16 @@ temporal_change_cumulative_df <- tibble(
   until_date = Date()
 )
 # run length(months_seq)
-for (i in 2:length(years_seq)) {
-  sim_random_df_small_until_threshold_date <-
-    sim_random_df_small |> 
+for (i in 2:length(years_seq)) { # start from 2 to skip "until 1999-01-01" which doesn't exist
+  sim_random_df_until_threshold_date <-
+    sim_random_df |> 
     filter(release_date <= years_seq[i])
   emp_df_until_threshold_date <- df_gene |> 
     filter(!is.na(id)) |> 
     filter(release_date <= years_seq[i])
   
   sim_df <- 
-    sim_random_df_small_until_threshold_date |> 
+    sim_random_df_until_threshold_date |> 
     group_by(run, id) |> 
     mutate(n = n()) |> 
     ungroup() |> 
@@ -370,7 +145,17 @@ for (i in 2:length(years_seq)) {
     mutate(
       condition = rep("simulations", nrow(.))
     )
-  emp_long_df <- 
+  emp_card_type_df <- 
+    emp_df_until_threshold_date |> 
+    mutate(name_type = paste(Name, Type)) |> 
+    group_by(name_type) |> 
+    summarise(n = n()) |> 
+    arrange(desc(n)) |> 
+    mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+    select(-name_type) |> 
+    distinct() %>%
+    mutate(condition = rep("card name + type", nrow(.)))
+  emp_card_df <- 
     emp_df_until_threshold_date |> 
     group_by(Name) |> 
     summarise(n = n()) |> 
@@ -388,56 +173,76 @@ for (i in 2:length(years_seq)) {
     select(-id) |> 
     distinct() %>%
     mutate(condition = rep("pokemon name", nrow(.)))
-  merge_df <- bind_rows(sim_df, emp_long_df, emp_poke_df) %>%
+  merge_df <- bind_rows(sim_df, emp_card_type_df, emp_card_df, emp_poke_df) %>%
     mutate(
       until_date = rep(years_seq[i], nrow(.))
     )
   temporal_change_cumulative_df <- bind_rows(temporal_change_cumulative_df, merge_df)
 } # 3 sec
-temporal_change_cumulative_df |> dim() # 6151 x 5
+temporal_change_cumulative_df |> dim() # 8541 x 5
 
 ```
 
-plot
+
+### plot 
+
+論文掲載予定
+
+#### filter: only 5 years interval (2005, 2010, 2015, 2020), focus on sim vs emp
 
 ```{r}
-temporal_change_cumulative_df |> 
-  ggplot(aes(x = n,y = ecdf, group = paste(until_date, run), colour = until_date)) +
-  geom_line(alpha = 1, size = .15/.751) +
+emp_vs_sim_temporal_five_years_interval_df <- temporal_change_cumulative_df |> 
+  filter(
+    condition %in% c("simulations", "pokemon name"),
+    until_date %in% ymd(c("2005-01-01", "2010-01-01", "2015-01-01", "2020-01-01"))
+    )
+```
+
+
+```{r}
+emp_vs_sim_temporal_five_years_interval_df |> 
+  # filter(condition == "pokemon name") |> 
+  ggplot(aes(x = n,y = ecdf, group = paste(until_date, run), colour = condition, size = condition, fill = until_date |> as.factor())) +
+  geom_point(
+    aes(alpha = condition, shape = condition),
+    # data = emp_vs_sim_temporal_five_years_interval_df |> filter(condition == "simulations"),
+    # alpha = .3, 
+    # colour = "grey30",
+    # size = .15/.751,
+    stroke = .1
+    ) +
+  # geom_point(alpha = 1, size = .15/.751) +
   # geom_point( alpha = 1, size = .1) +
+  scale_alpha_manual(values = c("pokemon name" = 1,"simulations" =  .2)) +
+  scale_shape_manual(values = c(21, 16)) +
   scale_x_continuous(
      expand = c(0.1,0),
-    # limits = c(1, 10000),
     trans = "log10", 
     breaks = 10^(0:10)
   ) +
   scale_y_continuous(
     expand = c(0.1,0),
-    # limits = c(0.0001, 1),
     trans = "log10", 
     breaks = 10^c(0, -3),
     labels = trans_format("log10", math_format(10^.x))
     ) +
-  scale_colour_paletteer_c("ggthemes::Blue-Green Sequential", trans = "date") + 
-  facet_wrap(vars(condition)) +
-  theme_minimal(base_size = 6) +
-  theme(
-    panel.grid = element_blank(),
-    legend.position = "none",
-    # panel.background = element_rect(size = .4),
-    axis.line = element_line(
-      size = .15/.751
-      ),
-    axis.text = element_text(size = 6),
-    axis.ticks = element_line(),
-    aspect.ratio = 1,
-    plot.background = element_rect(fill = "white", colour = NA)
-  )
-ggsave("./output/temporal-change-cumulative.png", width = 75, height = 30, unit = "mm", dpi = 600)
-ggsave("./output/temporal-change-cumulative.pdf", width = 75, height = 30, unit = "mm")
-
-
+  scale_colour_manual(values = c("black", "grey50")) +
+  scale_size_manual(values = c(.5, .3/.751)) +
+  # scale_colour_paletteer_c("ggthemes::Blue-Green Sequential", trans = "date") + 
+  # scale_fill_paletteer_c("pals::ocean.deep", trans = "date") +
+   scale_fill_viridis_d() +
+  facet_wrap(
+    # rows = vars(condition),
+    vars(until_date),
+    nrow = 1
+  ) +
+  theme_pokemon +
+  theme(aspect.ratio = 1, 
+        legend.position = c(.1, .4))
+ggsave("./output/count_emp_vs_sim_temporal_five_years_interval.png", width = 86, height = 35, unit = "mm", dpi = 600)
+# ggsave("./output/temporal-change-cumulative.pdf", width = 75, height = 30, unit = "mm")
 ```
+常にSimのほうが急に下がる（肩がとがっている）＝中間層が多い。10とか20とか。
 
 ### temporal change, yearly
 
@@ -641,16 +446,65 @@ ggsave("./output/temporal-change-each_release.png", width = 6000, height = 2000,
 
 ```
 
-### try {gganimate}
 
+### omake: frequency distribution of 1000 runs
 
-[gganimate](https://gganimate.com/)
 ```{r}
+df_count_pokemon_random_draw <- sim_random_df |> 
+  group_by(run, id) |> 
+  mutate(n = n()) |> 
+  ungroup() |> 
+  group_by(run) |> 
+  arrange(desc(n)) |>
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
+  select(run, n, ecdf) |> 
+  distinct() |> 
+  ungroup()
+df_count_pokemon_random_draw_mean <- df_count_pokemon_random_draw |> 
+  group_by(n) |> 
+  summarise(mean_ecdf = mean(ecdf))
+df_count_pokemon_random_draw |> 
+  # filter(run == 3) 
+  ggplot(
+    aes(
+      x = n, 
+      y = ecdf, 
+      colour = run
+    )
+  ) +
+  geom_line(aes(group = run), alpha = .01, size = .1) +
+  geom_point(aes(group = run), alpha = .01, size = .1) +
+  geom_line(
+    data = df_count_pokemon_random_draw_mean,
+    aes(y = mean_ecdf),
+    colour = "red"
+  ) +
+  scale_x_continuous(
+    limits = c(1, 130),
+    trans = "log10", 
+    breaks = 10^(0:10)
+  ) +
+  scale_y_continuous(
+    limits = c(0.001, 1),
+    trans = "log10", 
+    breaks = 10^(0:-10)
+    ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(size = .3),
+    axis.ticks = element_line(size = .1),
+    aspect.ratio = 1
+  )
+ggsave("./output/random-draw-1000runs.png", width = 3000, height = 2000, unit = "px")
 
-
-# # +
-#   transition_states(
-#     until_date
-#   )  +
 ```
 
+## まんべんなくとられているか
+
+group_by(id) |> summariseでnrow()でかんたんにわかる。empiricalは、現時点で905全ポケモンのうち903ポケが登場したことがある。
+ランダムのシミュレーションを何度もまわせば、この時点でこれくらいの数のポケモンが少なくとも一度ポケカになったということがわかるはず。そことどれくらいずれるのだろうか。
+
+### 多様性はどうか
+
+1年くらいのウィンドウをずらしていって、なんとかの多様性を測る。個体数とVariant数が一致しないので難しいのだが…。個体数がでればなぁ　試合なら出るか。

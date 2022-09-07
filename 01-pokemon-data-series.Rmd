@@ -180,22 +180,27 @@ series_classification_df3 <-
 series_classification_df3
 ```
 
+### solve #1:  black star promos' release_dates are aligned to the first release #1 
+
+use the end date.
 
 ```{r}
-# test
-# str_view_all(
-#   "From February 9, 2021", 
-#   "January|February|March|April|May|June|July|August|September|October|November|December")
-# str_view_all(
-#   "April - August, 2006", 
-#   "[:digit:]{4}")
-# str_view_all(
-#   "October 13th - November 26th, 2013", 
-#   "[:digit:]{4}")
-# str_view_all(
-#   "September, 2008 - March, 2009", 
-#   "[:digit:]{4}")
+series_classification_df3_blackstar <- series_classification_df3 |> 
+  # filter(series_class == "Black Star Promo") |> 
+  # select(release_date) |> 
+  mutate(
+    release_date = 
+      case_when(
+        series_class == "Black Star Promo"
+        ~ str_extract(release_date, "(?<=-\\s).*"),
+        TRUE ~ release_date),
+    release_date = if_else(release_date == "Present", "September, 2022", release_date))
 
+series_classification_df3_blackstar
+```
+
+
+```{r}
 # https://lubridate.tidyverse.org/reference/parse_date_time.html
 
 parse_date_time(
@@ -206,7 +211,7 @@ parse_date_time(
 # run
 
 series_classification_df4 <-
-  series_classification_df3 |> 
+  series_classification_df3_blackstar |> 
   mutate(
     release_date_month = 
       str_extract(
@@ -275,7 +280,7 @@ series_classification_df4 <-
       ) |> 
       parse_date_time(orders = "ybd"),
   )
-series_classification_df4
+series_classification_df4$release_date
 ```
 
 
@@ -324,6 +329,7 @@ release_dates_df3 <-
   mutate(
     series = recode(
       series,
+      # V3.25 = Bulbapedia
       `McDonalds Collection 2021` = "McDonald's Collection 2021",
       `Champions Path` = "Champion's Path",
       `Sword and Shield` = "Sword & Shield",
@@ -337,7 +343,8 @@ release_dates_df3 <-
       `X and Y Promos` = "XY Black Star Promos",
       `McDonalds Collection` = "McDonald's Collection",
       `Black and White` = "Black & White", 
-      `HeartGold and SoulSilver` = "HeartGold & SoulSilver"
+      `HeartGold and SoulSilver` = "HeartGold & SoulSilver",
+      `Pokemon GO` = "Pokémon GO"
     ),
     series = str_replace(series, "Pop", "POP")
   )

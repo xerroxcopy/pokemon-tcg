@@ -1,0 +1,10 @@
+# assemble plot
+
+```{r}
+library(patchwork)
+p1 <- p_count_full_name_type # 05
+p2 <- p_count_full_name
+p3 <- p_count
+(p1 + p2 + p3) / p3
+```
+

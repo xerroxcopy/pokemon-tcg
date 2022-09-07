@@ -33,11 +33,6 @@ knitr::opts_chunk$set(echo = TRUE,
 grDevices::dev.size()
 ```
 
-## data
-
-```{r}
-load("./data/2022-09-05-dataframes.RData")
-```
 
 ## plot style
 ```{r }
@@ -53,7 +48,8 @@ theme_pokemon <-
     axis.ticks = element_line(),
     plot.background = element_rect(fill = "white", colour = NA),
     strip.text = element_text(size = 6),
-    legend.text = element_text(size = 6)
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(3, units = "mm")
   )
 ```
 

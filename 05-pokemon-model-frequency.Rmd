@@ -14,17 +14,26 @@ df_poke_count_raw <- df |>
 [負うた子に教えられて浅瀬を渡る](https://qiita.com/xerroxcopy/items/b79635ef3dbcc29644c6)
 
 ```{r}
-
+# name + type. 
+# distinguish pokemons with the same name, but with different types
+df_count_full_name_type <- df_gene |> 
+  mutate(name_type = paste(Name, Type)) |> 
+  group_by(name_type) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  select(-name_type) |> 
+  distinct() |> 
+  mutate(condition = "card name + type")
+  
 df_count_full_name <- df_gene |> 
   group_by(Name) |> 
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
   mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
   select(-Name) |> 
-  distinct()
-
-
-df_gene |> View()
+  distinct() |> 
+  mutate(condition = "card name")
 df_count_pokemon <- df_gene |> 
   filter(!is.na(id)) |> 
   group_by(pokemon_name) |> 
@@ -32,7 +41,10 @@ df_count_pokemon <- df_gene |>
   arrange(desc(n)) |> 
   mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
   select(-pokemon_name) |> 
-  distinct() 
+  distinct() |> 
+  mutate(condition = "pokémon name")
+df_count_pokemon
+df_count_full_name
 ```
 
 `ecdf()`はX > nである割合であってX >= nである割合ではないのだな
@@ -40,95 +52,54 @@ df_count_pokemon <- df_gene |>
 
 ## plot ECDF
 
+Complementary Cumulative Distribution Function 
+
+
+### full name, type
+
+```{r}
+p_count_full_name_type <- df_count_full_name_type |> 
+  ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name + type") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+```
+
 ### full name
 
 ```{r}
-df_count_full_name |> 
-  ggplot(
-    aes(
-      x = n, 
-      y = ecdf
-    )
-  ) +
+p_count_full_name <- df_count_full_name |>
+  ggplot(aes(x = n, y = ecdf)) +
   geom_point() +
-  scale_x_continuous(
-    trans = "log10", 
-    breaks = 10^(0:10)
-  ) +
-  scale_y_continuous(
-    trans = "log10", breaks = 10^(0:-10)) +
-  theme_minimal() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name") +
+  theme_pokemon +
   theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(size = .3),
-    axis.ticks = element_line(size = .1),
+    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
+
 ```
 ### poke name
 
 ```{r}
-df_count_pokemon |> 
-  ggplot(
-    aes(
-      x = n, 
-      y = ecdf
-    )
-  ) +
+p_count <- df_count_pokemon |> 
+ ggplot(aes(x = n, y = ecdf)) +
   geom_point() +
-  scale_x_continuous(
-    limits = c(1, 130),
-    trans = "log10", 
-    breaks = 10^(0:10)
-  ) +
-  scale_y_continuous(
-    limits = c(0.001, 1),
-    trans = "log10", 
-    breaks = 10^(0:-10)
-    ) +
-  theme_minimal() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "pokemon name") +
+  theme_pokemon +
   theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(size = .3),
-    axis.ticks = element_line(size = .1),
+    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
 ```
-## 
 
-つぎに、1999-2005, 1999-2010, 1999-2015,みたいにして探る。ピカチュウが流行ったのって何年くらいだっけ？その影響はありそう。gganimateみたいなやつを使えればいいけど、ちょっとむずかしいかも。
-
-
-
-```{r}
-
-df_poke_count <- df |> 
-  group_by(Name) |> 
-  summarise(n = n()) |> 
-  arrange(desc(n)) |> 
-  mutate(ecdf = 1 - ecdf(n)(n)) |> 
-  select(-Name) |> 
-  distinct() |> 
-  mutate(ecdf = ecdf |> lead(default = 1))
-df_poke_count |> 
-  ggplot(
-    aes(
-      x = n, 
-      y = ecdf
-    )
-  ) +
-  geom_point() +
-  scale_x_continuous(
-    trans = "log10", 
-    breaks = 10^(0:10)
-  ) +
-  scale_y_continuous(
-    trans = "log10", breaks = 10^(0:-10)) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(size = .3),
-    axis.ticks = element_line(size = .1),
-    aspect.ratio = 1
-  )
-```

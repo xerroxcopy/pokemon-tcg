@@ -62,7 +62,9 @@ everything_df_bulbanized <-
       `X and Y Promos` = "XY Black Star Promos",
       `McDonalds Collection` = "McDonald's Collection",
       `Black and White` = "Black & White", 
-      `HeartGold and SoulSilver` = "HeartGold & SoulSilver"
+      `HeartGold and SoulSilver` = "HeartGold & SoulSilver",
+      `Pokemon GO` = "Pokémon GO"
+
     ),
     series = str_replace(series, "Pop", "POP")
   )
@@ -315,7 +317,6 @@ summarise_df_count_cards
 df_series2 <- df_series |> 
   left_join(summarise_df_count_cards, by = "series") |> 
   select(series_class:cards_total, pokemon_data_count, everything())
-df_series2 |> View()
 ```
 
 ## name the final df df
@@ -329,6 +330,8 @@ wrangle the `df` further in `pokemon-genes.Rmd` next. `df` to `df_genes`.
 ```{r}
 df |> colnames() |> paste0(collapse = "|\n")
 df$series_class|> unique()
+df |> 
+  filter(series == "Pokémon GO")
 ```
 
 |column|meaning|
