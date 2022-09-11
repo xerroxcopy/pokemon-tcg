@@ -1,0 +1,23 @@
+# game release dates and generation, cumulative pokemon data
+
+```{r}
+df_game_gen <- 
+  tribble(
+    ~game_gen, ~game_release_date, ~game_release_date_ja, ~pokemon_n_new,
+    1,         "1998-09-28",   "1996-02-27", 151,
+    2,         "2000-10-15",   "1999-11-21", 100,
+    3,         "2003-03-15",   "2002-11-21", 135, # https://bulbapedia.bulbagarden.net/wiki/Generation_III
+    4,         "2007-04-22",   "2006-09-28", 107, # https://bulbapedia.bulbagarden.net/wiki/Generation_IV
+    5,         "2011-03-04",   "2010-09-18", 156, 
+    6,         "2013-10-12",   "2013-10-12", 72,
+    7,         "2016-11-18",   "2016-11-18", 88, # 81+5+2=88
+    8,         "2019-11-15",   "2019-11-15", 96, # 89+7
+    9,         "2022-11-18",   "2022-11-18", NA_integer_
+    ) |> 
+  mutate(
+    across(starts_with("game_release"), as.Date),
+    game_end_date = lead(game_release_date),
+    pokemon_cumulative_n = cumsum(pokemon_n_new)
+  )
+
+```

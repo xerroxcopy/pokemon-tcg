@@ -2,18 +2,18 @@
 
 ## read raw
 
-using `sheet_names2` vector (which does not necessarily match the series names provided by Bulbapedia), read the excels.
+using `series_names_spreadsheet` vector (which does not necessarily match the series names provided by Bulbapedia), read the excels.
 ```{r}
 raw_xlsx <- 
   map(
-    sheet_names2,
+    series_names_spreadsheet,
     ~ read_xlsx(
       excel_path,
       sheet = .x,
       skip = 3,
       col_types = "text"
     )
-  ) 
+  ) # 30 sec
 ```
 
 ## convert to df
@@ -21,93 +21,49 @@ raw_xlsx <-
 `raw_xlsx` is still a list. Convert it to df: 
 
 ```{r}
-pokemon_df_list <- 
+cards_df <- 
   map2(
     .x = raw_xlsx,
-    .y = sheet_names2,
+    .y = c_series_spreadsheet_renamed,
     ~ mutate(.data = .x, series = rep(.y, nrow(.x)))
   ) |> 
   map(
     ~ mutate(
       .data = .x,
-      `Set #` = `Set #` |> as.character() # some are num, some are char
+      set_no = `Set #` |> as.character() # some are num, some are char
     )
-  )
-# bind rows
-everything_df_raw <- 
-  pokemon_df_list |> 
-  bind_rows() |> 
-  filter(!is.na(Type)) |> # remove empty rows
-  select(`Set #`, Name, Type, series)
-```
-
-## Match series names to Bulbapedia
-
-```{r}
-everything_df_bulbanized <- 
-  everything_df_raw |> 
-  mutate(
-    series = recode(
-      series,
-      `McDonalds Collection 2021` = "McDonald's Collection 2021",
-      `Champions Path` = "Champion's Path",
-      `Sword and Shield` = "Sword & Shield",
-      `Sword and Shield Promos` = "SWSH Black Star Promos",
-      `Sun and Moon` = "Sun & Moon",
-      `Sun and Moon Promos` = "SM Black Star Promos",
-      `Mcdonalds Collection 2015` = "McDonald's Collection 2015",
-      `Mcdonalds Collection 2014` = "McDonald's Collection 2014",
-      `McDonalds Collection 2012` = "McDonald's Collection 2012", # not Mcd!
-      `X and Y` = "XY",
-      `X and Y Promos` = "XY Black Star Promos",
-      `McDonalds Collection` = "McDonald's Collection",
-      `Black and White` = "Black & White", 
-      `HeartGold and SoulSilver` = "HeartGold & SoulSilver",
-      `Pokemon GO` = "Pokémon GO"
-
-    ),
-    series = str_replace(series, "Pop", "POP")
-  )
-```
-
-## Merge series df & poke df
-
-Now that the series names are Bulbanized, merge these datasets to retrieve `series_type` and `release_date` and  `series_gen`:
-
-```{r}
-df_series_en <- df_series |> select(!ends_with("_ja"))
-everything_df_merged <-
+  ) |> 
+  bind_rows() |>
+  rename(card_type = Type, card_name = Name) |> 
+  filter(!is.na(card_type)) |> # remove empty rows
+  select(set_no, card_name, card_type, series) |> 
   left_join(
-    everything_df_bulbanized,
-    df_series_en,
+    df_series |> select(!ends_with("_ja")),
     by = c("series")
   ) 
-everything_df_merged # 15029 x 11
+cards_df # 15029 x 8
 ```
 
-## fix typos in Type
+## fix typos in card_type
 
 "Fightning", "Coloress" etc.
 
-```{r}
-everything_df_merged |> dim() # 15029 x 10
-```
 
 
 ```{r}
 # check typos
 
-pokemon_df_summarised <- everything_df_merged |> 
-  group_by(Type) |> 
+pokemon_df_summarised <- cards_df |> 
+  group_by(card_type) |> 
   summarise(n = n()) |> 
   arrange(n |> desc())
-everything_df_raw$Type |> unique()
+cards_df$card_type |> unique()
 ```
 
 ```{r}
-everything_df_typo <- everything_df_merged |> 
+cards_df_typo <- cards_df |> 
   mutate(
-    Type = recode(Type, 
+    card_type = recode(card_type, 
       Fightning = "Fighting",
       FIGHting = "Fighting",
       Coloress = "Colorless",
@@ -117,9 +73,9 @@ everything_df_typo <- everything_df_merged |>
       Lightnijg = "Lightning",
       Lighting = "Lightning"
     ),
-    Name = 
+    card_name = 
       str_replace(
-        Name, "\\s+", " "
+        card_name, "\\s+", " "
       ) |> # Garados* δ EX Holon Phantoms 102/110 includes two spaces :(
       str_replace("Dartix", "Dartrix") |> 
       str_replace("\\sForm\\s", " Forme ") |> 
@@ -129,24 +85,35 @@ everything_df_typo <- everything_df_merged |>
       str_replace("Primal KyogreEK", "Primal KyogreEX") |> 
       str_replace("StaraptorFCLV.X", "StaraptorFBLV.X") |>
       str_replace("Sirfetch’d", "Sirfetch'd") |> 
-      str_replace("Castform\\sRain\\s", "Castform Rainy\\s"), # TODO: move this to df typo
-    Type = if_else(Name == "Morty", "Supporter", Type), # one of the two Morty incorrectly classified as "Psychic"
+      str_replace("Castform\\sRain\\s", "Castform Rainy\\s"),
+    card_type = if_else(card_name == "Morty", "Supporter", card_type), # one of the two Morty incorrectly classified as "Psychic"
   )
+```
 
+
+```{r}
 types_non_pokemon <-  c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM")
-pokemon_type_ranking <- everything_df_typo |>
-  filter(!Type %in% types_non_pokemon) |> 
-  group_by(Type) |> 
+pokemon_type_ranking <- cards_df_typo |>
+  filter(!card_type %in% types_non_pokemon) |> 
+  group_by(card_type) |> 
   summarise(n = n()) |> 
   arrange(desc(n))
 major_types <- pokemon_type_ranking |> 
   filter(n > 100) |> # omit type+type pokemons
-  select(Type) |> 
+  select(card_type) |> 
   pull()
+#check
+major_types
+```
+
+
+```{r}
 mixed_types <- pokemon_type_ranking |> 
   filter(n <= 100) |> # select type+type pokemons
-  select(Type) |> 
+  select(card_type) |> 
   pull()
+#check
+mixed_types
 ```
 
 ## color the types
@@ -158,94 +125,62 @@ mixed_types <- pokemon_type_ranking |>
 
 
 ```{r}
-everything_df_coloured <- everything_df_typo |> 
-  mutate(
-    colour = recode(
-      Type, 
-      Water = "#80DDFF",
-      Grass = "#80FF82",
-      Psychic = "#361C63",
-      Colorless = "#D1D1D1",
-      Fighting = "#8F441E",
-      Fire = "#FF0F23",
-      Lightning = "#F0C800",
-      Darkness = "#1D1D1B", # black
-      Metal = "#463F43", # silver
-      Dragon = "#ABAD00", # gold
-      Fairy = "#FF4DAF", # purple
-    ),
-    Type2 = case_when(
-      Type %in% mixed_types ~ "mixed",
-      TRUE ~ Type),
-    is_pokemon = !Type %in% types_non_pokemon | Name != "Buried Fossil" # tricky edge case: Buried Fossil is not a pokemon but Colorless item that can be used like a pokemon.
-  ) 
 
+df_type_colour <- tribble(
+  ~ card_type, ~ rgb, ~ colour,
+      "Water", "#80DDFF", "lightblue",
+      "Grass", "#80FF82", "green",
+      "Psychic", "#361C63", "purple",
+      "Colorless", "#D1D1D1", "lightgrey",
+      "Fighting", "#8F441E", "orange",
+      "Fire", "#FF0F23", "red",
+      "Lightning", "#F0C800", "yellow",
+      "Darkness", "#1D1D1B", "darkgrey",
+      "Metal", "#463F43", "silver",
+      "Dragon", "#ABAD00", "gold",
+      "Fairy", "#FF4DAF", "pink"
+)
 ```
 
-*colours*
-
-```{r}
-colours_named_vector <- 
-  c("Water" = "#80DDFF",
-      "Grass"= "#80FF82",
-      "Psychic" = "#361C63",
-      "Colorless" = "#D1D1D1",
-      "Fighting" = "#8F441E",
-      "Fire" = "#FF0F23",
-      "Lightning" = "#F0C800",
-      "Darkness" = "#1D1D1B", # black
-      "Metal" = "#463F43", # silver
-      "Dragon" = "#ABAD00", # gold
-      "Fairy" = "#FF4DAF", # purple
-      "mixed" = "black"
-    )
-```
 
 ## repair set numbers that are converted to Dates
-
-test
-
-```{r}
-# check problems
-"2022-04-22" |> 
-  ymd() %>% # default pipe does not support {} in RHS
-  {str_c(month(.), "/", day(.))}
-# pop series 9 1/17 Garchomp
-"44213.0" |> 
-  as.numeric() |> 
-  as.Date(origin = "1899/12/30") %>% # excel date starts from 12/30
-  {str_c(month(.), "/", day(.))}
-```
 
 regex: [Rdrr](https://rdrr.io/cran/stringi/man/about_search_regex.html)
 
 ```{r}
-everything_df_date <- everything_df_coloured |> 
-  # filter(series %in% c("EX Trainer Kit 2", "Pop Series 9")) |>
+cards_df_date <- cards_df_typo|> 
+  mutate(
+    card_type2 = case_when(
+      card_type %in% mixed_types ~ "mixed",
+      TRUE ~ card_type),
+    is_pokemon = !card_type %in% types_non_pokemon & card_name != "Buried Fossil"
+    # tricky edge case: Buried Fossil is not a pokemon but 
+    # Colorless item that can be used like a pokemon.
+  ) |> 
   mutate(
     set = 
       case_when(
         str_detect(
-          `Set #`,
+          set_no,
           pattern = "\\d{4}-\\d{2}-\\d{2}"
         ) ~
         # use {} to use dot operator more than once,
         # and use %>% instead of base |> to do so. base pipe doesn't support it
-        ymd(`Set #`) %>%
+        ymd(set_no) %>%
           {str_c(month(.), "/", day(.))}, # 11086 failed to parse
         str_detect(
-          `Set #`,
+          set_no,
           pattern = "\\d{5}.0"
         ) ~
-        as.character(`Set #`) |> 
+        as.character(set_no) |> 
           as.numeric() |>
           as.Date(origin = "1899/12/30") %>%
           {str_c(month(.), "/", day(.))}, # NAs introduced by coersion
-        TRUE ~ `Set #`
+        TRUE ~ set_no
       )
   ) |> 
-  select(set, everything(), -`Set #`)
-everything_df_date
+  select(set, everything(), -set_no)
+cards_df_date
 ```
 Ignore the warnings. Idk why it warns me that.
 
@@ -258,7 +193,7 @@ Ignore the warnings. Idk why it warns me that.
 # str_view_all("BH233/BH244", "(?<=[:alpha:]{0,8})\\d+(?=/)")
 # str_view_all("50a/147", "(?<=[:alpha:]{0,8})\\d+(?=[:lower:]{0,1}/)")
 
-everything_df_card_no <- everything_df_date |> 
+cards_df_card_no <- cards_df_date |> 
   mutate(
     card_number = 
       case_when(
@@ -272,8 +207,6 @@ everything_df_card_no <- everything_df_date |>
           str_extract(set, "\\d+") |> as.integer(),
         str_detect(set, "\\d+$") ~
           str_extract(set, "\\d+$") |> as.integer(),
-        # str_detect(set, "[A-Z]+\\d+") ~
-        #   str_extract(set, "\\d")
         TRUE ~ NA_integer_
       ),
     cards_total_official = 
@@ -289,11 +222,11 @@ everything_df_card_no <- everything_df_date |>
     is_secret_card =  (card_number > cards_total_official), # !is.na(card_total) &&
     release_date = as_date(release_date) # POSIXct to Date
   )
-everything_df_card_no2 <- 
-  everything_df_card_no |> 
+cards_df_card_no |> colnames()
+cards_df_card_no2 <- 
+  cards_df_card_no |> 
   select(
-    Name, 
-    series_gen, 
+    card_name, 
     series, 
     release_date, 
     set, 
@@ -302,14 +235,14 @@ everything_df_card_no2 <-
     starts_with("is_"),  
     everything()
   ) 
-everything_df_card_no2
+cards_df_card_no2
 ```
 ## count of data points
 
 Add a row to df that counts up the number of actual data points of pokemon cards available in the dataset [#4](https://github.com/xerroxcopy/pokemon-tcg/issues/4)
 ```{r}
 summarise_df_count_cards <- 
-  everything_df_card_no2 |> 
+  cards_df_card_no2 |> 
   filter(is_pokemon) |> # count only pokemons
   group_by(series) |> 
   summarise(pokemon_data_count = n())
@@ -319,10 +252,10 @@ df_series2 <- df_series |>
   select(series_class:cards_total, pokemon_data_count, everything())
 ```
 
-## name the final df df
+## name the final df df_card
 
 ```{r}
-df <- everything_df_card_no2
+df_card <- cards_df_card_no2
 ```
 
 wrangle the `df` further in `pokemon-genes.Rmd` next. `df` to `df_genes`.
@@ -336,20 +269,20 @@ df |>
 
 |column|meaning|
 |---|---|
-|`Name`|name from V3.25, fixed typo.|
+|`card_name`|name from V3.25, fixed typo.|
 |`series_gen`|generation of the series according to V3.25|
 |`series`|name of the series. the names are aligned to that on bulbapedia.|
 |`release_date`|release date of the series according to bulbapedia (except `Trainer Kit`s, which are based on V3.25). date, not POSIXct. |
-|`set`|`Set #` in V3.25. `chr`|
+|`set`|set_no in V3.25. `chr`|
 |`card_number`|card number of `set`, `int`. `12` if `GH12/GH124`, `123` if `AB123`.|
 |`cards_total_official`|official total number of cards, excluding secret cards. `int`. Available only if the card number is stylized as a fraction, e.g., `GH12/GH124`.|
-|`is_pokemon`|`TRUE` if pokemon. `Buried Fossil` is `FALSE` though it has a `Type` of `Colorless`.|
+|`is_pokemon`|`TRUE` if pokemon. `Buried Fossil` is `FALSE` though it has a `card_type` of `Colorless`.|
 |`is_secret_card`|`TRUE` if `card_number` of that card exceeds `cards_total_official`.|
-|`Type`|type of the card, `df$Type |> unique()` `Lightning`, `Tool`, `Metal/Fighting`, etc. Some typos are fixed.|
+|`card_type`|type of the card, `df$card_type |> unique()` `Lightning`, `Tool`, `Metal/Fighting`, etc. Some typos are fixed.|
 |`series_class`|from `df_series`, `Black Star Promo`, `Main Expansion`, `Special Expansions`, `Trainer Kit`, `Pop Series`, and `McDonalds Collection`. classified based on bulbapedia.|
 |`cards_total`|the total count of the cards, according to Bulbapedia. Doesn't necessarily match the number of cards listed in `df`, since the spreadsheet may be incomplete.|
 |`series_abb`|abbreviation on Bulbapedia.|
 |`meta_is_bulba_only`|metadata: `TRUE` if the series is available on Bulbapedia. in `df` this is all `FALSE`.|
 |`meta_is_v325_only`|metadata: `TRUE` if the series is available on spreadsheet but not on the series list of Bulbapedia. `TRUE`: `Trainer Kit`s, `FALSE` everything else.|
 |`colour`||
-|`Type2`|simplified `Type`s.|
+|`card_type2`|simplified `card_type`s.|

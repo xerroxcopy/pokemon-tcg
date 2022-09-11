@@ -1,0 +1,145 @@
+# individual poke
+
+## まずはなにもせずカウント
+```{r}
+df_poke_count_raw <- df |> 
+  group_by(card_name) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n))
+
+```
+
+### ECDF
+
+[負うた子に教えられて浅瀬を渡る](https://qiita.com/xerroxcopy/items/b79635ef3dbcc29644c6)
+
+```{r}
+# pokemon name.
+df_count_pokemon <- df_gene |> 
+  filter(!is.na(id)) |> 
+  group_by(pokemon_name) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |> 
+  select(-pokemon_name) |> 
+  distinct() |> 
+  mutate(condition = "pokémon name") |> 
+  arrange(desc(n))
+
+
+# card name. 
+df_count_full_name <- df_gene |> 
+  group_by(card_name) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  select(-card_name) |> 
+  distinct() |> 
+  mutate(condition = "card name")
+
+
+# card name + type. 
+# distinguish pokemons with the same name, but with different types
+df_count_full_name_type <- df_gene |> 
+  mutate(name_type = paste(card_name, Type)) |> 
+  group_by(name_type) |> 
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  select(-name_type) |> 
+  distinct() |> 
+  mutate(condition = "card name + type")
+
+# advanced:
+# full name, but remove deco tsuki cards
+# count only the cards named "Pikachu" for pikachu.
+df_count_full_name_remove_decorated <- df_gene |> 
+  filter(card_name == pokemon_name) |> 
+  group_by(card_name) |> # same as grouping by pokemon_name since card_name == pokemon_name
+  summarise(n = n()) |> 
+  arrange(desc(n)) |> 
+  mutate(ecdf = 1 - ecdf(n)(n - .01)) |>
+  select(-card_name) |> 
+  distinct() |> 
+  mutate(condition = "card name, remove decorated")
+```
+
+`ecdf()`はX > nである割合であってX >= nである割合ではないのだな
+やりたいこと的には、`n = 1`のときに、1以上のコピーがあるポケカの割合は1になってないとおかしい。n = 1のときに1よりもたくさんのコピーがある割合1 - .32とかを計算してしまっている。同様にn = 58のとき（ピカチュウさん）、X >= 58である割合は 1 / 2425 (2425はユニークなポケモン名の数、`df$card_name |> unique() |> length()`)かと思うが、0になってしまっている、つまりX > 58である割合を計算している。
+
+## plot ECDF
+
+Complementary Cumulative Distribution Function 
+
+
+### full name, type
+
+```{r}
+p_count_full_name_type <- df_count_full_name_type |> 
+  ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name + type") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+```
+
+### full name
+
+```{r}
+# p_count_full_name <- 
+  df_count_full_name |>
+  ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+
+```
+
+### full name, remove decorated
+
+```{r}
+df_count_full_name_remove_decorated |>
+  ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "card name") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+
+```
+・・・あんま変わらんな！！
+
+
+### poke name
+
+```{r}
+
+df_count_pokemon |> 
+ ggplot(aes(x = n, y = ecdf)) +
+  geom_point() +
+  scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
+  scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
+  labs(title = "pokemon name") +
+  theme_pokemon +
+  theme(
+    # text = element_text(family = "Swift"),
+    aspect.ratio = 1
+  )
+```
+
+

@@ -1,0 +1,47 @@
+# frequency-dependent selection
+
+## random selection
+
+
+
+## popularity 
+ゲームにおけるミュウとかアニメのポリゴンのようなおもしろエピソードがあって、その影響が見えると面白いのだが…
+
+[ポケモン総選挙720](https://wiki.ポケモン.com/wiki/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E7%B7%8F%E9%81%B8%E6%8C%99720)というのが2016年にあったらしい。[全結果](https://www.famitsu.com/news/201606/23109132.html)
+
+人気：選ばれる機会（ゲーム公開後のシリーズのリリース回数）にたいして何度選ばれたか。
+
+
+#### highlight unown
+
+アンノーンは映画になったのか？一時期やけに多いが…
+
+```{r}
+df_first_last_seen |> 
+ggplot(aes(x = release_date, y = id)) +
+  
+  geom_text(
+    data = df_game_gen |> filter(game_gen != 9),
+    aes(
+      label =as.roman(game_gen), 
+      x = game_release_date, 
+      y = pokemon_cumulative_n + 30),
+    size = 3,
+    hjust = 0,
+    family = "Helvetica",
+    fontface = "bold",
+    # vjust = 1,
+    nudge_x = 50,
+    # nudge_y = -1000
+  ) +
+  geom_count( # main count
+    aes(
+      # fill = first_and_last |> as.factor(), 
+      # shape = first_and_last,
+      colour = pokemon_name == "Unown",
+      # alpha = first_and_last |> as.factor(), 
+    ),
+    alpha = .3
+    )
+
+```

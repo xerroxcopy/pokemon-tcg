@@ -4,62 +4,6 @@
 
 For this scale of data, I'd rather use `read_xlsx()` instead of `googlesheets4::read_sheet()`
 
-```{r, message=FALSE, warning=FALSE}
-excel_path <- "./input/Pokemon TCG Spreadsheet V3.25.xlsx"
-sheet_names <- excel_sheets(excel_path)
-sheet_names2 <- sheet_names[-1] # remove "Overview" sheet
-
-release_dates <- 
-  map(
-    sheet_names2,
-    ~ read_xlsx(
-      excel_path,
-      sheet = .x, 
-      range = "B1:B2"
-    )
-  ) |> 
-  map(~ pull(.x)) |> 
-  reduce(c)
-release_dates_df <- 
-  tibble(
-    series = sheet_names2, 
-    release_date = release_dates
-  )
-release_dates_df
-overview_series_range <- c(
-  "D4:D12",
-  "G4:G11",
-  "J4:J26",
-  "M4:M22",
-  "D31:D43",
-  "G31:G50",
-  "J31:J47",
-  "M31:M46"
-  )
-series_gen <- 
-  map(
-    .x = overview_series_range,
-    ~ read_xlsx(
-      excel_path,
-      col_names = "series",
-      sheet = "Overview", 
-      range = .x
-    )
-  ) |> 
-  map2(
-    .y = 1:8,
-    ~ mutate(.data = .x, series_gen = rep(.y, nrow(.x)))
-  ) |> 
-  bind_rows()
-release_dates_df2 <- 
-  left_join(release_dates_df, series_gen, by = "series") |> 
-  arrange(release_date) |> 
-  mutate(
-    lead = lead(series_gen),
-    series_gen = if_else(is.na(series_gen), lead, series_gen),
-    lead = NULL) 
-release_dates_df2
-```
 
 ## release date, main expansion or not, from bulbagarden
 
@@ -109,7 +53,7 @@ series_classification_df <- bind_rows(
   series_black_star_promos_df,
   series_pop_series_df,
   series_mcdonalds_df)
-series_classification_df
+# series_classification_df
 ```
 
 ## merge with release dates df
@@ -118,12 +62,6 @@ Merge `series_classification_df ` with `release_dates_df2`
 ```{r}
 series_classification_df |> colnames()
 release_dates_df2 |> colnames()
-# str_view_all("October, 2003 - September, 2006 ", ".+(?=\\s-)")
-# str_view_all("September 7, 2018 ", "\\s\\*\\s|(?<=[a-z]{3,10}\\s\\d{4})\\s")
-# 
-# str_view_all(
-#   "January, 2003 - February, 2004 February, 2004 - July, 2006", 
-#   "\\s\\*\\s|(?<=[a-z]{3,13},?\\s\\d{4})\\s(?!-)")
 ```
 
 
@@ -186,8 +124,6 @@ use the end date.
 
 ```{r}
 series_classification_df3_blackstar <- series_classification_df3 |> 
-  # filter(series_class == "Black Star Promo") |> 
-  # select(release_date) |> 
   mutate(
     release_date = 
       case_when(
@@ -319,86 +255,99 @@ series_classification_df6 <-
 series_classification_df6
 ```
 
-## join
+## rename series names to align Bulbapedia's names
 
-表記ゆれや数日程度の`release_date`のずれがある。基本的にBulbapediaのものにあわせる
-sheet名もそれに伴って書き換えなければいけないが、仕方ない
+表記ゆれをBulbapediaのものにあわせる
+
 ```{r}
-release_dates_df3 <-
-  release_dates_df2 |> 
-  mutate(
-    series = recode(
-      series,
-      # V3.25 = Bulbapedia
-      `McDonalds Collection 2021` = "McDonald's Collection 2021",
-      `Champions Path` = "Champion's Path",
-      `Sword and Shield` = "Sword & Shield",
-      `Sword and Shield Promos` = "SWSH Black Star Promos",
-      `Sun and Moon` = "Sun & Moon",
-      `Sun and Moon Promos` = "SM Black Star Promos",
-      `Mcdonalds Collection 2015` = "McDonald's Collection 2015",
-      `Mcdonalds Collection 2014` = "McDonald's Collection 2014",
-      `McDonalds Collection 2012` = "McDonald's Collection 2012", # not Mcd!
-      `X and Y` = "XY",
-      `X and Y Promos` = "XY Black Star Promos",
-      `McDonalds Collection` = "McDonald's Collection",
-      `Black and White` = "Black & White", 
-      `HeartGold and SoulSilver` = "HeartGold & SoulSilver",
-      `Pokemon GO` = "Pokémon GO"
-    ),
-    series = str_replace(series, "Pop", "POP")
-  )
-release_dates_df3
+excel_path <- "./input/Pokemon TCG Spreadsheet V3.25.xlsx"
+sheet_names <- excel_sheets(excel_path)
+series_names_spreadsheet <- sheet_names[-1] # remove "Overview" sheet
+
+c_series_spreadsheet_renamed <- series_names_spread_sheet |> 
+  recode(
+  # format: spreadsheet V3.25 = Bulbapedia
+  `McDonalds Collection 2021` = "McDonald's Collection 2021",
+  `Champions Path` = "Champion's Path",
+  `Sword and Shield` = "Sword & Shield",
+  `Sword and Shield Promos` = "SWSH Black Star Promos",
+  `Sun and Moon` = "Sun & Moon",
+  `Sun and Moon Promos` = "SM Black Star Promos",
+  `Mcdonalds Collection 2015` = "McDonald's Collection 2015",
+  `Mcdonalds Collection 2014` = "McDonald's Collection 2014",
+  `McDonalds Collection 2012` = "McDonald's Collection 2012", # not Mcd!
+  `X and Y` = "XY",
+  `X and Y Promos` = "XY Black Star Promos",
+  `McDonalds Collection` = "McDonald's Collection",
+  `Black and White` = "Black & White", 
+  `HeartGold and SoulSilver` = "HeartGold & SoulSilver",
+  `Pokemon GO` = "Pokémon GO"
+) |> 
+  str_replace( "Pop", "POP")
 ```
+
 つぎに、Bulbapediaを母体に一緒にしつつもTrainer KitはBulbapediaのリストにはないため`series_class`に`Trainer Kit`を新設しつつ、`release_date`についてはBulbapediaを優先する。
+
 ```{r}
-series_release_df1 <- full_join(
+# setdiff(series_names_325, 
+        
+        series_classification_df6$series
+
+```
+
+
+```{r}
+sheet_names_only_in_ss <- c_series_spreadsheet_renamed[!c_series_spreadsheet_renamed %in% series_classification_df6$series]
+
+release_dates_only_in_ss <-
+  map(
+    sheet_names_only_in_ss,
+    ~ read_xlsx(
+      excel_path,
+      sheet = .x,
+      range = "B1:B2"
+    )
+  ) |>
+  map(~ pull(.x)) |>
+  reduce(c)
+series_classification_only_in_ss <-
+  tibble(
+    series = sheet_names_only_in_ss,
+    release_date = release_dates_only_in_ss,
+    series_class = rep("Trainer Kit", length(sheet_names_only_in_ss))
+  ) 
+```
+
+```{r}
+series_classification_df7 <- full_join(
   series_classification_df6, 
-  release_dates_df3,
-  by = c("series")) |> 
+  series_classification_only_in_ss) |> 
   distinct() |> 
   mutate(
-    series_class = 
-      case_when(
-        str_detect(series, "Trainer\\sKit") ~ "Trainer Kit", 
-        TRUE ~ series_class
-      )
-  )
-series_release_df1
-```
-
-
-```{r}
-df_series <- series_release_df1 |> 
-  # select(release_date.x, release_date.y) |> 
-  mutate(
-    # indicate if the series is in V3.25 spreadsheet or 
-    # only available on bulbagarden's list
-    meta_is_bulba_only = is.na(release_date.y),
-    meta_is_v325_only = series_class == "Trainer Kit",
-    release_date = 
-      case_when(
-        is.na(release_date.x) & !is.na(release_date.y) ~ release_date.y,
-        
-        !is.na(release_date.x) & is.na(release_date.y) ~ release_date.x,
-        release_date.x == release_date.y ~ release_date.x,
-        release_date.x != release_date.y ~ release_date.x,
-        # TRUE ~ NA_Date_
-      ),
-      release_date.x = NULL,
-      release_date.y = NULL,
-      cards_total = cards_total |> as.character() |> as.integer(),
-      cards_total_ja = cards_total |> as.character() |> as.integer(),
-      series_class = case_when(
-        series == "Pokemon GO" ~ "Special Expansion",
-        TRUE ~ series_class
-      ),
-    # across(starts_with("release_date"), ~ as_date) nazeka ugokan
+    cards_total = cards_total |> as.character() |> as.integer(),
+    cards_total_ja = cards_total |> as.character() |> as.integer(),
     release_date = release_date |> as_date(),
     release_date_ja = release_date_ja |> as_date()
   ) |> 
-  select(series_class, series, release_date, cards_total, series_gen, series_abb,  series_ja, release_date_ja, cards_total_ja, everything() )
-df_series # 157 x 11
+  select(
+    series_class, 
+    series, 
+    release_date, 
+    cards_total, 
+    # series_gen, 
+    series_abb,
+    series_ja,
+    release_date_ja,
+    cards_total_ja
+  ) |> 
+  arrange(release_date)
+series_classification_df7 |> View()
+```
+
+
+```{r}
+df_series <- series_classification_df7
+df_series # 156 x 8
 ```
 
 ## df_series: colnames explanation
@@ -406,21 +355,19 @@ df_series # 157 x 11
 ```{r}
 df_series |> colnames()
 
+
 ```
 
-|`colname`|`meaning`|str|
-|---|---|---|
-|`series_class`|Retrieved from Bulbagarden. Either `"Main Expansion"`, `"Special Expansion"`, `"Black Star Promo"`, `"Pop Series"`, `"McDonalds Collection"`, or `"Trainer Kit"`.|chr|
-| `series`|The name of the series. "`Neo Genesis`", "`Sun & Moon`" etc. The names are based on the ones listed in Bulbapedia, not the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613).|chr|
-|`release_date`|The release date of the series. The dates are based on the ones listed in Bulbapedia, not the ones on the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613), from which the Bulbapedia's date slightly differ. Release dates with no specific dates are converted to the 1st day of the month, e.g., `May 2003` -> `2003-05-01`.|Date|
-|`cards_total`|the amount of total cards of the series, according to Bulbapedia. The official count is sometimes lower than this. This does not necessarily match the amount of total cards of the series that can be calculated from the card list. The card list is based on V3.25 spreadsheet and the data is not exhaustive.|int|
-|`series_gen`|generation of the series, from 1-8. This is based on V3.25 spreadsheet and may not match from Bulbapedia's classification (e.g., `Legendary Collection` classified as series_gen 1 in spreadsheet, series_gen 2 in Bulbapedia).|int|
-|`series_abb`|from Bulbapedia. might be useful for plotting to avoid overcrowding.|chr|
-|`series_ja`|Name of the series in Japanese version according to Bulbapedia.|chr|
-|`release_date_ja`||Date|
-|`cards_total_ja`||int|
-|`meta_is_bulba_only`|`TRUE` if the series is only from Bulbapedia.|lgl|
-|`meta_is_v325_only`|`TRUE` if the series is only from spreadsheet. "Trainer Kit"s.|lgl|
+|`colname`|`meaning`|
+|---|---|
+|`series_class`|Retrieved from Bulbagarden. Either `"Main Expansion"`, `"Special Expansion"`, `"Black Star Promo"`, `"Pop Series"`, `"McDonalds Collection"`, or `"Trainer Kit"`.|
+|`series`|The name of the series. "`Neo Genesis`", "`Sun & Moon`" etc. The names are based on the ones listed in Bulbapedia, not the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613).|chr|
+|`release_date`|The release date of the series. The dates are based on the ones listed in Bulbapedia, not the ones on the [V3.25 spreadsheet](https://docs.google.com/spreadsheets/d/10G8wEY70qJ7rEnGbDzJp13vdOB4ikIjz4E3SQVRglRc/edit#gid=59182613), from which the Bulbapedia's date slightly differ. Release dates with no specific dates are converted to the 1st day of the month, e.g., `May 2003` -> `2003-05-01`.|
+|`cards_total`|the amount of total cards of the series, according to Bulbapedia. The official count is sometimes lower than this. This does not necessarily match the amount of total cards of the series that can be calculated from the card list. The card list is based on V3.25 spreadsheet and the data is not exhaustive.|
+|`series_abb`|from Bulbapedia. might be useful for plotting to avoid overcrowding.|
+|`series_ja`|Name of the series in Japanese version according to Bulbapedia.|
+|`release_date_ja`||
+|`cards_total_ja`||
 
 In this chapter we tidied the data for the series (`df_series`). In the next chapter `pokemon-cards` we tidy the data for the individual cards (`df`).
 

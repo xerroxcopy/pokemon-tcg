@@ -1,0 +1,356 @@
+# plot types
+
+### geom_count
+
+```{r}
+
+df |> 
+  # filter(card_type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      y = card_type2,
+      colour = series_gen
+    )
+  ) +
+  # geom_quasirandom(groupOnX = FALSE, size = .3,) +
+  geom_count(alpha = .3) +
+  scale_size_area() +
+  scale_colour_identity() +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+ggsave("./output/ReleaseDate-card_typeCount.png", width = 1500, height = 1000, unit = "px")
+```
+2020年代のTrainerはちょっとおかしい気が…
+Stadiumは一時期Stadiumというカテゴリだったが、今はTrainerのサブカテゴリ
+[supporter](https://bulbapedia.bulbagarden.net/wiki/Supporter_card_(TCG))
+[item](https://bulbapedia.bulbagarden.net/wiki/Item_card_(TCG))
+[trainer](https://bulbapedia.bulbagarden.net/wiki/Trainer_card_(TCG))
+
+
+### 折れ線
+
+```{r}
+df |> 
+  mutate(year = release_date |> year()) |> 
+  # mutate(colour = if_else(str_detect(colour, "#"), colour, "#ffffff")) |> 
+  mutate(
+    card_type2 = case_when(
+      card_type2 %in% major_types ~ card_type2, 
+      TRUE ~ "Others"
+    )
+  ) |>
+  count(card_type2, year) |> 
+  complete(card_type2, year) |> 
+  mutate(n = replace_na(n, 0)) |> 
+  ggplot(
+      aes(
+        x = year,
+        y = n,
+        # y = card_type,
+        # fill = card_type2
+        fill = card_type2
+      )
+    ) +
+  geom_area() +
+  theme_pokemon
+ggsave("./output/ReleaseDate-card_typeCountArea.png", width = 1500, height = 1000, unit = "px")
+```
+
+### series type ~  cards_total~ time
+```{r}
+
+df_series |> 
+  # filter(card_type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      y = series_class,
+      size = cards_total,
+      # colour = gen
+    )
+  ) +
+  # geom_quasirandom(groupOnX = FALSE, size = .3,) +
+  geom_jitter(alpha = .3,width = 0, height = .1) +
+  scale_size_area() +
+  scale_colour_identity() +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+
+## シェア争い
+
+
+
+## proportion, frequency
+[make geom_area proportional](https://stackoverflow.com/questions/45438665/create-proportional-geom-area-plot-directly-in-ggplot2)
+```{r}
+df |> 
+  filter(card_type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = card_type
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+ggsave("./output/ReleaseDate-card_typeCountAreaShare.png", width = 1500, height = 1000, unit = "px")
+```
+### highlight fairies
+
+```{r}
+df |> 
+  filter(card_type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = card_type == "Fairy"
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+### highlight secret cards
+
+```{r}
+df |> 
+  filter(card_type %in% major_types) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = is_secret_card
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+
+```{r}
+df |> 
+  filter(card_type %in% major_types,
+         !is.na(is_secret_card)) |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = is_secret_card
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+### set size ~ time
+```{r}
+df_series |> colnames()
+df_series |> 
+  ggplot(
+    aes(
+      x = release_date, 
+     y = cards_total,
+     colour = series_class
+    )
+  ) +
+    geom_smooth(size = .2, se = FALSE) +
+  geom_text(aes(label = series_abb), size = 1.2) +
+  theme_minimal() +
+  # facet_wrap(facets = vars(series_class)) +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    # legend.position = "none",
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+### series class frequency ~ time
+
+```{r}
+df_series |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = series_class
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+perhaps geom_density better?
+
+リリース頻度
+```{r}
+df_series |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      y = ..density..,
+      fill = series_class
+      # fill = colour
+    )
+  ) +
+  geom_density(
+    position = "stack",
+    adjust = .4
+    ) +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+実際の枚数
+```{r}
+df_series |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      y = cards_total,
+      fill = series_class
+      # fill = colour
+    )
+  ) +
+  geom_density(
+    # position = "stack",
+    adjust = .4
+    ) +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+```{r}
+df |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = card_type == "Water"
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+
+## secret cards
+
+```{r}
+df |> 
+  ggplot(
+    aes(
+      x = release_date, 
+      # y = card_type,
+      fill = is_secret_card
+      # fill = colour
+    )
+  ) +
+  geom_area(stat = "bin", position = "fill") +
+  theme_minimal() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+```
+いろいろなものが復活しうる。継承がカード→カードではないため。
+
+## pokemon genes 
+
+### pokemon gen share
+
+TODO: ビンをMonthにしたい…
+```{r}
+df_gene$release_date[1] |> is.Date()
+df_gene |> 
+  # mutate(release_month = ym(release_date)) |> View()
+  ggplot(
+    aes(x = release_date,
+        group_by = pokemon_gen |> as.factor(),
+        fill = pokemon_gen) 
+  ) +
+  geom_bar(
+    colour = "white",
+    size = .2,
+    stat = "bin",
+    # position = "fill",
+    bins = 100
+    ) +
+  theme_minimal() +
+  scale_fill_viridis_c() +
+  # scale_fill_manual(values = colours_named_vector) +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line(size = .3),
+    axis.ticks = element_line(size = .1)
+  )
+    
+```
+新しいGenがリリースされると一気にそれが多くなるが、しばらくするとかなり偏りがなくなってくる（平衡状態みたいな）。第1世代はそれにしても多い気がするのでバイアスが検出できるかもしれない。
+

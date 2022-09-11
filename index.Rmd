@@ -54,7 +54,7 @@ theme_pokemon <-
 ```
 
 ```{r}
-penguins |> 
+p0 <- penguins |> 
   ggplot(aes(x = bill_length_mm ,y = bill_depth_mm, group = species, colour = body_mass_g)) +
   geom_line(alpha = 1) +
   # geom_point(size = .15/.751/2) +
@@ -71,7 +71,10 @@ penguins |>
     cols = vars(species),
     rows = vars(sex)
   ) + 
-  theme_pokemon 
+  theme_pokemon +
+  theme(
+    legend.position = "none"
+  )
 ggsave("./output/plot_example.svg", width = 166/2, height = 110/2, unit = "mm")
 grDevices::dev.size()
 # ggedit(p1)

@@ -1,0 +1,254 @@
+# UMAP 
+
+```{r}
+library(uwot) # package {umap} does not allow metric input of categorical
+df_gene |> colnames()
+```
+## data
+IDをFactorとして扱うのはおかしくない気がしてきた。
+それで一旦固定してみてUMAPのパラメタをためそう
+
+```{r}
+
+df_for_umap <- df_gene |> 
+  filter(!is.na(id)) |> 
+  mutate(
+    seconds_since_first_release =
+      interval(min(release_date), release_date) |>
+      int_length(),
+    is_secret_card = replace_na(is_secret_card, FALSE),
+    time_since_first_release_standardized = seconds_since_first_release / seconds_since_first_release |> max(),
+    master = replace_na(master, "no_master"),
+    forme_variant = replace_na(forme_variant, "no_forme_variant")
+  ) |> 
+  select(
+    release_date, # for plot,
+    time_since_first_release_standardized, pokemon_gen, # continuous values
+    id, Type2, series, is_secret_card, series_class, is_gx:forme_variant, # factors
+    ) |>
+  mutate(
+    across(pokemon_gen:pokemon_gen, ~as.numeric(.x)), # continuous values
+    across(id:forme_variant, ~as.factor(.x)), # factors
+  )
+df_for_umap # 12724 x 43
+
+```
+
+
+
+### run UMAP
+
+[uwot](https://github.com/jlmelville/uwot) mate
+https://www.rdocumentation.org/packages/uwot/versions/0.1.11/topics/umap
+{uwot}'s `uwot::umap()` does not accept tibble. convert it to data.frame
+```{r}
+set.seed(1121)
+df_for_umap2 <- df_for_umap |> 
+  select(-release_date)
+columns <- df_for_umap2 |> colnames()
+matrix_umap <- df_for_umap2 |> 
+  as.data.frame() |> 
+  uwot::umap(
+    verbose = TRUE, 
+    n_threads = 6,
+    n_neighbors = 30,
+    min_dist = 3,
+    spread = 50,
+    fast_sgd = TRUE, # TRUE for viz 
+    metric = list("euclidean" = columns[1:2],
+                  "categorical" = columns[3:42])
+  )
+# prepare df for plot
+df_umap <- matrix_umap |> 
+  as_tibble() |> 
+  rename(x = V1, y = V2) |> 
+  rowid_to_column() |> 
+  left_join(df_for_umap |> rowid_to_column())
+df_umap |> colnames()
+```
+### plot
+
+```{r}
+p_emp_umap_pokemon_gen <- df_umap |> 
+  ggplot(aes(x = x, y = y, fill = release_date)) +
+  geom_point( 
+  data= df_umap |> select(-pokemon_gen),
+  colour = "#eeedf0",
+  size = .1, stroke = 0,
+  ) +
+  geom_point(pch = 21, colour = "black", size = .1, stroke = 0) +
+  scale_x_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100, "", 100),
+    name = expression(paste("UMAP  ", italic(X)))
+  ) +
+  scale_y_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100,  0, 100),
+    name = expression(paste("UMAP  ", italic(Y)))
+  ) +
+  scale_fill_paletteer_c(
+    "pals::ocean.deep",
+    trans = "date",
+    # date_breaks = "3 years"
+    breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    name = "Date"
+  ) +
+  facet_wrap(
+    vars(pokemon_gen),
+    nrow = 1,
+    labeller = labeller(pokemon_gen = as.roman)
+  ) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = 1,
+    legend.position = "none"
+    # legend.key.height = unit(1, units = "mm"),
+    # legend.key.width = unit(1, units = "mm")
+  )
+ggsave("./output/emp_umap_factor_id.svg", width = 166, height = 35, unit = "mm")
+```
+### plot gen ~ facet date
+
+```{r}
+# ymd("2020-04-04") |> year()
+df_umap |> 
+  mutate(year = ymd(release_date) |> year()) |> 
+  ggplot(aes(x = x, y = y, fill = pokemon_gen |> as.factor())) +
+  geom_point(
+  data= df_umap,
+  colour = "#eeedf0",
+  size = .1, stroke = 0,
+  ) +
+  geom_point(pch = 21, colour = "black", size = .1, stroke = 0) +
+  scale_x_continuous(
+    breaks = c(-100,0, 100),
+    labels = c(-100, "", 100),
+    name = expression(paste("UMAP", italic(X)))
+  ) +
+  scale_y_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100, "", 100),
+    name = expression(paste("UMAP", italic(Y)))
+  ) +
+  scale_fill_paletteer_d(
+    "rcartocolor::ag_Sunset",
+    name = "Generation"
+  ) +
+  facet_wrap(
+    vars(year),
+    nrow = 3,  ) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = 1,
+    legend.key.height = unit(2, units = "mm"),
+    legend.key.width = unit(2, units = "mm")
+  )
+# ggsave("./output/emp_umap_factor_id_yearly.svg", width = 166, height = 80, unit = "mm")
+ggsave("./output/emp_umap_factor_id_yearly.png", width = 166, height = 80, unit = "mm", dpi = 600)
+
+```
+
+### misc plots
+
+#### forme
+```{r}
+df_umap |> 
+  filter(forme_variant != "no_forme_variant") |> 
+  mutate(year = ymd(release_date) |> year()) |> 
+  ggplot(aes(x = x, y = y, fill = forme_variant)) +
+  geom_point(
+  data= df_umap,
+  colour = "#eeedf0",
+  size = .1, stroke = 0,
+  ) +
+  geom_point(pch = 21, colour = "black", size = .5, stroke = 0) +
+  scale_x_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100, "", 100),
+    name = expression(paste("UMAP  ", italic(X)))
+  ) +
+  scale_y_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100,  0, 100),
+    name = expression(paste("UMAP  ", italic(Y)))
+  ) +
+  geom_text_repel(
+    aes(label = forme_variant),
+    max.overlaps = 100,
+    size = 1,
+    min.segment.length = 0,
+    segment.size = .2
+  ) +
+  # scale_fill_paletteer_d(
+  #   "pals::ocean.deep",
+  #   trans = "date",
+  #   # date_breaks = "3 years"
+  #   breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+  #   labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+  #   name = "Date"
+  # ) +
+  facet_grid(
+    rows = vars(pokemon_gen),
+    cols = vars(year),
+  ) +
+  theme_pokemon +
+  theme(
+    legend.position = "none",
+    aspect.ratio = 1,
+    legend.key.height = unit(1, units = "mm"),
+    legend.key.width = unit(1, units = "mm")
+  )
+ggsave("./output/emp_umap_release_year~pokemon_gen~forme.png", width = 166, height = 100, unit = "mm", dpi = 600)
+```
+#### V
+
+```{r}
+df_umap |> 
+  mutate(year = ymd(release_date) |> year()) |> 
+  ggplot(aes(x = x, y = y,　colour = is_v_family )) +
+  geom_point(
+  data= df_umap |> select(-is_v_family),
+  colour = "#eeedf0",
+  size = .3, stroke = 0,
+  ) +
+  geom_point( size = .5, stroke = 0) +
+  scale_x_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100, "", 100),
+    name = expression(paste("UMAP  ", italic(X)))
+  ) +
+  scale_y_continuous(
+    breaks = c(-100, 0, 100),
+    labels = c(-100,  0, 100),
+    name = expression(paste("UMAP  ", italic(Y)))
+  ) +
+  # geom_text_repel(
+  #   aes(label = forme_variant),
+  #   max.overlaps = 100,
+  #   size = 1,
+  #   min.segment.length = 0,
+  #   segment.size = .2
+  # ) +
+  # scale_fill_paletteer_d(
+  #   "pals::ocean.deep",
+  #   trans = "date",
+  #   # date_breaks = "3 years"
+  #   breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+  #   labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+  #   name = "Date"
+  # ) +
+  # facet_grid(
+  #   rows = vars(pokemon_gen),
+  #   cols = vars(year),
+  # ) +
+  theme_pokemon +
+  theme(
+    legend.position = "none",
+    aspect.ratio = 1,
+    legend.key.height = unit(1, units = "mm"),
+    legend.key.width = unit(1, units = "mm")
+  )
+ggsave("./output/emp_umap_release_year~pokemon_gen~forme.png", width = 166, height = 100, unit = "mm", dpi = 600)
+```

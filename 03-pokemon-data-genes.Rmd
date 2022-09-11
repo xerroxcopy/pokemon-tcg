@@ -5,38 +5,38 @@ Create a list of the most basic names of pokemons, e.g. "pikachu", along with th
 You don't have to run the next chunk:
 
 ```{r}
-pokemon_names_df_raw <- read_csv("./input/pokemon_github.csv")
-pokemon_names_df_raw_ja <- read_csv("./input/ポケモンデータシート.csv")
-pokemon_names_df_raw_ja |> colnames()
-pokemon_names_df1 <- pokemon_names_df_raw |> 
-  # filter(Form %in% c("Normal Forme", NA)) |> 
-  select(
-    ID, Name, Generation) |> 
-  rename(
-    id = ID,
-    name = Name, 
-    pokemon_gen = Generation
-         ) |> 
-  distinct() |> 
-  filter(!str_detect(name, "50"))
-pokemon_names_df1 |> dim()
-pokemon_names_df_ja <- pokemon_names_df_raw_ja |> 
-  rename(
-    id = `ぜんこくNo.`,
-    name_ja = `名前`,
-    name = `英語名`
-  ) |> 
-  select(id, name_ja, name)
-df_names <- 
-  full_join(pokemon_names_df1, pokemon_names_df_ja, by = c("name", "id")) |> 
-  distinct() |> 
-  mutate(id = id |> as.character() |> as.integer()) |> 
-  select(id, name, name_ja, pokemon_gen)
-df_names |> View()
-pokemon_names_df_ja |> 
-  filter(id == "469")
- 
-  View(pokemon_names_df1 )
+# pokemon_names_df_raw <- read_csv("./input/pokemon_github.csv")
+# pokemon_names_df_raw_ja <- read_csv("./input/ポケモンデータシート.csv")
+# pokemon_names_df_raw_ja |> colnames()
+# pokemon_names_df1 <- pokemon_names_df_raw |> 
+#   # filter(Form %in% c("Normal Forme", NA)) |> 
+#   select(
+#     ID, card_name, Generation) |> 
+#   rename(
+#     id = ID,
+#     name = card_name, 
+#     pokemon_gen = Generation
+#          ) |> 
+#   distinct() |> 
+#   filter(!str_detect(name, "50"))
+# pokemon_names_df1 |> dim()
+# pokemon_names_df_ja <- pokemon_names_df_raw_ja |> 
+#   rename(
+#     id = `ぜんこくNo.`,
+#     name_ja = `名前`,
+#     name = `英語名`
+#   ) |> 
+#   select(id, name_ja, name)
+# df_names <- 
+#   full_join(pokemon_names_df1, pokemon_names_df_ja, by = c("name", "id")) |> 
+#   distinct() |> 
+#   mutate(id = id |> as.character() |> as.integer()) |> 
+#   select(id, name, name_ja, pokemon_gen)
+# df_names |> View()
+# pokemon_names_df_ja |> 
+#   filter(id == "469")
+#  
+#   View(pokemon_names_df1 )
 ```
 bad bad bad. I resort to 
 [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/List_of_Japanese_Pok%C3%A9mon_names) once again to produce [multiple csvs](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once). The CSVs are stored under `./input/bulbapedia_name`.
@@ -59,29 +59,26 @@ names_df <- map(
   ) |> 
   bind_rows() |> 
   rename(
-    id = Ndex,
+    pokedex_id = Ndex,
     name = English,
     name_ja = Kana
     ) |> 
-  select(id, name, name_ja, pokemon_gen)
+  select(pokedex_id, name, name_ja, pokemon_gen)
 names_df2 <- names_df |> 
   mutate(
-    id = id |> as.character() |> as.integer(),
+    pokedex_id = pokedex_id |> as.character() |> as.integer(),
   )
 df_names <- names_df2 |> 
-  filter(!is.na(id)) # remove gen 9 pokemons
-df_names |> 
-  filter(str_detect(name, "Nidoran"))
-df_names
+  filter(!is.na(pokedex_id)) # remove gen 9 pokemons
 ```
 
 ## pokemon sequencing
 
 ```{r}
-df_gene <- df |> 
+df_gene <- df_card |> # from 02 
   filter(is_pokemon) |> 
   mutate(
-    nm = Name
+    nm = card_name
   ) |> 
   mutate(
     is_gx = 
@@ -197,27 +194,21 @@ df_gene <- df |>
   left_join(df_names, by = c("nm" = "name")) |> 
   rename(pokemon_name = nm)
 ```
+warnings
+
+> Warning: Expected 3 pieces. Missing pieces filled with `NA` in 12713 rows [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+
+are for GX tag team buddies, ignore them.
 
 ## remove pokemon name from original name to extract subgenes
 
 subgene or subpokemon or parasites or decorations or whatever
 
 ```{r}
+df_gene |> colnames()
 df_gene <- df_gene |>   
   rowwise() |> 
-  mutate(pokemon_deco = str_remove(Name, pattern = paste(pokemon_name))) |> 
-  select(id, Name, pokemon_name, name_ja, pokemon_deco, pokemon_gen, Type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_"), starts_with("meta_")) |> 
+  mutate(pokemon_deco = str_remove(card_name, pattern = paste(pokemon_name))) |> 
+  select(pokedex_id, card_name, pokemon_name, name_ja, pokemon_deco, pokemon_gen, card_type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_")) |> 
   ungroup()
 ```
-
-```{r}
-df_gene |> View()
-```
-
-
-
-
-
-
-
-
