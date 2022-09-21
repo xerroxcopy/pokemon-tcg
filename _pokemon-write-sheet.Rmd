@@ -6,12 +6,15 @@
 save(
   theme_pokemon, # index.Rmd
   df_card, # 02- 
+  df_series, # 02
+  c_types_non_pokemon, # 02
+  c_major_types, # 02
+  c_mixed_types, # 02
   df_type_colour, # 02-, pokemon type and colour
   df_gene, # 03
-  # df_series, 
   df_series2, # 02 then 03
   df_names, # 03
-  # df_game_gen, 
+  df_game_gen, # 04
   # df_transitional_umap,
      file = paste0("./data/", Sys.Date(), "-dataframes.RData"))
 load("./data/2022-09-11-dataframes.RData")
@@ -37,24 +40,14 @@ sheet_write( # df_names from pokemon-genes.Rmd
   )
 
 sheet_write(
-  df_series,
+  df_series2,
   ss = ss_output,
   sheet = "series_global"
   )
 sheet_write(
-  df, 
-  ss = ss_output,
-  sheet = "cards"
-  )
-sheet_write(
   df_gene, 
   ss = ss_output,
-  sheet = "cards: pokemon"
-  )
-sheet_write(
-  release_dates_df2, 
-  ss = ss_output,
-  sheet = "releases"
+  sheet = "cards"
   )
 ```
 

@@ -19,7 +19,7 @@ library(magrittr)
 library(lubridate)
 library(readxl)
 library(ggbeeswarm)
-library(gganimate)
+
 library(paletteer)
 library(scales)
 library(palmerpenguins)

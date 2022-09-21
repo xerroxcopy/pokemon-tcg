@@ -4,13 +4,13 @@
 
 ```{r}
 
-df |> 
+df_gene |> 
   # filter(card_type %in% major_types) |> 
   ggplot(
     aes(
       x = release_date, 
       y = card_type2,
-      colour = series_gen
+      colour = pokemon_gen
     )
   ) +
   # geom_quasirandom(groupOnX = FALSE, size = .3,) +
@@ -36,12 +36,12 @@ Stadiumは一時期Stadiumというカテゴリだったが、今はTrainerの�
 ### 折れ線
 
 ```{r}
-df |> 
+df_gene |> 
   mutate(year = release_date |> year()) |> 
-  # mutate(colour = if_else(str_detect(colour, "#"), colour, "#ffffff")) |> 
+  # mutate(colour = if_else(str_detect(colour, "#"), colour, "#ffffff")) |>
   mutate(
     card_type2 = case_when(
-      card_type2 %in% major_types ~ card_type2, 
+      card_type2 %in% c_major_types ~ card_type2,
       TRUE ~ "Others"
     )
   ) |>
@@ -66,26 +66,17 @@ ggsave("./output/ReleaseDate-card_typeCountArea.png", width = 1500, height = 100
 ```{r}
 
 df_series |> 
-  # filter(card_type %in% major_types) |> 
   ggplot(
     aes(
       x = release_date, 
       y = series_class,
       size = cards_total,
-      # colour = gen
     )
   ) +
-  # geom_quasirandom(groupOnX = FALSE, size = .3,) +
   geom_jitter(alpha = .3,width = 0, height = .1) +
   scale_size_area() +
   scale_colour_identity() +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
+  theme_pokemon
 ```
 
 
@@ -96,8 +87,8 @@ df_series |>
 ## proportion, frequency
 [make geom_area proportional](https://stackoverflow.com/questions/45438665/create-proportional-geom-area-plot-directly-in-ggplot2)
 ```{r}
-df |> 
-  filter(card_type %in% major_types) |> 
+df_gene |> 
+  filter(card_type %in% c_major_types) |> 
   ggplot(
     aes(
       x = release_date, 
@@ -107,20 +98,15 @@ df |>
     )
   ) +
   geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
+  # scale_fill_manual(values = colours_named_vector) +
+  theme_pokemon
 ggsave("./output/ReleaseDate-card_typeCountAreaShare.png", width = 1500, height = 1000, unit = "px")
 ```
 ### highlight fairies
 
 ```{r}
-df |> 
-  filter(card_type %in% major_types) |> 
+df_gene |> 
+  filter(card_type %in% c_major_types) |> 
   ggplot(
     aes(
       x = release_date, 
@@ -141,8 +127,8 @@ df |>
 ### highlight secret cards
 
 ```{r}
-df |> 
-  filter(card_type %in% major_types) |> 
+df_gene |> 
+  filter(card_type %in% c_major_types) |> 
   ggplot(
     aes(
       x = release_date, 
@@ -159,12 +145,16 @@ df |>
     axis.line = element_line(size = .3),
     axis.ticks = element_line(size = .1)
   )
+
+df_gene |> 
+  filter(release_date > ymd("2022-01-01")) |> 
+  select(is_secret_card, release_date, set, everything())
 ```
 
 
 ```{r}
-df |> 
-  filter(card_type %in% major_types,
+df_gene |> 
+  filter(card_type %in% c_major_types,
          !is.na(is_secret_card)) |> 
   ggplot(
     aes(
@@ -279,7 +269,7 @@ df_series |>
 ```
 
 ```{r}
-df |> 
+df_gene |> 
   ggplot(
     aes(
       x = release_date, 
@@ -301,7 +291,7 @@ df |>
 ## secret cards
 
 ```{r}
-df |> 
+df_gene |> 
   ggplot(
     aes(
       x = release_date, 
@@ -328,6 +318,7 @@ df |>
 TODO: ビンをMonthにしたい…
 ```{r}
 df_gene$release_date[1] |> is.Date()
+df_gene$release_date[1] |> day() <- 3
 df_gene |> 
   # mutate(release_month = ym(release_date)) |> View()
   ggplot(

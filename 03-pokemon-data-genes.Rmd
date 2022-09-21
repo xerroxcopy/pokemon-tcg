@@ -75,8 +75,9 @@ df_names <- names_df2 |>
 ## pokemon sequencing
 
 ```{r}
-df_gene <- df_card |> # from 02 
-  filter(is_pokemon) |> 
+df_gene_pokemon <- df_card |> # from 02 
+  rowid_to_column(var = "card_id") |> 
+  filter(is_pokemon) |>
   mutate(
     nm = card_name
   ) |> 
@@ -192,7 +193,33 @@ df_gene <- df_card |> # from 02
     ),
   ) |> 
   left_join(df_names, by = c("nm" = "name")) |> 
-  rename(pokemon_name = nm)
+  rename(pokemon_name = nm) |> 
+  rowwise() |> 
+  mutate(
+    pokemon_deco = str_remove(
+      card_name, 
+      pattern = paste(pokemon_name)
+    )
+  ) |> 
+  select(
+    card_id, 
+    card_name, 
+    pokedex_id, 
+    pokemon_name,
+    name_ja, 
+    pokemon_deco, 
+    pokemon_gen, 
+    card_type2,
+    team_buddy1, 
+    team_buddy2, 
+    set, 
+    series,
+    release_date, 
+    everything(),
+    starts_with("is_"), 
+    starts_with("has_"), 
+  ) |> 
+  ungroup()
 ```
 warnings
 
@@ -205,10 +232,26 @@ are for GX tag team buddies, ignore them.
 subgene or subpokemon or parasites or decorations or whatever
 
 ```{r}
-df_gene |> colnames()
-df_gene <- df_gene |>   
-  rowwise() |> 
-  mutate(pokemon_deco = str_remove(card_name, pattern = paste(pokemon_name))) |> 
-  select(pokedex_id, card_name, pokemon_name, name_ja, pokemon_deco, pokemon_gen, card_type2, team_buddy1, team_buddy2, set, series, release_date, everything(), starts_with("is_"), starts_with("has_")) |> 
-  ungroup()
+df_gene_pokemon # 12325 x 56
+df_gene <- bind_rows(
+  df_gene_pokemon,
+  df_card |> rowid_to_column(var = "card_id") |> filter(!is_pokemon)
+  ) |>
+  arrange(card_id)
+  
 ```
+### summary of the data
+紀要掲載予定
+
+```{r}
+df_gene |> count() # 14565
+df_gene |> count(is_pokemon) # 12325, non-2240
+df_gene |> 
+  group_by(series) |> 
+  count() # 125 series
+df_gene |> 
+  filter(series_class != "Black Star Promo") |> 
+  filter(release_date == max(release_date) )
+
+```
+

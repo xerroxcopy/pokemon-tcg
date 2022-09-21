@@ -264,7 +264,7 @@ excel_path <- "./input/Pokemon TCG Spreadsheet V3.25.xlsx"
 sheet_names <- excel_sheets(excel_path)
 series_names_spreadsheet <- sheet_names[-1] # remove "Overview" sheet
 
-c_series_spreadsheet_renamed <- series_names_spread_sheet |> 
+c_series_spreadsheet_renamed <- series_names_spreadsheet |> 
   recode(
   # format: spreadsheet V3.25 = Bulbapedia
   `McDonalds Collection 2021` = "McDonald's Collection 2021",
@@ -370,4 +370,48 @@ df_series |> colnames()
 |`cards_total_ja`||
 
 In this chapter we tidied the data for the series (`df_series`). In the next chapter `pokemon-cards` we tidy the data for the individual cards (`df`).
+
+## misc data
+
+[Google Trends](https://trends.google.com/trends/explore?date=2004-01-01%202022-09-21&q=pokemon%20card,pokemon%20tcg,%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%82%AB%E3%83%BC%E3%83%89,%2Fm%2F027qg4)
+
+```{r}
+df_sales_worldwide  <- read_sheet("https://docs.google.com/spreadsheets/d/1VcVuCtDyKI5oqGsWJPKJGO7y-vIVZge6JrRqrE_kAQY/edit#gid=520335802", sheet = "sales") |> 
+  mutate(date = as.Date(date))
+google_trends <- read_csv("./input/multiTimeline.csv", skip = 1) # from Google Trends 
+colnames(google_trends)
+google_trends_df <- google_trends |> 
+  rename(Pokémon = "Pokémon Trading Card Game: (Worldwide)", MtG = "Magic: The Gathering: (Worldwide)") |> 
+  mutate(date = parse_date(Month, format = "%Y-%m")) |> 
+  select(date, everything(), -Month) |> 
+  mutate(cumP = cumsum(Pokémon), cumM = cumsum(MtG)) |> 
+  pivot_longer(cols = starts_with("cum"))
+
+  # pivot_longer(cols = Pokémon:MtG, names_to = "franchise")
+google_trends_df
+
+```
+
+
+```{r}
+pb1 <- df_sales_worldwide |> 
+  filter(!is.na(sales)) |>
+  ggplot(aes(date, billion)) +
+  geom_point() +
+  # geom_line(data = google_trends_df, aes(y = value/100, colour = name)) +
+  geom_line() +
+  scale_x_date(
+        breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    name = "Date"
+  ) +
+  scale_y_continuous(
+    "Sales (Billion $)",
+    breaks = (0:4) * 10,
+    labels = c(0, "", "", "", 4)
+  ) +
+  theme_pokemon
+
+(0:4) * 1e+10
+```
 

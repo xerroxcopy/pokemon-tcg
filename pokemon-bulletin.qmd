@@ -1,0 +1,53 @@
+---
+title: "ポケモンカードゲームの非ランダムなデザイン生成過程"
+author: "Minoru Matsui"
+format: 
+  docx:
+    number-sections: true
+    number-depth: 3
+    highlight-style: github
+---
+# ポケモンカードゲームの非ランダムなデザイン生成過程
+
+Non-random design generation process of Pokémon TCG 
+
+
+Hello $E = mc^{2}$!
+
+```{r}
+#| echo: false
+#| message: false
+library(googlesheets4)
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(readxl)
+library(ggbeeswarm)
+library(gganimate)
+library(paletteer)
+library(scales)
+library(palmerpenguins)
+library(uwot)
+library(ggrepel)
+library(knitr)
+theme_pokemon <- 
+  theme_minimal(base_size = 6, base_family = "Helvetica") +
+  theme(
+    line = element_line(size = .15/.751, colour = "black"),
+    text = element_text(size = 6, colour = "black"),
+    title = element_text(size = 6, colour = "black"),
+    panel.grid = element_blank(),
+    axis.line = element_line(),
+    axis.text = element_text(size = 6, colour = "black"),
+    axis.ticks = element_line(),
+    plot.background = element_rect(fill = "white", colour = NA),
+    strip.text = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(3, units = "mm")
+  )
+load("./data/2022-09-11-dataframes.RData")
+
+```
+
+You can add options to executable code like this
+

@@ -3,7 +3,7 @@
 
 ```{r}
 series_gen_df <- df_series2 |> 
-  select(series_gen, series, release_date, cards_total, pokemon_data_count) |> 
+  select(series, release_date, cards_total, pokemon_data_count) |> 
   distinct()
 series_gen_df2 <- map_dfr(
   .x = 1:8, 
@@ -44,7 +44,7 @@ Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis
 
 ```{r}
 df_first_last_seen <- df_gene |> 
-  group_by(id) |> 
+  group_by(pokedex_id) |> 
   mutate(
     first_and_last = case_when(
       release_date == min(release_date) ~ "Debut",
@@ -53,7 +53,7 @@ df_first_last_seen <- df_gene |>
     )
   )
 df_gene |> 
-  group_by(id) |> 
+  group_by(pokedex_id) |> 
   mutate(
     first_and_last = case_when(
       release_date == min(release_date) ~ "Debut",
@@ -64,9 +64,9 @@ df_gene |>
   filter(first_and_last == "Debut") |> 
   select(first_and_last, everything()) |> 
   ungroup() |> 
-  arrange(id)
+  arrange(pokedex_id)
 df_first_last_seen |>
-  filter(id == 1) |> 
+  filter(pokedex_id == 1) |> 
   select(first_and_last, release_date, everything()) |> 
   arrange(release_date)
 
@@ -75,7 +75,7 @@ df_first_last_seen |>
 
 ```{r}
 p_emp_release_date <- df_first_last_seen |> 
-ggplot(aes(x = release_date, y = id)) +
+ggplot(aes(x = release_date, y = pokedex_id)) +
   geom_vline(
     data = df_game_gen |> filter(game_gen != 9),
     aes(xintercept = game_release_date),
@@ -152,7 +152,7 @@ ggsave("./output/emp_release-date.png", width = 83, height = 60, unit = "mm", dp
 ```{r}
 # df_gene$id[1] |> is.integer()
 df_gene |> 
-  ggplot(aes(x = release_date, y = id, colour = pokemon_deco)) +
+  ggplot(aes(x = release_date, y = pokedex_id, colour = pokemon_deco)) +
     geom_point(colour = "grey30") +
   geom_text(aes(label = pokemon_deco), size = 2) +
   # scale_colour_viridis_c() +
@@ -169,7 +169,7 @@ df_gene |>
 
 ```{r}
 df_gene |> 
-  ggplot(aes(x = release_date, y = id, colour = pokemon_deco)) +
+  ggplot(aes(x = release_date, y = pokedex_id, colour = pokemon_deco)) +
     geom_point(colour = "grey30") +
   geom_text(aes(label = pokemon_deco), size = 2) +
   # scale_colour_viridis_c() +
@@ -187,7 +187,7 @@ df_gene |>
 
 ```{r}
 df_gene |> 
-  ggplot(aes(x = id, fill = pokemon_gen |> as.factor())) +
+  ggplot(aes(x = pokedex_id, fill = pokemon_gen |> as.factor())) +
   geom_bar() +
   theme_minimal() +
   theme(
@@ -206,12 +206,18 @@ df_gene |>
 すべてリリースごとにわけて、どれくらいで落ち着くか（平衡状態になるか）を見られそう。
 
 ```{r}
-df_gene |> select(-is_pokemon, -meta_is_v325_only, -meta_is_bulba_only) |> 
-  summarise(across(where(is.logical), ~ sum(.))) |> 
+df_gene |> select(is_secret_card, everything()) 
+
+df_gene |> 
+  select(-is_pokemon) |>
+  summarise(across(where(is.logical), ~ sum(., na.rm = TRUE))) |> 
   summarise(across(everything(), ~ sum(.))) |> 
   pivot_longer(cols = everything()) |> 
   mutate(name = fct_reorder(name, desc(value))) |> 
   ggplot(aes(x = name, y = value)) +
   geom_point() +
-  coord_flip()
+  scale_y_continuous(trans= "log10") +
+  coord_flip() +
+  theme_pokemon
 ```
+

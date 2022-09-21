@@ -2,7 +2,8 @@
 
 ## まずはなにもせずカウント
 ```{r}
-df_poke_count_raw <- df |> 
+df_poke_count_raw <- df_gene |> 
+  filter(is_pokemon) |> 
   group_by(card_name) |> 
   summarise(n = n()) |> 
   arrange(desc(n))
@@ -14,9 +15,10 @@ df_poke_count_raw <- df |>
 [負うた子に教えられて浅瀬を渡る](https://qiita.com/xerroxcopy/items/b79635ef3dbcc29644c6)
 
 ```{r}
-# pokemon name.
+# pokemon name. the only datatype that is comparable to the random draw null model
+
 df_count_pokemon <- df_gene |> 
-  filter(!is.na(id)) |> 
+  filter(is_pokemon) |> 
   group_by(pokemon_name) |> 
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
@@ -29,6 +31,7 @@ df_count_pokemon <- df_gene |>
 
 # card name. 
 df_count_full_name <- df_gene |> 
+  filter(is_pokemon) |> 
   group_by(card_name) |> 
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
@@ -41,7 +44,8 @@ df_count_full_name <- df_gene |>
 # card name + type. 
 # distinguish pokemons with the same name, but with different types
 df_count_full_name_type <- df_gene |> 
-  mutate(name_type = paste(card_name, Type)) |> 
+  filter(is_pokemon) |> 
+  mutate(name_type = paste(card_name, card_type2)) |> 
   group_by(name_type) |> 
   summarise(n = n()) |> 
   arrange(desc(n)) |> 
@@ -54,6 +58,7 @@ df_count_full_name_type <- df_gene |>
 # full name, but remove deco tsuki cards
 # count only the cards named "Pikachu" for pikachu.
 df_count_full_name_remove_decorated <- df_gene |> 
+  filter(is_pokemon) |> 
   filter(card_name == pokemon_name) |> 
   group_by(card_name) |> # same as grouping by pokemon_name since card_name == pokemon_name
   summarise(n = n()) |> 
@@ -83,15 +88,15 @@ p_count_full_name_type <- df_count_full_name_type |>
   labs(title = "card name + type") +
   theme_pokemon +
   theme(
-    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
+p_count_full_name_type
 ```
 
 ### full name
 
 ```{r}
-# p_count_full_name <- 
+p_count_full_name <-
   df_count_full_name |>
   ggplot(aes(x = n, y = ecdf)) +
   geom_point() +
@@ -100,13 +105,14 @@ p_count_full_name_type <- df_count_full_name_type |>
   labs(title = "card name") +
   theme_pokemon +
   theme(
-    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
-
+p_count_full_name
 ```
 
 ### full name, remove decorated
+
+decorated cards, like "Surfing Pikachu VMAX bababa" are omitted. Only Pikachu cards with the exact name "Pikachu" on the card are counted.
 
 ```{r}
 df_count_full_name_remove_decorated |>
@@ -114,10 +120,9 @@ df_count_full_name_remove_decorated |>
   geom_point() +
   scale_x_continuous(trans = "log10", breaks = 10^(0:10), name = expression(italic("x"))) +
   scale_y_continuous(trans = "log10", breaks = 10^(0:-10), name = expression(italic("Pr") ( X>= x) )) +
-  labs(title = "card name") +
+  labs(title = "only the cards with plain pokemon name") +
   theme_pokemon +
   theme(
-    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
 
@@ -126,6 +131,8 @@ df_count_full_name_remove_decorated |>
 
 
 ### poke name
+
+pokemon name. the only datatype that is comparable to the random draw null model
 
 ```{r}
 
@@ -137,7 +144,6 @@ df_count_pokemon |>
   labs(title = "pokemon name") +
   theme_pokemon +
   theme(
-    # text = element_text(family = "Swift"),
     aspect.ratio = 1
   )
 ```

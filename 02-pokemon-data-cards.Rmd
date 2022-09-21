@@ -21,6 +21,8 @@ raw_xlsx <-
 `raw_xlsx` is still a list. Convert it to df: 
 
 ```{r}
+df_series |> select(!ends_with("_ja")) #156 series
+df_series_en <- df_series |> filter(!is.na(series)) |> select(!ends_with("_ja")) |> distinct() # 143 series
 cards_df <- 
   map2(
     .x = raw_xlsx,
@@ -33,16 +35,21 @@ cards_df <-
       set_no = `Set #` |> as.character() # some are num, some are char
     )
   ) |> 
-  bind_rows() |>
+  bind_rows() |> 
   rename(card_type = Type, card_name = Name) |> 
   filter(!is.na(card_type)) |> # remove empty rows
   select(set_no, card_name, card_type, series) |> 
   left_join(
-    df_series |> select(!ends_with("_ja")),
+    df_series_en,
     by = c("series")
-  ) 
-cards_df # 15029 x 8
+  )
+cards_df |> 
+  filter(
+    series == "DP Black Star Promos"
+  ) # no duplicates
+cards_df # 14565 
 ```
+
 
 ## fix typos in card_type
 
@@ -92,28 +99,28 @@ cards_df_typo <- cards_df |>
 
 
 ```{r}
-types_non_pokemon <-  c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM")
+c_types_non_pokemon <-  c("Trainer", "Energy", "Supporter", "Item", "Stadium", "Tool", "TM")
 pokemon_type_ranking <- cards_df_typo |>
-  filter(!card_type %in% types_non_pokemon) |> 
+  filter(!card_type %in% c_types_non_pokemon) |> 
   group_by(card_type) |> 
   summarise(n = n()) |> 
   arrange(desc(n))
-major_types <- pokemon_type_ranking |> 
+c_major_types <- pokemon_type_ranking |> 
   filter(n > 100) |> # omit type+type pokemons
   select(card_type) |> 
   pull()
 #check
-major_types
+c_major_types
 ```
 
 
 ```{r}
-mixed_types <- pokemon_type_ranking |> 
+c_mixed_types <- pokemon_type_ranking |> 
   filter(n <= 100) |> # select type+type pokemons
   select(card_type) |> 
   pull()
 #check
-mixed_types
+c_mixed_types
 ```
 
 ## color the types
@@ -151,9 +158,9 @@ regex: [Rdrr](https://rdrr.io/cran/stringi/man/about_search_regex.html)
 cards_df_date <- cards_df_typo|> 
   mutate(
     card_type2 = case_when(
-      card_type %in% mixed_types ~ "mixed",
+      card_type %in% c_mixed_types ~ "mixed",
       TRUE ~ card_type),
-    is_pokemon = !card_type %in% types_non_pokemon & card_name != "Buried Fossil"
+    is_pokemon = !card_type %in% c_types_non_pokemon & card_name != "Buried Fossil"
     # tricky edge case: Buried Fossil is not a pokemon but 
     # Colorless item that can be used like a pokemon.
   ) |> 
@@ -182,7 +189,7 @@ cards_df_date <- cards_df_typo|>
   select(set, everything(), -set_no)
 cards_df_date
 ```
-Ignore the warnings. Idk why it warns me that.
+Ignore the warnings (`Warning:  11193 failed to parse.Warning: NAs introduced by coercion`). Idk why it warns me that.
 
 ## card number, promo or not
 
@@ -261,10 +268,12 @@ df_card <- cards_df_card_no2
 wrangle the `df` further in `pokemon-genes.Rmd` next. `df` to `df_genes`.
 ## columns 
 ```{r}
-df |> colnames() |> paste0(collapse = "|\n")
-df$series_class|> unique()
-df |> 
-  filter(series == "Pokémon GO")
+# df |> colnames() |> paste0(collapse = "|\n")
+# df$series_class|> unique()
+# df |> 
+#   filter(series == "Pokémon GO")
+df_card |> filter(release_date == as.Date("2009-12-01"))
+df_card |> dim() # 14565 x 13
 ```
 
 |column|meaning|

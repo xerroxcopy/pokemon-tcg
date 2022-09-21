@@ -19,5 +19,18 @@ df_game_gen <-
     game_end_date = lead(game_release_date),
     pokemon_cumulative_n = cumsum(pokemon_n_new)
   )
+df_game_gen
+```
+
+これをもとに、各リリースがどのGenerationまでのポケモンを使えたのかを書いておきたい（temporal_change_each_release_dfをプロットする際にgenerationでfacet gridしたいため）。
+game_release_dateとgame_end_dateに挟まれてるrelease_dateのgame_genを書きたいだけなんだ！！どうやる！！
+できたけどrelease_dateがからっぽな日本リリースは除かれるよ。問題ないと思うけど。
+
+```{r}
+df_series_releaes_gen_world_release_only <-
+  full_join(df_series2, df_game_gen, by = character()) |> 
+  filter(release_date > game_release_date & release_date < game_end_date) |> 
+  select(all_of(df_series2 |> colnames()), release_gen = game_gen)
 
 ```
+

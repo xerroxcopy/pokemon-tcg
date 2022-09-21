@@ -1,0 +1,41 @@
+# assemble plot
+[patchwork manual](https://patchwork.data-imaginist.com/articles/guides/layout.html)
+```{r fig.width = 2.97, fig.height= 4.438}
+library(patchwork)
+p1 <- p_emp_release_date # first-last indicator colour could be better. legend needs improvement.
+p2 <- p_emp_release_date # placeholder, use random data and replace
+p2a <- p_sim_emp_debut_cumsum
+p2b <- p_sim_emp_debut_residual
+p3 <- p_emp_umap_pokemon_gen
+p4 <- p_temporal_change_cumulative
+p5 <- p_emp_vs_sim_temporal_five_years_interval 
+p6<- p_emp_sim_count_id
+
+(p1 + p2)/ ((p2a +p2b)　- p6) / p3 / (p4 + p5) +
+# (p0 + p0 + (p0/p0)) / p0 / (p0 + p0) / (p0 + plot_spacer()) +
+  plot_layout(
+    widths = c(1, 1),
+    heights = c(.25, .25, .25, .25, .25, .25, .25, .25)
+    # widths = unit(c(83, 83), c("mm", "mm")),
+    # heights =unit(c(83/4, 83/4, 83/4, 83/4), c("mm", "mm", "mm", "mm")),
+    ) 
+  # plot_annotation(
+  #   tag_levels = "A"
+  # )
+ggsave("./output/entire_plot.png", height = 240, width = 166, units = "mm", dpi = 150)
+grDevices::dev.size()
+p_sim_emp_debut_cumsum
+```
+
+# assemble plot for bulletin
+
+幅166mm
+売上データ、ポケモンの名前のCCDF、Null model、あと何載せよう。データセットの紹介という性格が強いので、どんな属性を切り出したかとか、タイプとかもいいかもしれない
+
+```{r}
+
+pb1
+ggsave("./output/entire_plot.png", height = 240, width = 166, units = "mm", dpi = 150)
+
+```
+
