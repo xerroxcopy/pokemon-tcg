@@ -13,7 +13,7 @@ save(
   df_type_colour, # 02-, pokemon type and colour
   df_gene, # 03
   df_series2, # 02 then 03
-  df_names, # 03
+  df_names, # 03. names of pokemon, pokedex id, pokemon gen
   df_game_gen, # 04
   # df_transitional_umap,
      file = paste0("./data/", Sys.Date(), "-dataframes.RData"))

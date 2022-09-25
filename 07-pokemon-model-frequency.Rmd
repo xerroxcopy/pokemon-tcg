@@ -1,5 +1,7 @@
 # individual poke
 
+最も単純な帰無モデルと比較するために、リアルデータのCCDFを両対数グラフで書く。
+
 ## まずはなにもせずカウント
 ```{r}
 df_poke_count_raw <- df_gene |> 

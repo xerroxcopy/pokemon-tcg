@@ -19,12 +19,14 @@ library(magrittr)
 library(lubridate)
 library(readxl)
 library(ggbeeswarm)
-
+library(ggridges)
 library(paletteer)
 library(scales)
 library(palmerpenguins)
 library(uwot)
 library(ggrepel)
+library(stringi)
+library(ggimage)
 knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 3,
                       fig.height = 2)
@@ -79,4 +81,7 @@ ggsave("./output/plot_example.svg", width = 166/2, height = 110/2, unit = "mm")
 grDevices::dev.size()
 # ggedit(p1)
 ```
+
+
+
 

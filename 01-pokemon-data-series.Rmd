@@ -371,13 +371,19 @@ df_series |> colnames()
 
 In this chapter we tidied the data for the series (`df_series`). In the next chapter `pokemon-cards` we tidy the data for the individual cards (`df`).
 
-## misc data
+## misc data: sales data, cumulative sales
 
 [Google Trends](https://trends.google.com/trends/explore?date=2004-01-01%202022-09-21&q=pokemon%20card,pokemon%20tcg,%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%82%AB%E3%83%BC%E3%83%89,%2Fm%2F027qg4)
 
 ```{r}
 df_sales_worldwide  <- read_sheet("https://docs.google.com/spreadsheets/d/1VcVuCtDyKI5oqGsWJPKJGO7y-vIVZge6JrRqrE_kAQY/edit#gid=520335802", sheet = "sales") |> 
   mutate(date = as.Date(date))
+
+df_sales_worldwide
+```
+
+
+```{r}
 google_trends <- read_csv("./input/multiTimeline.csv", skip = 1) # from Google Trends 
 colnames(google_trends)
 google_trends_df <- google_trends |> 
@@ -391,14 +397,15 @@ google_trends_df <- google_trends |>
 google_trends_df
 
 ```
-
+### plot
 
 ```{r}
-pb1 <- df_sales_worldwide |> 
+pb1 <-
+  df_sales_worldwide |> 
   filter(!is.na(sales)) |>
   ggplot(aes(date, billion)) +
   geom_point() +
-  # geom_line(data = google_trends_df, aes(y = value/100, colour = name)) +
+  # geom_line(data = google_trends_df |> filter(name == "cumP"), aes(y = value/100, colour = name)) +
   geom_line() +
   scale_x_date(
         breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
@@ -406,12 +413,11 @@ pb1 <- df_sales_worldwide |>
     name = "Date"
   ) +
   scale_y_continuous(
-    "Sales (Billion $)",
+    "Sales in USD bn",
     breaks = (0:4) * 10,
-    labels = c(0, "", "", "", 4)
+    labels = c(0, "", "", "", 40)
   ) +
   theme_pokemon
 
-(0:4) * 1e+10
 ```
 

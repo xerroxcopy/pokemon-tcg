@@ -1,44 +1,5 @@
 # df_names
 
-Create a list of the most basic names of pokemons, e.g. "pikachu", along with their pokedex # and generation. Kaggle's data wasn't good, [Github](https://github.com/lgreski/pokemonData/blob/master/Pokemon.csv)'s data wasn't either.
-
-You don't have to run the next chunk:
-
-```{r}
-# pokemon_names_df_raw <- read_csv("./input/pokemon_github.csv")
-# pokemon_names_df_raw_ja <- read_csv("./input/ポケモンデータシート.csv")
-# pokemon_names_df_raw_ja |> colnames()
-# pokemon_names_df1 <- pokemon_names_df_raw |> 
-#   # filter(Form %in% c("Normal Forme", NA)) |> 
-#   select(
-#     ID, card_name, Generation) |> 
-#   rename(
-#     id = ID,
-#     name = card_name, 
-#     pokemon_gen = Generation
-#          ) |> 
-#   distinct() |> 
-#   filter(!str_detect(name, "50"))
-# pokemon_names_df1 |> dim()
-# pokemon_names_df_ja <- pokemon_names_df_raw_ja |> 
-#   rename(
-#     id = `ぜんこくNo.`,
-#     name_ja = `名前`,
-#     name = `英語名`
-#   ) |> 
-#   select(id, name_ja, name)
-# df_names <- 
-#   full_join(pokemon_names_df1, pokemon_names_df_ja, by = c("name", "id")) |> 
-#   distinct() |> 
-#   mutate(id = id |> as.character() |> as.integer()) |> 
-#   select(id, name, name_ja, pokemon_gen)
-# df_names |> View()
-# pokemon_names_df_ja |> 
-#   filter(id == "469")
-#  
-#   View(pokemon_names_df1 )
-```
-bad bad bad. I resort to 
 [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/List_of_Japanese_Pok%C3%A9mon_names) once again to produce [multiple csvs](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once). The CSVs are stored under `./input/bulbapedia_name`.
 ```{r}
 files <- list.files(
@@ -60,17 +21,102 @@ names_df <- map(
   bind_rows() |> 
   rename(
     pokedex_id = Ndex,
-    name = English,
-    name_ja = Kana
+    pokemon_name = English,
+    pokemon_name_ja = Kana
     ) |> 
-  select(pokedex_id, name, name_ja, pokemon_gen)
+  select(pokedex_id, pokemon_name, pokemon_name_ja, pokemon_gen)
 names_df2 <- names_df |> 
   mutate(
     pokedex_id = pokedex_id |> as.character() |> as.integer(),
   )
-df_names <- names_df2 |> 
-  filter(!is.na(pokedex_id)) # remove gen 9 pokemons
 ```
+
+## images
+
+[kaggle](https://www.kaggle.com/datasets/arenagrenade/the-complete-pokemon-images-data-set?resource=download)
+```{r}
+image_file_names <- list.files("./input/image_kaggle", pattern = "png")
+# new_names <- image_file_names |> str_remove("70px-") |> str_remove("(?<=[:digit:]{3}).+(?=\\.)")
+new_names <-
+  image_file_names %>% 
+  if_else(
+    str_detect(., pattern = "mime|mr-|hakamo|ho-oh|-o\\.|porygon-z|^tapu-|^type-"), 
+    ., 
+    str_remove(., pattern = "-.+(?=\\.png)")
+  ) 
+file.rename(
+  paste0("./input/image_kaggle/",image_file_names),
+  to = paste0("./input/image_kaggle/", new_names)
+)
+```
+
+
+```{r}
+
+
+df_names <-
+  names_df2 |> 
+  filter(!is.na(pokedex_id)) |>  # remove gen 9 pokemons
+  mutate(
+    pokemon_name_simplified = tolower(pokemon_name) |> 
+      str_replace("\\. ", "-") |> 
+      str_remove("\\.") |> 
+      str_remove("\\'") |> 
+      str_replace("mime jr", "mime-jr") |> 
+      str_replace("tapu ", "tapu-") |> 
+      str_replace("type: null", "type-null") |> 
+      stri_trans_general("Latin-ASCII"), 
+    image_large = paste0("./input/image_kaggle/", pokemon_name_simplified, ".png"),
+    image_small = paste0(
+    "./input/bulbapedia_image/",
+    sprintf("%03d", pokedex_id),
+    # pokemon_name,
+    ".png"
+    )
+  )
+
+View(df_names)
+df_names |> 
+  # filter(pokedex_id < 100) |> 
+  ggplot(
+    aes(x = pokedex_id %/% 30, y = pokedex_id %% 30, image = image_small)) +
+  geom_image(size = .04) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = 1
+  )
+  
+stri_trans_general("Zażółć gęślą jaźń", "Latin-ASCII")
+
+iconv("Sjögren's", "Latin-ASCII") 
+```
+## pokemon images
+
+[source](https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_National_Pok%C3%A9dex_number).
+use cmd+i > media
+
+[leading zeros](https://stackoverflow.com/questions/8266915/format-number-as-fixed-width-with-leading-zeros)
+
+```{r fig.width = 5, fig.height = 5}
+# image_file_names <- list.files("./input/bulbapedia_image_temp/", pattern = "png")
+# new_names <- image_file_names |> str_remove("70px-") |> str_remove("(?<=[:digit:]{3}).+(?=\\.)")
+# file.rename(
+#   paste0("./input/bulbapedia_image_temp/",image_file_names),
+#   to = paste0("./input/bulbapedia_image/", new_names)
+# )
+df_names |> 
+ 
+  ggplot(
+    aes(x = pokedex_id %/% 30, y = pokedex_id %% 30, image = path)) +
+  geom_image(size = .04) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = 1
+  )
+ggsave("./output/pokemons.png", width = 5000, height = 5000, units = "px")
+```
+
+
 
 ## pokemon sequencing
 

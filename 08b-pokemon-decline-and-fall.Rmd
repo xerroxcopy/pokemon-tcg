@@ -1,0 +1,287 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# decline and fall of pokemon empire
+
+昔は人気なかったやつが人気でたり、逆だったり、の極端なやつらをいくつか経時的に追ってったほうがいい気がしてきた。
+そういうやつを見つけてみよう：
+
+relativeなrankをつくって、その変動が大きいものをみつけるか。ずっとRankが低い・高いやつをハイライトするのもよさそう
+
+1. 一番大きなrankから一番小さなRankにいっている（栄枯盛衰のうち栄転）
+1. 一番小さなrankから一番大きなRankにいっている（栄枯盛衰のうち転落）
+1. 大→小→大　（一時期すごかった、はやり）
+1. 小→大→小　（カムバック）
+1. ずっとちいさなRank（ずっと栄光）
+1. ずっと大きなRank（不人気）
+くらいがとれると面白そう
+どうやるの
+relative_rankが…
+
+1. 
+1. 
+1.
+1.
+1. na.omitしたrankが平均して一番小さい
+1.na.omitしたrankが平均して一番大きい…？
+
+
+
+## no show
+
+でてくるポケモンではなく、でてこないポケモンに着目してみる。
+でてこないポケモンの数もシミュレーションと違う。
+prepare all possible entries of pokemons, in that specific era. for example, pokedex 152, gen 2 pokemon cannot appear in game_gen_era == 1 period.
+
+```{r}
+empty_rank_df <-
+  tibble(
+    pokedex_id = map(
+      .x = 1:8,
+      ~ 1:df_game_gen$pokemon_cumulative_n[.x]
+    ) |> 
+      unlist(),
+    game_gen_era = map(
+      .x = 1:8,
+      ~ rep(.x, df_game_gen$pokemon_cumulative_n[.x])
+    ) |> 
+      unlist()
+  ) |> 
+  left_join(df_names, by = "pokedex_id")
+```
+
+```{r}
+df_no_appearance_emp <- temporal_change_per_gen_df |> 
+  filter(condition == "pokemon name") |> 
+  right_join(empty_rank_df) |> 
+  filter(is.na(n)) |> 
+  count(game_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across())
+df_no_appearance_emp |> 
+  ggplot(aes(x = game_gen_era, pokedex_id)) +
+  # geom_point() +
+  geom_text(
+    aes(label = pokemon_name),
+    size = 6 * pt_convert
+  )
+```
+↑たとえばgame_gen_era == 1 のころには151のミュウだけカードが一度も登場してない。アンノーンにいたっては一時期ものすごく多かったのに、ゼロになってる。ほんとかよ？第2世代の時期で最も多く（1位）、第3世代でゼロ枚、第4世代でまた一位…？まじ？
+
+```{r}
+df_gene |> 
+  filter(pokemon_name == "Unown") |> 
+  count(release_date) |> 
+  ggplot(aes(x = release_date, n)) +
+  geom_col() +
+  geom_vline(
+    data = df_game_gen,
+    aes(xintercept = game_release_date),
+    inherit.aes = FALSE
+  )
+```
+たしかにぽっかりあいてますね…。
+
+game_gen_era == 8ともなると非常にポケモンが多いので一度も登場していないカードも相当ありそう。
+
+これもかなりランダムとは違う気がするし、測れる気がする。
+
+## compare voids with random
+```{r}
+temporal_change_per_gen_df |> 
+  filter(condition == "simulations", run == 1) |> 
+  right_join(empty_rank_df) |> 
+  filter(is.na(n)) |> 
+  count(game_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across())|> 
+  ggplot(aes(x = game_gen_era, pokedex_id)) +
+  # geom_point() +
+  geom_text(
+    aes(label = pokemon_name),
+    size = 6 * pt_convert
+  )
+  
+```
+### compare numerically, then visually
+
+Game-gen-eraごとに集計して、その数がどれくらいシミュレーションと違うかみてみよう
+ただしrunすべてについて行うので、right_joinが全部に起きないといけないので難しそう
+```{r}
+df_no_appearance_sim <- temporal_change_per_gen_df |> 
+  filter(condition == "simulations") |> 
+  group_by(run) |> 
+  group_split() %>%
+  map2_dfr(
+    .x = .,
+    .y = 1:simulation_runs,
+    ~ right_join(
+      ., 
+      empty_rank_df,
+      by = c(
+        "game_gen_era", 
+        "pokedex_id", 
+        "pokemon_name",
+        "pokemon_name_ja", 
+        "pokemon_gen", 
+        "pokemon_name_simplified", 
+        "image_large", 
+      "image_small")
+    ) |> 
+      mutate(run = .y)
+  ) |> 
+  filter(is.na(n)) |> 
+  count(run, game_gen_era, pokemon_gen) |> 
+  mutate(condition = "simulations")
+df_no_appearance_emp2 <- df_no_appearance_emp |> 
+  count(game_gen_era, pokemon_gen) |> 
+  mutate(condition = "pokemon name")
+
+```
+plot simVSemp, zansa
+
+```{r}
+df_no_appearance_sim |> 
+  ggplot(aes(x = game_gen_era, y = n, fill = pokemon_gen)) +
+  geom_quasirandom(
+    groupOnX = TRUE, 
+    size = .5, 
+    # alpha = .2,
+    pch = 21,
+    stroke = 0
+    ) +
+  geom_point(
+    data = df_no_appearance_emp2,
+    # colour = "red"
+    # aes(fill = pokemon_gen),
+    pch = 21,
+    colour ="white",
+    
+  ) +
+  scale_fill_viridis_c() +
+  # scale_y_continuous(trans = "log10")
+  facet_wrap(
+     vars(pokemon_gen)
+  ) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = 1,
+    legend.position = "none"
+  )
+```
+なんかおかしいな。第三世代のポケモン、第三世代がでた瞬間は少なくともかなりたくさん出たはずなのに、３も４も０になってる。…ではないわ。これは登場していない数なのでいいんだ。むしろ、いくら第３世代登場直後でも確率的には、ランダムにとれば少しは登場しない奴らがいてもおかしくないのに、全然「一回も登場しないようなポケモンがいない」ということで、正の新奇バイアスの傍証といえましょう。第５世代がでるころともなるとその御利益もなくなり、かなりの数が未登場。
+ちょっと世代忘れて、数だけでみてみましょう：
+
+```{r}
+df_no_appearance <- bind_rows(
+  df_no_appearance_emp2, df_no_appearance_sim
+  ) |> 
+  group_by(game_gen_era, condition, run) |> 
+  summarise(sum = sum(n)) |>
+  ungroup() |> 
+  complete(game_gen_era, condition, fill = list(sum = 0))
+df_no_appearance |> 
+  filter(condition == "simulations") |> 
+  ggplot(aes(x = game_gen_era, y = sum)) +
+  geom_quasirandom() +
+  geom_line(
+    data = df_no_appearance |> filter(condition == "pokemon name"),
+    colour = "red"
+  )
+```
+第４世代までは全部登場させるようなバイアスがかかっていて、５世代以降はかなり「もう諦めようぜ、もう多すぎだから全部作ろうと思わないでいいよ」みたいになってることが一目瞭然である。もちろん５世代目以降はランダムでも多いのであれだけど、ランダムの値からのハズレをみても。
+
+### 残差
+```{r}
+df_no_appearance_residual <- full_join(
+  df_no_appearance_emp2 |> select(-condition), df_no_appearance_sim |> select(-condition), by = c("game_gen_era", "pokemon_gen")
+  ) |> 
+  mutate(n.x = replace_na(n.x, 0)) |> 
+  rename(empirical = "n.x", simulations = "n.y") |> 
+  mutate(residual = empirical - simulations)
+
+df_no_appearance_residual |> 
+  # filter(condition == "simulations") |>
+  ggplot(aes(x = game_gen_era, y = residual, colour = pokemon_gen- game_gen_era)) +
+  geom_hline(yintercept = 1, colour = "blue", alpha = .4) +
+  geom_jitter(size = .3) +
+  scale_colour_viridis_c() +
+  theme_pokemon
+```
+これはプロットが難しいな…ggridgesするときがきた？
+```{r}
+
+df_no_appearance_residual |> 
+  # mutate(game_gen_era = )) |> 
+  ggplot(aes(
+    y =fct_rev(as.factor(game_gen_era)),
+    # y = paste0("Gen", game_gen_era,"Era, Gen", pokemon_gen, "pokemons"),
+    x = residual, 
+    fill = (pokemon_gen - game_gen_era) |> as.factor()
+    # group = pokemon_gen
+  )) +
+  geom_density_ridges(rel_min_height = .01, alpha = .5) +
+  # facet_grid(
+  #   rows = vars(game_gen_era),
+  #   scales = "free_y"
+  # ) +
+  geom_vline(xintercept = 0) +
+  scale_fill_viridis_d("Pokémons from i generations ago") +
+  theme_pokemon +
+  theme(legend.position = c(0.2, 0.8))
+```
+第４世代までは新しく登場したばかりのポケモンも昔からのポケモンも大した差はなく平等にとられていた（し、ランダムよりもずっとあますところなくとられていた）が、第５世代では明らかに第５世代が優遇されており、そのアオリを昔の世代たちがくっている
+
+
+### 
+`average_relative_rank`全Eraつうじてのランクの高さ。数値が低いほど上位を維持している。人気どあい。0.5以上であれば中央以上に人気といっていい。多分。
+`rank()`関数じたいは少ないほうから順にランク１位！としてしまう。nが多いほどランクが上位（小さい）になってほしいので、[ここ](https://stats.stackexchange.com/questions/3321/rank-in-r-descending-order)を参考に逆にする。
+```{r}
+decline_and_fall_of_pokemon_empire_df <- temporal_change_per_gen_df |> 
+  filter(condition == "pokemon name") |> 
+  right_join(empty_rank_df) |> 
+  group_by(game_gen_era) |> 
+  # arrange(desc(n)) |> 
+  mutate(n = replace_na(n, 0)) |> # NAを放置すると次のrank()でNAのやつらの順位が一緒にならん
+  mutate(rank = rank(-n, ties.method = "min")) |> # higher n -> smaller rank ?
+  ungroup() |> 
+  select(game_gen_era, pokemon_gen,  pokedex_id,n, rank, ecdf,  condition) |> 
+  group_by(game_gen_era) |> 
+  mutate(relative_rank = rank/max(rank, na.rm = TRUE)) |> 
+  filter(!is.na(relative_rank)) |> 
+  ungroup() |> 
+  group_by(pokedex_id) |> 
+  mutate(
+    average_relative_rank = ave(relative_rank, na.rm = TRUE), # 5., 6.
+    # delta = 
+  )
+
+```
+
+
+```{r}
+decline_and_fall_of_pokemon_empire_df |> 
+  ggplot(aes(y = relative_rank, x = pokedex_id)) +
+  geom_point()
+```
+なんでPokedex_idによって変な線が見えるんじゃー！面白いけど絶対なんかの都合なので取り除く。
+
+plot average_relative_rank ~ game_gen
+```{r}
+decline_and_fall_of_pokemon_empire_df |> 
+  ggplot(aes(x = pokedex_id, y = average_relative_rank)) +
+  geom_col() +
+    facet_grid(
+    rows = vars(pokemon_gen),
+    scales = "free_y"
+  ) +
+  coord_flip() +
+
+  theme_pokemon
+
+```
+
+
+```{r}
+decline_and_fall_of_pokemon_empire_df |> ggplot(aes(x = game_gen,  y = relative_rank, group = pokedex_id, colour = pokedex_id)) +
+  geom_line() 
+  scale_y_continuous(trans = "log10")
+```

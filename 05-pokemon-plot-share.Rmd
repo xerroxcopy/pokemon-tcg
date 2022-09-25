@@ -1,82 +1,27 @@
 # plot types
 
-### geom_count
+## first appeared
 
 ```{r}
-
-df_gene |> 
-  # filter(card_type %in% major_types) |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      y = card_type2,
-      colour = pokemon_gen
-    )
-  ) +
-  # geom_quasirandom(groupOnX = FALSE, size = .3,) +
-  geom_count(alpha = .3) +
-  scale_size_area() +
-  scale_colour_identity() +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-ggsave("./output/ReleaseDate-card_typeCount.png", width = 1500, height = 1000, unit = "px")
-```
-2020年代のTrainerはちょっとおかしい気が…
-Stadiumは一時期Stadiumというカテゴリだったが、今はTrainerのサブカテゴリ
-[supporter](https://bulbapedia.bulbagarden.net/wiki/Supporter_card_(TCG))
-[item](https://bulbapedia.bulbagarden.net/wiki/Item_card_(TCG))
-[trainer](https://bulbapedia.bulbagarden.net/wiki/Trainer_card_(TCG))
-
-
-### 折れ線
-
-```{r}
-df_gene |> 
-  mutate(year = release_date |> year()) |> 
-  # mutate(colour = if_else(str_detect(colour, "#"), colour, "#ffffff")) |>
+df_type_lifespan <- df_gene |> 
+  group_by(card_type2) |> 
   mutate(
-    card_type2 = case_when(
-      card_type2 %in% c_major_types ~ card_type2,
-      TRUE ~ "Others"
-    )
-  ) |>
-  count(card_type2, year) |> 
-  complete(card_type2, year) |> 
-  mutate(n = replace_na(n, 0)) |> 
-  ggplot(
-      aes(
-        x = year,
-        y = n,
-        # y = card_type,
-        # fill = card_type2
-        fill = card_type2
-      )
-    ) +
-  geom_area() +
-  theme_pokemon
-ggsave("./output/ReleaseDate-card_typeCountArea.png", width = 1500, height = 1000, unit = "px")
-```
+    is_debut_of_type = release_date == min(release_date),
+    is_last_appearance_of_type = release_date == max(release_date)
+    ) |> 
+  select(card_type2, release_date, is_debut_of_type, is_last_appearance_of_type) |> 
+  filter(is_debut_of_type | is_last_appearance_of_type) |> 
+  distinct() |> 
+  select(-is_last_appearance_of_type) |> 
+  pivot_wider(values_from = release_date, names_from = is_debut_of_type) |> 
+  rename(ymin = "TRUE", ymax = "FALSE") |> 
+  ungroup()
 
-### series type ~  cards_total~ time
-```{r}
-
-df_series |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      y = series_class,
-      size = cards_total,
-    )
-  ) +
-  geom_jitter(alpha = .3,width = 0, height = .1) +
-  scale_size_area() +
-  scale_colour_identity() +
-  theme_pokemon
+df_type_lifespan |> 
+  mutate(card_type2 = fct_reorder(card_type2, ymin)) |> 
+  ggplot(aes(x = card_type2, ymin = ymin, ymax = ymax)) +
+  geom_linerange() +
+  coord_flip()
 ```
 
 
@@ -85,94 +30,103 @@ df_series |>
 
 
 ## proportion, frequency
+
 [make geom_area proportional](https://stackoverflow.com/questions/45438665/create-proportional-geom-area-plot-directly-in-ggplot2)
+
+
+25年通してそこまで色によるシェアは変わっていない。TODO: これと帰無モデルとの差をみてみたいけどどうだろう
+
 ```{r}
 df_gene |> 
+  mutate(release_bin = round_date(release_date, "6 months")) |> 
   filter(card_type %in% c_major_types) |> 
+  left_join(df_type_colour, by = "card_type") |> 
+  count(release_bin, card_type, series_class, pokemon_gen) |> 
   ggplot(
     aes(
-      x = release_date, 
-      # y = card_type,
+      x = release_bin, 
+      y = n,
       fill = card_type
-      # fill = colour
     )
   ) +
-  geom_area(stat = "bin", position = "fill") +
-  # scale_fill_manual(values = colours_named_vector) +
+  # geom_col(stat = "bin", position = "fill") +
+  geom_col() +
+  scale_fill_manual(values = c_named_colour) +
+  facet_wrap(vars(pokemon_gen)) +
   theme_pokemon
 ggsave("./output/ReleaseDate-card_typeCountAreaShare.png", width = 1500, height = 1000, unit = "px")
 ```
-### highlight fairies
-
+## cumulative card amount ~ t, for each colour
+紀要掲載予定
+[fct_reorder](https://cran.r-project.org/web/packages/forcats/vignettes/forcats.html), on [legend](https://forcats.tidyverse.org/reference/fct_reorder.html) too
 ```{r}
-df_gene |> 
-  filter(card_type %in% c_major_types) |> 
+
+df_cum <- df_gene |> 
+  # mutate(release_bin = round_date(release_date, "1 month")) |> 
+  # filter(card_type %in% c_major_types) |> 
+  mutate(card_type3 = if_else(is_pokemon, card_type2, "non-Pokémon")) |> 
+  left_join(df_type_colour, by = "card_type2") |> 
+  count(release_date, card_type3, rgb) |> 
+  complete(release_date, card_type3, fill = list(n = 0)) |> 
+  group_by(card_type3) |> 
+  mutate(cumsum = cumsum(n)) |> 
+  ungroup() |> 
+  mutate(card_type3 = fct_reorder(card_type3, cumsum, max)) 
+coefficient <- 320 # purely aesthetic, to align two y-axes
+p_total_sales_and_total_cards <-
+df_cum |>
   ggplot(
     aes(
       x = release_date, 
-      # y = card_type,
-      fill = card_type == "Fairy"
-      # fill = colour
+      y = cumsum,
     )
   ) +
-  geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-### highlight secret cards
-
-```{r}
-df_gene |> 
-  filter(card_type %in% c_major_types) |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      # y = card_type,
-      fill = is_secret_card
-      # fill = colour
+  geom_area(aes(fill = fct_reorder2(card_type3, release_date, cumsum))) +
+  geom_line(
+    data =  df_sales_worldwide |> filter(!is.na(sales)),
+    aes(date, billion * coefficient),
+    size = .3
+  ) +
+   geom_point(
+    data =  df_sales_worldwide |> filter(!is.na(sales)),
+    aes(date, billion * coefficient),
+    pch = 21,
+    size = .9,
+    stroke = .5,
+    colour = "white",
+    fill = "black"
+  ) +
+  scale_fill_manual(values = c_named_colour, na.value = "grey30") +
+  scale_x_date(
+    expand = c(0, 0),
+    breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    name = "Date"
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0),
+    breaks = 0:6 * 2500,
+    labels = c(0, "", 5000, "", 10000, "", 15000),
+    sec.axis = sec_axis(
+      ~ . / coefficient, 
+      name = "Sales in bn Cards",
+      breaks = 0:4 * 10,
+      labels = c(0, "", "", "", 40 )
     )
   ) +
-  geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-
-df_gene |> 
-  filter(release_date > ymd("2022-01-01")) |> 
-  select(is_secret_card, release_date, set, everything())
-```
-
-
-```{r}
-df_gene |> 
-  filter(card_type %in% c_major_types,
-         !is.na(is_secret_card)) |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      # y = card_type,
-      fill = is_secret_card
-      # fill = colour
-    )
+  labs(
+    fill = "Type",
+    y = "Total # of Cards",
+    x = "Date"
   ) +
-  geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
+  theme_pokemon +
   theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
+    legend.position = c(.2, .6)
   )
 ```
+
+
+
 ### set size ~ time
 ```{r}
 df_series |> colnames()
@@ -198,127 +152,12 @@ df_series |>
 ```
 ### series class frequency ~ time
 
-```{r}
-df_series |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      # y = card_type,
-      fill = series_class
-      # fill = colour
-    )
-  ) +
-  geom_area(stat = "bin") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-
-perhaps geom_density better?
-
-リリース頻度
-```{r}
-df_series |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      y = ..density..,
-      fill = series_class
-      # fill = colour
-    )
-  ) +
-  geom_density(
-    position = "stack",
-    adjust = .4
-    ) +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-
-実際の枚数
-```{r}
-df_series |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      y = cards_total,
-      fill = series_class
-      # fill = colour
-    )
-  ) +
-  geom_density(
-    # position = "stack",
-    adjust = .4
-    ) +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-
-```{r}
-df_gene |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      # y = card_type,
-      fill = card_type == "Water"
-      # fill = colour
-    )
-  ) +
-  geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-
-## secret cards
-
-```{r}
-df_gene |> 
-  ggplot(
-    aes(
-      x = release_date, 
-      # y = card_type,
-      fill = is_secret_card
-      # fill = colour
-    )
-  ) +
-  geom_area(stat = "bin", position = "fill") +
-  theme_minimal() +
-  # scale_fill_manual(values = colours_named_vector) +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line(size = .3),
-    axis.ticks = element_line(size = .1)
-  )
-```
-いろいろなものが復活しうる。継承がカード→カードではないため。
-
 ## pokemon genes 
 
 ### pokemon gen share
 
 TODO: ビンをMonthにしたい…
 ```{r}
-df_gene$release_date[1] |> is.Date()
-df_gene$release_date[1] |> day() <- 3
 df_gene |> 
   # mutate(release_month = ym(release_date)) |> View()
   ggplot(
@@ -345,3 +184,40 @@ df_gene |>
 ```
 新しいGenがリリースされると一気にそれが多くなるが、しばらくするとかなり偏りがなくなってくる（平衡状態みたいな）。第1世代はそれにしても多い気がするのでバイアスが検出できるかもしれない。
 
+
+```{r}
+set_releases_df <- df_series2 |> 
+  mutate(release_bin = round_date(release_date, "6 months") |> as.Date()) |> 
+  filter(!is.na(cards_total)) |> 
+  select(!ends_with("_ja")) |> 
+  distinct() |> 
+  mutate(series_class = series_class |> as.factor()) |> 
+  mutate(series_class = fct_infreq(series_class)) 
+p_set_releases <-
+  set_releases_df |> 
+  ggplot(
+    aes(release_bin, cards_total, group_by = series, fill = series_class)
+  ) +
+  geom_col(colour = "white", size = .2) +
+  scale_fill_paletteer_d("NineteenEightyR::sunset1") +  # https://github.com/EmilHvitfeldt/r-color-palettes
+  scale_x_date(
+    expand = c(0, 0),
+    breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    
+  ) +
+  scale_y_continuous(expand = c(0, 0), labels = c(0, "", "", "", 800)) +
+  labs(
+    fill = "Set Classification",
+    y = "# of Cards", 
+    x = "Release Date (6 Months Bin)"
+  ) +
+  theme_pokemon +
+  theme(
+  ) +
+  guides(
+    # fill = guide_legend(nrow = 2, byrow = TRUE)
+  )
+
+```
+ppaletteかなりいいけどあまりに色がポケモンなので、なんか違うことにとっといたほうがよさそう

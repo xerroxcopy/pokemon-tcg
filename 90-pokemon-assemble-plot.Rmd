@@ -31,11 +31,26 @@ p_sim_emp_debut_cumsum
 
 幅166mm
 売上データ、ポケモンの名前のCCDF、Null model、あと何載せよう。データセットの紹介という性格が強いので、どんな属性を切り出したかとか、タイプとかもいいかもしれない
+1:2にならんなー
 
 ```{r}
+pb1 <- p_total_sales_and_total_cards # 05 pokemon plot share
+pb2 <- p_set_releases # 05 pokemon plot share
 
-pb1
-ggsave("./output/entire_plot.png", height = 240, width = 166, units = "mm", dpi = 150)
+(pb1 + pb2) / plot_spacer() +
+  plot_layout(
+    widths = c(1, 2),
+    heights = c(1, 1)
+    # widths = unit(c(83, 83), c("mm", "mm")),
+    # heights =unit(c(83/4, 83/4, 83/4, 83/4), c("mm", "mm", "mm", "mm")),
+    ) +
+  plot_annotation(
+    tag_levels = "A",
+  ) &
+  theme(plot.tag = element_text(size = 10,family = "Helvetica",  face = "bold")) 
+
+ggsave("./output/bulletin_entire_plot.png", height = 166/3*2, width = 166, units = "mm", dpi = 600)
 
 ```
 
+Bold以上は指定[できない](https://www.rdocumentation.org/packages/ggplot2/versions/2.0.0/topics/element_text)っぽい。太いフォントにするか、あとでIllustratorでやるかの2択ですね。

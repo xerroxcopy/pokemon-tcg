@@ -134,19 +134,30 @@ c_mixed_types
 ```{r}
 
 df_type_colour <- tribble(
-  ~ card_type, ~ rgb, ~ colour,
-      "Water", "#80DDFF", "lightblue",
-      "Grass", "#80FF82", "green",
-      "Psychic", "#361C63", "purple",
+  ~ card_type2, ~ rgb, ~ colour,
+      "non-Pokémon", "#f8f8f8", "grey",
+      "Water", "#4AA9DC", "lightblue",
+      "Grass", "#9BDE71", "green",
+      "Psychic", "#7D66A3", "purple",
       "Colorless", "#D1D1D1", "lightgrey",
-      "Fighting", "#8F441E", "orange",
-      "Fire", "#FF0F23", "red",
-      "Lightning", "#F0C800", "yellow",
-      "Darkness", "#1D1D1B", "darkgrey",
-      "Metal", "#463F43", "silver",
+      "Fighting", "#FCAC26", "orange",
+      "Fire", "#F5592D", "red",
+      "Lightning", "#F9E000", "yellow",
+      "Darkness", "#37464C", "darkgrey",
+      "Metal", "#707C79", "silver",
       "Dragon", "#ABAD00", "gold",
-      "Fairy", "#FF4DAF", "pink"
+      "Fairy", "#F2499A", "pink",
+      "mixed", "#000000", "black",
 )
+df_type_colour %>%
+  ggplot(aes(x = 1, y = 1:nrow(.), colour = I(rgb), label = card_type2)) +
+  geom_text(fontface = "bold")+
+  theme_pokemon
+c_named_colour <- df_type_colour |> 
+  # column_to_rownames(var = "card_type") |> 
+  select(card_type2, rgb) |> 
+  deframe() # https://stackoverflow.com/questions/19265172/converting-two-columns-of-a-data-frame-to-a-named-vector
+```
 ```
 
 
