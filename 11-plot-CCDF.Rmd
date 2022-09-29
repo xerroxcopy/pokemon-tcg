@@ -1,0 +1,89 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# plot CCDF with top pokemons
+
+
+### plot CCDF ~ 8 gens
+
+紀要掲載予定
+
+```{r}
+c_top_pokemons <- #10から移植。もっとかんたんにやりたいので
+# df_view <- 
+  temporal_change_per_gen_df |> 
+  filter(condition == "pokemon name") |> 
+  group_by(game_gen_era) |>
+  # mutate(rank_era = rank(-n, ties.method = "min")) 
+  filter(n == max(n)) |> 
+  pull(pokemon_name) |> 
+  unique()
+
+top_pokemons_paths_df <-
+  temporal_change_per_gen_df |> 
+  filter(
+    condition == "pokemon name", 
+    pokemon_name %in% c_top_pokemons
+  )
+```
+
+
+
+[scale_size_identity](# https://stackoverflow.com/questions/47479779/can-geom-image-from-the-ggimage-package-be-made-to-preserve-the-image-aspect-r) ただしaspect.ratioを使う方法[here](https://themockup.blog/posts/2020-10-11-embedding-images-in-ggplot/)だと関係ない気がする。
+```{r}
+aspect_ratio <- 1
+# p_temporal_change_per_gen <-
+  temporal_change_per_gen_df |> 
+  filter(condition == "simulations") |> 
+  ggplot(aes(x = n,y = ecdf)) +
+  geom_vline(xintercept = 0, size = .03, colour = "#5C747A") +
+  geom_line(
+    aes(group = paste(game_gen_era, run)),
+    size = .1, alpha = .01, colour = "#FFCB03",) + # 8 * 1000 lines
+  geom_point(
+    data = temporal_change_per_gen_df |> 
+      filter(condition == "pokemon name") |> 
+      select(n, ecdf, game_gen_era) |> distinct(),
+    colour = "#3267B0", size = .5,
+  ) +
+  geom_image(
+    data = top_pokemons_paths_df,
+    aes(image = image_large),
+    size = .15,
+    height = .3,
+    by = "width",
+    asp = aspect_ratio,
+    nudge_x = .5
+  ) +
+  scale_size_identity() + 
+  scale_x_continuous(
+    expand = c(0.08, 0.2),
+    breaks = 0:10 * 5,
+    labels = c(0, "", 10, "", 20, "", 30, "", 40, "", 50),
+    name = "Frequency of Pokémon"
+  ) +
+  scale_y_continuous(
+    expand = c(0.1,0),
+    name = expression(italic("Pr") ( X>= x) ),
+    trans = "log10",
+    breaks = 10^(0:-3),
+    labels = trans_format("log10", math_format(10^.x))
+    ) +
+  facet_wrap(
+    vars(game_gen_era),
+    nrow = 2,
+    scales = "free",
+    labeller = era_labeller
+  ) +
+  theme_pokemon +
+  theme(
+    aspect.ratio = aspect_ratio
+  ) # takes 30 sec, drawing 1000 lines * 8...?
+ggsave("./output/p_emp_vs_sim_cumulative_ccdf_ semilog_0start.png", width = 166, height = 100, unit = "mm", dpi = 1200)
+ggsave("./output/p_emp_vs_sim_cumulative_ccdf_semilog_0start.svg", width = 166, height = 100, unit = "mm", dpi = 1200)
+```
+
+caption: リリースのperiodごとのポケモンカードの累積頻度分布。黄色の線が帰無モデルのシミュレーション1000runsにおける分布。いずれかの時期に頻度が最も多かったポケモンに関しては、ほかの時期とともに画像をつけている。アンノーンが第二世代の時期に初登場一位だったが第3世代で全く登場せず、また第４世代の時期に１位になるなど変動が激しいことがわかる。ピカチュウは特にここ最近非常に人気だが、常にそうだったわけではなく、ではじめの第１世代のころは大したことない。
+SVGは非常に重く、PNGは非常に埋め込んだはずの画像が汚いので、SVGを開いてPNGで書き出したいが、Patchwork使うとなるとそうもいかないよねえ…
+

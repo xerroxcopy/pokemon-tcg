@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# remixedness
+
+横軸がポケモンの数、縦軸がVariationの数的な
+
+```{r}
+pokemon_diversity_df <- df_gene |> 
+  filter(is_pokemon) |> 
+  select(pokemon_name, card_name) |> 
+  group_by(pokemon_name) |> 
+  mutate(pokemon_count = n()) |> 
+  ungroup() |> 
+  group_by(card_name) |> 
+  mutate(card_name_count = n()) |> 
+  distinct() |> 
+  arrange(pokemon_count |> desc()) |> 
+  ungroup() |> 
+  group_by(pokemon_name) |> 
+  mutate(diversity_inside_a_pokemon = n()) |> 
+  select(pokemon_name, pokemon_count, diversity_inside_a_pokemon) |> 
+  distinct() |> 
+  left_join(df_names) |> 
+  ungroup()
+```
+
+
+```{r}
+pokemon_diversity_df |> 
+ggplot(aes(pokemon_count, diversity_inside_a_pokemon, colour = pokemon_gen)) +
+  geom_count(alpha = .3) +
+  geom_text_repel(
+    data = pokemon_diversity_df |> filter(diversity_inside_a_pokemon > 10),
+    aes(label = pokemon_name),
+    size = 4 * pt_convert,
+    min.segment.length = 0,
+    segment.size = .3
+  ) +
+  scale_colour_viridis_c() +
+  facet_wrap(vars(pokemon_gen), scales = "free") +
+  theme_pokemon
+  # geom_text(aes(label = pokemon_name))
+```
+
+↑これの傾きなどは論じられるかも。時系列でだんだん数もふえていく・・・・
+↑こっちのほうが↓よりいいなやっぱり
+
+```{r}
+pokemon_diversity_df |> 
+  ggplot(aes(pokemon_gen, diversity_inside_a_pokemon, colour = pokemon_count)) +
+  geom_jitter() +
+  geom_text(
+    data = pokemon_diversity_df |> filter(diversity_inside_a_pokemon > 10),
+    aes(label = pokemon_name)
+  ) +
+  scale_colour_viridis_c(trans = "log10") +
+  # scale_y_continuous(trans = "log10") +
+  theme_pokemon
+```
+

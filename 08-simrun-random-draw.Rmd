@@ -1,0 +1,233 @@
+# random draw
+
+ここでの目的は、株式会社ポケモンのデザイナーの思考パターンをランダムでどこまで模せるかを調べること。そのためにはいくつかのpresumptionが必要になる。まず、あるタイムステップ（具体的には`release_date`のどこか）`t = t_n`で、すでにリリースされているポケモンのゲーム・すでに公開されているポケモンのリストがあるとする。`t_n`においてリリースする枚数は興味がないので、すでに決定しているとする（`release_date`における`total_cards`に相当する）。そのとき、デザイナーは次のように適当にポケモンを選ぶことが考えられる：
+
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶ。重複を許す。
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶ。重複をなるべく避ける（その回にすでにひいたポケモンにネガティブなバイアスがかかる）。毎回のリリースで偏りが生じる。
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶ。重複を好む（すでにひいたポケモンにポジティブなバイアスがかかる）
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶのだが、そのとき`t_n`が最も最近（頭痛が痛い…）の`game_release_date`に近い場合、新しく追加されたポケモンを好んで選ぶ（新しいポケモンの発表直後はどうも多くリリースされているように見えるので）。pro-noveltyな変異 bias.
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶのだが、Generation Iの151匹から好んで選ぶ。第1世代へポジティブなバイアス。やっぱり人気だから…イーブイとかピカチュウとか…。
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶするのだが、今までのリリースで多く選ばれたものを好んで選ぶ。正の頻度依存変異バイアス。
+1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶするのだが、前回のリリースで選ばれたポケモンを好んで選ぶ。伝達バイアス。
+
+これだけあればとりあえず十分かと・・・。まず１だけ実装してみよう。
+nested dfでやるかmatrixでやるかはたまたdfでやるか。毎回population_sizeが違うのでnested dfがいいのかな
+
+
+```{r}
+series_gen_df3 <- series_gen_df2 |> 
+  left_join(df_game_gen |> select(game_gen, pokemon_cumulative_n), by = "game_gen") |> 
+  filter(!is.na(pokemon_data_count))
+# series_gen_df3
+```
+[Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
+```{r}
+
+sim_random_df <- tibble(
+  series_gen = integer(),
+  series = character(),
+  release_date = Date(),
+  cards_total = integer(),
+  pokemon_data_count = integer(),
+  game_gen = integer(),
+  pokemon_cumulative_n = integer(),
+  pokedex_id = integer(), 
+  run = integer()
+)
+simulation_runs <- 1000
+
+for (simulation_run in 1:simulation_runs) {
+  single_sim_result_df <- series_gen_df3 |>
+  mutate(
+    pokedex_id =  map2( # rowwise() does not work...?
+      .x = pokemon_data_count,
+      .y = pokemon_cumulative_n,
+      ~ runif(
+        n = .x,
+        min = 1,
+        max = .y + 1
+      ) |> floor()
+    ),
+    run = rep(simulation_run, nrow(series_gen_df3))
+  ) |> 
+  unnest_longer(pokedex_id)
+  sim_random_df <- bind_rows(sim_random_df, single_sim_result_df)
+} #  7min? for 1000 runs
+sim_random_df |> dim() # 1 2325 000 x 9
+```
+
+
+## compare gen histogram 
+
+### count
+```{r}
+df_empirical_count_id <- 
+  df_gene |> 
+  filter(is_pokemon) |> # filter only pokemons. is_
+  group_by(pokedex_id) |> 
+  summarise(n = n()) %>% 
+  mutate(
+    condition = rep("empirical", nrow(.))
+  )
+sim_random_count_pokemon_df <- 
+  sim_random_df |> 
+  # left_join(df_names, by = "id") |> 
+  group_by(pokedex_id, run) |> 
+  summarise(n = n()) |> 
+  ungroup() %>%
+  mutate(
+    condition = rep("simulation", nrow(.))
+  ) 
+
+
+```
+### merge
+
+```{r}
+emp_sim_count_id_df <- 
+  bind_rows(
+    df_empirical_count_id, 
+    sim_random_count_pokemon_df
+  ) |> 
+  left_join(df_names, by = "pokedex_id")
+emp_sim_count_id_df |> colnames()
+```
+
+### plot the sim~emp difference
+
+SDを準備（重いし、大量に書かれるので）
+```{r}
+emp_sim_count_id_summary_df <- emp_sim_count_id_df |> 
+  group_by(condition, pokemon_gen) |> 
+  summarise(
+    mean = mean(n),
+    sd = sd(n)
+  )
+```
+annotation用のdfを用意。上位３ポケモンの画像を貼る
+```{r}
+emp_sim_count_id_annotate_df <-
+  emp_sim_count_id_df |>
+  filter(condition == "empirical") |> 
+  group_by(pokemon_gen) |> 
+  mutate(rank = rank(-n, ties.method = "min")) |> 
+  filter(rank <= 3)
+```
+これ↓を掲載予定
+geom_quasirandomをつかっていると非常にプロットが重い（最終的に70MBとかになる）。実データに関してはviolinを使うか、pngで書き出して扱ったほうがよさそう
+```{r}
+aspect_ratio = 1
+# p_emp_sim_count_id <-
+  emp_sim_count_id_df |> 
+  # filter(condition == "simulation") |>
+  ggplot(aes(x = pokemon_gen, y = n)) +
+  geom_violin(
+    data = emp_sim_count_id_df |> filter(condition == "simulation"),
+    aes(group = pokemon_gen, fill = condition),
+    alpha = .3,
+    colour = "transparent",
+    scale = "width",
+    bw = 1
+  ) +
+geom_quasirandom(
+    data = emp_sim_count_id_df |> filter(condition == "empirical"),
+    aes(group = pokemon_gen, fill = condition),
+    pch = 21,
+    size = .7,
+    alpha = .8,
+    # dodge.width = .8,
+    stroke = 0,
+    colour = "transparent"
+    ) +
+geom_pointrange(
+    data = emp_sim_count_id_summary_df, 
+    aes(
+      y = mean, 
+      ymin = mean-sd, 
+      ymax = mean+sd, 
+      group = condition,
+      colour = condition
+    ),
+    position = position_dodge(.8),
+    fatten = .1,
+    stroke = 1,
+    size = .2
+  ) +
+  # aesthetic line for readability
+  geom_segment(
+    data = emp_sim_count_id_annotate_df,
+    aes(
+      xend = pokemon_gen, 
+      x = pokemon_gen + .4,
+      yend = n
+    ),
+    size = .05,
+    # lineend = "butt",
+    # linejoin = "mitre",
+    # arrow = arrow(length = unit(.5, "mm")),
+    colour = pokemon_blue
+  ) +
+  geom_image(
+    data = emp_sim_count_id_annotate_df,
+    aes(x = pokemon_gen, y = n, image = image_large),
+    size = .08,
+    height = .05,
+    by = "width",
+    asp = aspect_ratio,
+    nudge_x = .4,
+  ) +
+  
+  scale_colour_manual(
+    values= c("simulation" = pokemon_yellow, "empirical" = pokemon_blue)
+  ) +
+  scale_fill_manual(
+    values= c("simulation" = pokemon_yellow |> lighten(.4), "empirical" = pokemon_blue |> darken(.4))
+  ) +
+  scale_x_continuous(
+    breaks = 1:8,
+    labels = 1:8 |> as.roman(),
+    name = "Pokémon Generation"
+  ) +
+  scale_y_continuous(
+    limits = c(0, 85), # ignore pikachu!
+    breaks = c(0, 40, 80),
+    name = "Freqeuncy of Cards",
+    # trans = "log10"
+  ) +
+  theme_pokemon +
+  theme(
+    legend.position = c(.8, .7),
+    aspect.ratio = aspect_ratio
+  )
+ggsave("./output/p_emp_sim_count_id.png", width = 1000, height = 1000, unit = "px", dpi = 600)
+ggsave("./output/p_emp_sim_count_id.svg", width = 83, height = 45, unit = "mm", dpi = 600) 
+ggsave("./output/p_emp_sim_count_id.pdf", width = 83, height = 45, unit = "mm", dpi = 600) 
+
+
+```
+`geom_quasirandom()` points might not be visible in rstudio, but works fine for svgs.
+
+Caption:
+各世代に属するポケモンの、2022年9月までに発売されたカードの数。オレンジが実際のデータ、ダークグレーがシミュレーション結果。白点と線は平均±SD。第一世代に属するPikachuに関しては、実データにおいてn=135で全世代通してトップだが、あまりに大きいためプロットからは除いた（計算にはもちろん含めてある）。
+
+というかEeveeが2位だと思ってたのだがCharizardなのだね。pokemon_nameとcard_nameでだいぶ違うのだろう。Charizardという名前card_nameでは少ないけど、Charizardというポケモンpokemon_nameでは多いということ。つまりEeveeよりもリミックスされがちだということだ！
+リミックス度が測れるな　横軸がポケモンの数、縦軸がVariationの数的な
+
+
+#### variations (ignore)
+
+まずは全部のIDについてテスト
+```{r}
+sim_random_count_pokemon_df |> 
+  filter(run < 10) |> 
+  ggplot(aes(x = pokedex_id, y = n)) +
+  geom_jitter(alpha = .1, size = .2, colour = "grey40") +
+  geom_point(data = df_empirical_count_id, size = 1, alpha = .5, colour = "orange") +
+  theme_pokemon
+ggsave("./output/count_emp_vs_sim_total_individual_ID.png", width = 83, height = 35, unit = "mm", dpi = 600)
+
+```
+
+
+
+

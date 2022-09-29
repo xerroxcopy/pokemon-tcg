@@ -1,7 +1,6 @@
 # assemble plot
 [patchwork manual](https://patchwork.data-imaginist.com/articles/guides/layout.html)
 ```{r fig.width = 2.97, fig.height= 4.438}
-library(patchwork)
 p1 <- p_emp_release_date # first-last indicator colour could be better. legend needs improvement.
 p2 <- p_emp_release_date # placeholder, use random data and replace
 p2a <- p_sim_emp_debut_cumsum
@@ -32,25 +31,98 @@ p_sim_emp_debut_cumsum
 幅166mm
 売上データ、ポケモンの名前のCCDF、Null model、あと何載せよう。データセットの紹介という性格が強いので、どんな属性を切り出したかとか、タイプとかもいいかもしれない
 1:2にならんなー
+[arranging plots with patchwork](https://ggplot2-book.org/arranging-plots.html)
 
-```{r}
-pb1 <- p_total_sales_and_total_cards # 05 pokemon plot share
+
+まずは概要てきなもの、シミュレーションが関係ないもの。
+```{r, fig.width = 2.97, fig.height= 2, warnings = FALSE, message = FALSE}
+pb1 <- p_total_sales_and_total_cards # 05 plot share
 pb2 <- p_set_releases # 05 pokemon plot share
-
-(pb1 + pb2) / plot_spacer() +
+pb10 <- p_df_umap_gene_type_prop # 15, 1c1
+(pb1|pb2|pb10) +
+# p_dummy + p_dummy  +p_dummy_facet_8 +
   plot_layout(
-    widths = c(1, 2),
-    heights = c(1, 1)
+    # design = layout
+    # widths = c(1, 1,1,1,1,1,1,1),
+    # heights = c(1, 3, .5, .5, 1.5, 1),
+    guides = "collect"
     # widths = unit(c(83, 83), c("mm", "mm")),
     # heights =unit(c(83/4, 83/4, 83/4, 83/4), c("mm", "mm", "mm", "mm")),
     ) +
   plot_annotation(
-    tag_levels = "A",
+    tag_levels = "1", # temporarily 1, change to A eventually
   ) &
-  theme(plot.tag = element_text(size = 10,family = "Helvetica",  face = "bold")) 
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) 
+```
+次に単純なカウント。割合とかではなく。CCDFなど。
 
-ggsave("./output/bulletin_entire_plot.png", height = 166/3*2, width = 166, units = "mm", dpi = 600)
+```{r fig.width = 2.97, fig.height= 3.5, warnings = FALSE, message = FALSE}
+pb4 <- p_temporal_change_per_gen # pokemon-plot-CCDF, heavy, 2x4 facet
+pb9 <- p_sim_emp_1on1_count_temporal # 17 2x8
+pb8 <- p_emp_sim_count_id # 5mb 8in1, image, aspect_ratio = 1, requires large space
+pb4/(pb9|pb8)+
+  plot_layout(
+    heights = c(4,2,2),
+    guides = "collect"
+    ) +
+  plot_annotation(
+    tag_levels = "1", # temporarily 1, change to A eventually
+  ) &
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) 
+
+ggsave("./output/bulletin_entire_plot.png", height = 166, width = 200, units = "mm", dpi = 600)
 
 ```
 
-Bold以上は指定[できない](https://www.rdocumentation.org/packages/ggplot2/versions/2.0.0/topics/element_text)っぽい。太いフォントにするか、あとでIllustratorでやるかの2択ですね。
+
+```{r fig.width = 2.97, fig.height= 2}
+pb3 <- p_sim_emp_debut_cumsum # 1x1 lines
+pb5 <- p_sim_emp_debut_residual  #1x8
+pb6 <- p_no_appearance # 1x8
+pb7 <- p_average_relative_rank # 1x2, can be fit 1x1
+pb11 <- p_pandoras_ridges # 10 decline and fall 1*1, y=8
+pb12 <- p_pandoras_aggregate # 1x1, x=8, 8000 points maybe convert to violin?
+(pb3|pb7|pb11|pb12) /pb5 / pb6 +
+  plot_layout(
+    heights = c(4,2,2),
+    guides = "collect"
+    ) +
+  plot_annotation(
+    tag_levels = "1", # temporarily 1, change to A eventually
+  ) &
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) 
+ggsave(paste0("./output/", Sys.Date(), "-bulletin_entire_plot.png"), height = 120, width = 166, units = "mm", dpi = 300)
+
+```
+### test layouts with lighter plots 
+
+
+```{r fig.width = 2.97, fig.height= 4.438}
+(pbA|pbA|pbA)/pbE/pbE/pbE/(pbA|pbA) +
+  plot_layout(
+    guides = "collect"
+  ) +
+  plot_annotation(
+    tag_levels = "A",
+  ) &
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  )
+ggsave("./output/frutiger-test2.svg", height = 166, width = 200, units = "mm")
+# pdf -> no plot tags, no legends
+# svg -> frutiger doesn't work
+# png -> frutiger doesn't work
+```
+
+
+Bold以上は指定[できない](https://www.rdocumentation.org/packages/ggplot2/versions/2.0.0/topics/element_text)が、直接フルネームで指定すればできるはず。。

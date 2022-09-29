@@ -27,36 +27,76 @@ library(uwot)
 library(ggrepel)
 library(stringi)
 library(ggimage)
+library(patchwork)
+library(colorspace) # darken/lighten
+library(FactoMineR) # PCA()
+library(showtext)
+
+# devtools::install_github("zeehio/facetscales")
+# library(facetscales)
+
 knitr::opts_chunk$set(echo = TRUE,
-                      fig.width = 3,
-                      fig.height = 2)
+                      fig.width = 4,
+                      fig.height = 3)
 ```
 ```{r}
 grDevices::dev.size()
 ```
 
 
-## plot style
+## prepare plot style
+
+[strip margin](https://stackoverflow.com/questions/56153261/distancing-facet-grid-strips-from-the-faceted-canvas)
+
 ```{r }
 theme_pokemon <- 
-  theme_minimal(base_size = 6, base_family = "Helvetica") +
+  theme_minimal(base_size = 6, base_family = "Univers LT Std") +
   theme(
-    line = element_line(size = .15/.751, colour = "black"),
-    text = element_text(size = 6, colour = "black"),
-    title = element_text(size = 6, colour = "black"),
+    line = element_line(size = .1/.751, colour = "#545B66"),
+    text = element_text(size = 6, colour = "#778190"),
+    title = element_text(size = 6, colour = "#778190"),
     panel.grid = element_blank(),
     axis.line = element_line(),
-    axis.text = element_text(size = 6, colour = "black"),
+    axis.text = element_text(size = 6, colour = "#778190"),
     axis.ticks = element_line(),
     plot.background = element_rect(fill = "white", colour = NA),
     strip.text = element_text(size = 6),
+    strip.switch.pad.grid = unit(2, "mm"),
+    strip.placement = "outside",
     legend.text = element_text(size = 6),
-    legend.key.size = unit(3, units = "mm")
+    legend.key.size = unit(3, units = "mm"),
+    plot.tag = element_text(
+      size = 10, 
+      family = "Univers LT Std Condensed", 
+      face = "bold"
+    )
   )
+# pokemon_yellow <- "#FFCB03" # from logo svg, mainly for sim data
+pokemon_yellow <- "#F9E000"
+pokemon_blue <- "#3267B0" # from logo svg, mainly for emp data
+pt_convert <- .352777778
+
+```
+## prepare labeller
+
+[ref](https://rion778.hatenablog.com/entry/2016/01/03/192905)
+```{r}
+era_labeller <- 1:8 |>
+  as.roman() %>%
+  paste0(., " Era") |> 
+  setNames(1:8) |> 
+  as_labeller()
+pokemon_gen_labeller <- 1:8 |>
+  as.roman() %>%
+  paste0(., "s") |> 
+  setNames(1:8) |> 
+  as_labeller()
 ```
 
+
 ```{r}
-p0 <- penguins |> 
+# p0 <-
+  penguins |> 
   ggplot(aes(x = bill_length_mm ,y = bill_depth_mm, group = species, colour = body_mass_g)) +
   geom_line(alpha = 1) +
   # geom_point(size = .15/.751/2) +
@@ -75,13 +115,38 @@ p0 <- penguins |>
   ) + 
   theme_pokemon +
   theme(
-    legend.position = "none"
+    legend.position = "none",
+    
   )
-ggsave("./output/plot_example.svg", width = 166/2, height = 110/2, unit = "mm")
+ggsave("./output/p_penguin.svg", width = 166/2, height = 110/2, unit = "mm")
 grDevices::dev.size()
 # ggedit(p1)
 ```
+## fonts 
+{showtext}
+```{r}
+list.files(path = "./fonts")
+c_univers_otf <- list.files(path = "./fonts")
+font_add(
+  family = "Univers LT Std", 
+  regular = c_univers_otf[27],
+  bold = c_univers_otf[5],
+  italic = c_univers_otf[20]
+         )
+font_add(
+  family = "Univers LT Std Condensed",
+  regular = c_univers_otf[11],
+  bold = c_univers_otf[6],
+  italic = c_univers_otf[12],
+)
+
+showtext_auto()
+showtext_opts(dpi = 300) # https://community.rstudio.com/t/font-gets-really-small-when-saving-to-png-using-ggsave-and-showtext/147029/7, #10
+# match the dpi to the one in png output!
+```
 
 
+## chapters
 
+`data-genes`: create pokemon list(`df_names`), and connect each row to the images of pokémon, pokemon sequencing (`is_vmax` etc) for `df_gene`.
 

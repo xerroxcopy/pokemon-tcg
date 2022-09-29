@@ -1,0 +1,231 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# apply types to the random data
+
+see the changes in share of colour / type.
+
+
+by the most typical types of the pokemon per generation
+
+tweak plot from 05 plot share:
+
+```{r}
+df_gene |>
+  filter(is_pokemon) |> 
+  mutate(
+    release_bin = round_date(release_date, "6 months") |> as.Date()
+  ) |> 
+  ggplot(
+    aes(
+      x = release_bin, 
+      fill = card_type2
+    )
+  ) +
+  geom_bar(
+    # aes(fill = card_type3),
+    position = "fill"
+  ) +
+  geom_vline(
+    data = df_game_gen,
+    aes(xintercept = game_release_date),
+    # size = .05/.751,
+    colour = "grey20"
+  ) +
+  scale_fill_manual(values = c_named_colour, na.value = "grey30") +
+  scale_x_date(
+    expand = c(0, 0),
+    breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    name = "Date"
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0),
+  ) +
+  labs(
+    fill = "Type",
+    y = "Proportion of Type",
+    x = "Date"
+  ) +
+  theme_pokemon
+```
+
+## plot UMAP for typical types in emp
+
+Genごとに、そしてポケモンごとに、ポリゴンがGen2では0.2の割合ででんき、０．７の割合でむしょく、0.1の割合でフェアリー、みたいなのをだす。それをプロットしてみたい。どれくらい偏ってるものなのか。
+
+```{r}
+
+df_main_type_emp <-
+  df_gene |> 
+  filter(is_pokemon) |> 
+  select(card_type2, pokemon_name) |> # temporarily simplify
+  group_by(pokemon_name, card_type2) |> 
+  summarise(type_count = n(), card_type2, pokemon_name) |> 
+  distinct() |> 
+  ungroup(card_type2) |> 
+  mutate(rank = rank(type_count, ties.method = "random")) |> # random is the only acceptable choice. dont want ties and dont want any specific type to win
+  filter(rank == 1) |> 
+  ungroup() |> 
+  select(pokemon_name, main_type = card_type2)
+
+df_gene_type_prop <-
+  df_gene |> 
+  filter(is_pokemon) |> 
+  group_by(pokemon_name) |> 
+  rowid_to_column("temp_id") |> 
+  mutate(truek = TRUE) |> 
+  pivot_wider(names_from = "card_type2", values_from = truek, values_fill = FALSE) |> 
+  # kokode hontoha release_gen demo group_ shitai
+  group_by(pokemon_name) |> 
+  mutate(no_of_cards_with_the_same_name = n()) |> 
+  summarise(across(Lightning:Fairy, ~ sum(.) / no_of_cards_with_the_same_name), pokemon_name, pokemon_gen) |> 
+  distinct()
+  
+
+```
+```{r}
+gene_type_pca <- df_gene_type_prop |> 
+  select(-pokemon_gen) |> 
+  column_to_rownames("pokemon_name") |> 
+  PCA()
+```
+```{r}
+gene_type_pca$var$coord[, 1:2] # each types arrow
+gene_type_pca$ind$coord[, 1:2] |> 
+  as_tibble() |> 
+  rename(x = "Dim.1", y = "Dim.2") |> 
+  cbind(df_main_type_emp) |> 
+  ggplot(aes(x, y, colour = main_type)) +
+  geom_count() +
+  scale_colour_manual(values = c_named_colour)
+```
+
+
+```{r}
+umap_gene_type_prop <- df_gene_type_prop |> 
+  select(-pokemon_gen) |> 
+  column_to_rownames("pokemon_name") |> 
+  uwot::umap(
+    verbose = TRUE,
+    min_dist = .8,
+    n_neighbors = 5,
+    fast_sgd = TRUE
+    )
+```
+```{r fig.height = 2, fig.width =2}
+df_umap_gene_type_prop <- umap_gene_type_prop |> 
+  as_tibble() |> 
+  cbind(df_gene_type_prop) |> 
+  left_join(df_main_type_emp, by = "pokemon_name") |> 
+  left_join(df_names) |> 
+  rename(x = "V1", y = "V2")
+```
+
+
+```{r fig.height = 2, fig.width =2}
+p_df_umap_gene_type_prop <- 
+df_umap_gene_type_prop |> 
+  ggplot(aes(x,y, colour = main_type)) +
+  # stat_density_2d(
+  #   geom = "raster",
+  #   aes(fill = after_stat(density)),
+  #   contour = FALSE,
+  # ) +
+  # geom_point(
+  #   data = df_umap_gene_type_prop |> select(-pokemon_gen, -main_type),
+  #   colour = "grey80",
+  #   # alpha = .05,
+  #   size = .1
+  # ) +
+  geom_point( size = .5) +
+  # geom_text(aes(label = pokemon_name), size = 4 * pt_convert) +
+  scale_colour_manual(values = c_named_colour, "Type") +
+  scale_fill_viridis_c(option = "A") +
+  # facet_wrap(
+  # vars(pokemon_gen),
+  # # cols = vars(pokemon_gen)
+  # ) +
+  theme_pokemon +
+  theme( 
+    aspect.ratio = 1
+  )
+ggsave("./output/emp_main_type_umap.png", width = 150, height = 100, unit = "mm", dpi = 600) 
+
+```
+
+## type share transition, with sim
+
+```{r}
+df_gene_type_prop2 <-
+  df_gene_type_prop |> 
+  ungroup() |> 
+  pivot_longer(Lightning:Fairy, names_to = "type", values_to = "proportion") |> 
+  filter(proportion > 0) 
+  
+df_gene_type_prop2 |> 
+  ggplot(aes(x = proportion, fill = type)) +
+  geom_histogram(
+    # position = "fill" # proportional
+  ) +
+  scale_fill_manual(values = c_named_colour)
+  
+
+```
+compare main and real, actual distribution. any noticeable difference?
+
+```{r}
+df_gene_type_prop3 <- df_gene_type_prop2 |> 
+  filter(proportion > .7) |> 
+  rename(main_type = "type")
+
+df_gene |> 
+  filter(is_pokemon) |> 
+  left_join(df_gene_type_prop3, by = "pokemon_name") |> 
+  select(release_date, pokemon_name, main_type, card_type2) |> 
+  pivot_longer(cols = c("main_type", "card_type2"), names_to = "condition", values_to = "type") |> 
+   mutate(
+    release_bin = round_date(release_date, "6 months") |> as.Date()
+  ) |> 
+  ggplot(
+    aes(
+      x = release_bin, 
+      fill = type
+    )
+  ) +
+  geom_bar(
+    # aes(fill = card_type3),
+    position = "fill"
+  ) +
+  geom_vline(
+    data = df_game_gen,
+    aes(xintercept = game_release_date),
+    # size = .05/.751,
+    colour = "grey20"
+  ) +
+  scale_fill_manual(values = c_named_colour, na.value = "grey30") +
+  scale_x_date(
+    expand = c(0, 0),
+    breaks = c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")),
+    labels = format(c(ymd("2000-01-01"), ymd("2010-01-01"), ymd("2020-01-01")), "%Y"),
+    name = "Date"
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0),
+  ) +
+  labs(
+    fill = "Type",
+    y = "Proportion of Type",
+    x = "Date"
+  ) +
+  facet_wrap(
+    vars(condition),
+    ncol = 1
+  ) +
+  theme_pokemon
+  
+  
+```
+これはきついですね。あんまりメインのタイプでは近似して表現できない。正確でない。これを使ってシミュレーションのポケモン名に無理やりタイプを与えても何もでてこなさそう。

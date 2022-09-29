@@ -1,0 +1,250 @@
+# residual
+
+Growth Rate in Newberry & Plotkin (2022)に代わるものとして、インターバルを計算できないだろうか。
+あるポケモン（なんでもいいのでなにかを想像）のカードが発売されたとして、次また登場するのはいつか？
+Timestepではなく時間のデータもあるのもなにかに使えるかも。とくに何百枚もリリースされるメインとMcDonaldsとかを一緒に扱うのは少し気が引ける。
+その時点で500種のポケモンが発表されていたとしよう。デザインをランダムで決めていたとすると、次の125枚のリリースで少なくとも一枚登場する確率は…
+
+```{r}
+1 - (499/500)^125 # .221
+```
+22%くらい。そもそも種数にもかなり乖離がありそう。
+
+```{r}
+sim_random_df 
+```
+150万行あるので注意しましょう…。
+とりあえず種数を計算してみましょう。簡単そうだから。
+累積種数（一度以上登場したことのあるポケモンの数~ｔ）と、そのときどきの種数をEmpiricalからやってみる。そのときどきを計算すればそれをcumsumするのはラクそう。
+
+## cumulative
+
+### empirical
+
+#### prepare df for plot
+
+```{r}
+df_first_seen <-
+  df_first_last_seen |> # 06
+  filter(is_pokemon) |> 
+  select(pokedex_id, first_and_last, pokemon_name, release_date, pokemon_gen) |> 
+  filter(first_and_last == "Debut") |> 
+  distinct() |> # 902, 2 absent still as of today
+  ungroup() |> 
+  arrange(release_date) %>%
+  mutate(
+    onek = rep(1, nrow(.)),
+    cumsum = cumsum(onek),
+    onek = NULL
+    )
+```
+
+#### plot
+
+```{r}
+df_first_seen |> 
+  ggplot(aes(x = release_date, y = cumsum)) +
+  geom_line()
+```
+
+### sim
+```{r}
+sim_random_df |> colnames()
+```
+#### flag Debut & Last Seen for a random sim run
+```{r}
+# sim_random_df_first_last_seen <- sim_random_df |> 
+#   group_by(run, pokedex_id) |> 
+#   mutate(
+#     first_and_last = case_when(
+#       release_date == min(release_date) ~ "Debut",
+#       release_date == max(release_date) ~ "Last Seen",
+#       TRUE ~ "Inbetween"
+#     )
+#   )
+
+
+  
+```
+<!-- TODO: これでrun==1の場合でいいのでoverviewと同じプロットをしないとね(右上 -->
+
+#### prepare df for plot
+
+```{r}
+sim_random_df_first_seen <-
+  sim_random_df |> 
+  group_by(run, pokedex_id) |> 
+  filter(release_date == min(release_date)) |> 
+  distinct() |> 
+  mutate(onek = 1) |> 
+  ungroup(pokedex_id) |> 
+  arrange(release_date) |> 
+  mutate(
+    cumsum = cumsum(onek),
+    onek = NULL
+  ) # 30 sec
+```
+
+#### plot
+論文掲載予定（ちっちゃく、下の残差プロットと並べて）
+```{r}
+p_sim_emp_debut_cumsum <-
+  sim_random_df_first_seen |> 
+  ggplot(aes(x = release_date, y = cumsum)) +
+  geom_vline(
+    data = df_game_gen |> filter(game_gen != 9),
+    aes(xintercept = game_release_date),
+        colour = "grey80",
+    # linetype = "dotted",
+    size = .05/.751
+  ) +
+  geom_hline(
+    data = df_game_gen,
+    aes(yintercept = pokemon_cumulative_n),
+    size = .05/.751,
+    colour = "grey80"
+  ) +
+  # sim distribution
+  # geom_violin(
+  #   aes(group = release_date),
+  #    scale = "width",
+  #   width = 100,
+  #   colour = "transparent",
+  #   bw = 1,
+  #   fill = pokemon_yellow
+  # ) +
+  # optional: sim cumulative paths
+  geom_line(
+    aes(group = run),
+    colour = pokemon_yellow,
+    alpha = .01,
+    size = .05
+  ) +
+  # empirical data
+  geom_line(
+    data = df_first_seen,
+    colour = pokemon_blue,
+    size = .2
+    ) +
+  scale_x_date(
+    breaks = c(as.Date("2000-01-01"),as.Date("2010-01-01"),as.Date("2020-01-01")),
+    labels = c("", "", ""),
+    expand = c(.01, .01),
+    name = NULL
+  ) +
+  scale_y_continuous(
+    breaks = c(0, 500, 1000),
+    labels = c(0, "", 1000),
+    expand = c(0,0),
+    limits = c(0, 1000),
+    name = "Total Debutant"
+  ) +
+  theme_pokemon
+ggsave("./output/p_total_debutant.png", width = 166/4, height = 100/4, unit = "mm", dpi = 1200)
+ggsave("./output/p_total_debutant.pdf", width = 166/4, height = 100/4, unit = "mm", dpi = 1200) # pdf renders violin better than svg
+```
+### residual plot
+
+```{r}
+sim_random_df_first_seen # sim
+df_first_seen # emp
+```
+この差をそれぞれのrelease_dateについてとりたい。
+
+[fill()](https://tidyr.tidyverse.org/reference/fill.html)かなにかを使ってまずは全tickにデータを入れる必要がある気が ->completeですかね
+
+```{r}
+df_debut_emp <-
+  df_first_seen |> 
+  group_by(release_date) |> 
+  mutate(cumsum = max(cumsum)) |> 
+  select(release_date, cumsum) |> 
+  ungroup() |> 
+  distinct() |> 
+  right_join(
+    tibble(release_date = release_dates),
+    by = "release_date"
+  ) |> 
+  arrange(release_date) |> 
+  fill(cumsum, .direction = "down")
+```
+```{r}
+df_debut_sim <-
+# df_view <- 
+sim_random_df_first_seen |> 
+  group_by(release_date, run) |>
+  mutate(cumsum = max(cumsum)) |> 
+  select(release_date, cumsum, run) |> 
+  ungroup() |> 
+  distinct() |> 
+  right_join(
+    tibble(release_date = release_dates),
+    by = "release_date"
+  ) |> 
+  group_by(run) |> 
+  arrange(release_date) |> 
+  fill(cumsum, .direction = "down") |> 
+  ungroup()
+
+# merge them
+df_debut_sim_emp <- df_debut_sim |> 
+  left_join(df_debut_emp, by = "release_date") |> 
+  rename(cumsum_sim = cumsum.x, cumsum_emp = cumsum.y) |> 
+  mutate(residual = cumsum_emp - cumsum_sim) |> 
+  left_join(df_series3, by = c("release_date"))
+
+```
+`residual` = the amount of excess debutants.
+
+#### plot the residual ~ t
+95%信頼？信頼…？信用…？区間…？と０がかぶってるかどうかで色付けしたいね。そんなことしていいんかな
+
+```{r}
+df_debut_mean <- df_debut_sim_emp |> 
+      group_by(release_date) |> 
+      summarise(mean_residual = mean(residual), release_gen) |>
+      distinct()
+
+# p_sim_emp_debut_residual <-
+  df_debut_sim_emp |> 
+  ggplot(aes(x = release_date, y = residual)) +
+  geom_hline(yintercept = 0, colour = "grey80") +
+  geom_violin(
+    aes(fill = release_gen, group = release_date),
+    alpha = .3,
+    colour = "transparent",
+    scale = "width",
+    width = 50
+  ) + 
+  geom_line(
+    data = df_debut_mean,
+    aes(y =  mean_residual, colour = release_gen),
+    size = .5,
+  ) +
+  geom_point(
+    data = df_debut_mean,
+    aes(y =  mean_residual, colour = release_gen),
+    size = .5
+  ) +
+  scale_x_date(
+    breaks = seq(as.Date("1999-01-01"), by = "years", length.out = 25),
+    labels = c(1999:2023),
+    expand = c(0, 0),
+    name = "Year"
+  ) +
+  scale_y_continuous(
+    breaks= -2:2 * 25,
+    name = "Residual, Sim - Empirical Data",
+  ) +
+  scale_fill_viridis_c() + 
+  scale_colour_viridis_c() +
+  facet_wrap(
+    vars(release_gen), 
+    scales = "free",
+    nrow = 1,
+    labeller = pokemon_gen_labeller
+  ) +
+  theme_pokemon
+
+```
+

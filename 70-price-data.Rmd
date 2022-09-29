@@ -1,0 +1,128 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# data
+
+data from [pokemon_cards_project](https://github.com/JonathanWamsley/pokemon_cards_project), csv from [here](https://github.com/JonathanWamsley/pokemon_cards_project/tree/master/data)
+
+```{r}
+price_data_raw <- read_csv("./input/snapshot_2020-03-24.csv")
+price_data_raw 
+```
+
+```{r}
+price_data_raw |> colnames()
+price_data_raw$`Median Price Normal` |> unique()
+price_data_raw$`...1` |> unique()
+price_df1 <- price_data_raw |> 
+  rename(
+    card_id2 = index,
+    card_name = `Card Name`,
+    series = `Set Name`,
+    set = `Card Number`,
+    rarity = Rarity,
+    card_type = `Card Type`,
+    hp = HP,
+    evolution_stage = Stage,
+    pokemon_name = `Pokemon 1`,
+    pokemon_id = `Pokedex 1`
+    ) |> 
+  mutate(
+    price_foil = 
+      str_extract(`Market Price Foil`, "[:digit:]+\\.[:digit:]+") |> as.numeric(),
+    price_normal = 
+      str_extract(`Market Price Normal`, "[:digit:]+\\.[:digit:]+") |> as.numeric(),
+    price_foil_median = 
+      str_extract(`Median Price Foil`, "[:digit:]+\\.[:digit:]+") |> as.numeric(),
+    price_normal_median = 
+      str_extract(`Median Price Normal`, "[:digit:]+\\.[:digit:]+") |> as.numeric(),
+  )  |> 
+  select(-`...1`, -`...22`, -matches("Price", ignore.case = FALSE), -Url, -`Scraped Date`)
+price_df1 |> View()
+price_df1
+```
+
+```{r}
+price_df1 |> 
+  ggplot(
+    aes(price_normal, price_foil, colour = hp)
+  ) +
+  geom_count(alpha = .2, stroke = 1) +
+  geom_abline(slope = 1, size = .1) +
+  geom_smooth(methods = "lm") +
+  scale_x_continuous(limits = c(.01, 120), trans = "log10") +
+  scale_y_continuous(limits = c(.01, 120), trans = "log10") +
+  scale_colour_viridis_c(trans = "log10") +
+  # facet_wrap(vars(rarity)) +
+  theme_pokemon +
+  theme(aspect.ratio = 1)
+```
+```{r fig.width=3, fig.height=2}
+price_df1 |> filter(!is.na(price_normal_median), is.na(price_normal))
+price_df2 <- price_df1 |> 
+  # select(-ends_with("median")) |> 
+  pivot_longer(cols = starts_with("price_"), names_to = "foil", values_to = "price")  |> 
+  filter(
+    hp < 500, hp > 0,
+    rarity %in% c("Common", "Uncommon", "Rare", "Promo", "Ultra Rare", "Secret Rare", "Shiny Holo Rare")
+  ) 
+price_df2 |> 
+  ggplot(aes(hp, price, colour = price)) +
+  geom_count(data = price_df2 |> select(-foil), size = .3, colour = "grey70") +
+  geom_count(alpha = .2, size = .3) +
+  facet_grid(
+    cols = vars(rarity),
+    rows = vars(foil)
+  ) +
+  scale_y_continuous(
+    breaks = 10^(-1:3),
+    labels = 10^(-1:3),
+    trans = "log10"
+    ) +
+  scale_colour_viridis_c(trans = "log10") +
+  theme_pokemon
+```
+
+
+```{r fig.height=3, fig.width-4}
+price_df2$evolution_stage |> unique()
+price_df2 |> colnames()
+price_df2 |> 
+  ggplot(aes(pokemon_id, price, colour = hp)) +
+  geom_count(
+    data = price_df2 |> select(-foil), 
+    size = .3, 
+    colour = "grey70",
+    alpha = .3
+    ) +
+  geom_count(alpha = .5, size = .3) +
+  geom_smooth() +
+  facet_grid(
+    cols = vars(rarity),
+    rows = vars(foil)
+  ) +
+  scale_y_continuous(
+    breaks = 10^(-1:3),
+    labels = 10^(-1:3),
+    trans = "log10"
+    ) +
+  scale_colour_viridis_c(trans = "log10", limits = c(40, NA)) +
+  theme_pokemon
+```
+
+release_dateが古ければ高い、というのはありそう。
+
+```{r}
+price_series <- price_df2$series |> unique() 
+series <- df_series2$series
+setdiff(price_series, series)
+
+price_df1 |> 
+  count(card_name, series) |> 
+  arrange(desc(n))
+```
+
+
+

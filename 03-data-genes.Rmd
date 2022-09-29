@@ -1,0 +1,280 @@
+# df_names
+
+[Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/List_of_Japanese_Pok%C3%A9mon_names) once again to produce [multiple csvs](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once). The CSVs are stored under `./input/bulbapedia_name`.
+```{r}
+files <- list.files(
+  path = "./input/bulbapedia_name", 
+  pattern = "*.csv",
+  full.names = TRUE)
+names_df <- map(
+  files,
+  ~ read_csv(
+    file = .x, 
+    skip = 1, 
+    col_types = "c"
+  ) 
+) |> 
+  map2(
+    .y = 1:9,
+    ~ mutate(.data = .x, pokemon_gen = rep(.y, nrow(.x)))
+  ) |> 
+  bind_rows() |> 
+  rename(
+    pokedex_id = Ndex,
+    pokemon_name = English,
+    pokemon_name_ja = Kana
+    ) |> 
+  select(pokedex_id, pokemon_name, pokemon_name_ja, pokemon_gen)
+names_df2 <- names_df |> 
+  mutate(
+    pokedex_id = pokedex_id |> as.character() |> as.integer(),
+  )
+```
+
+## images
+
+large images (`image_large`, in `./input/image_kaggle/`) are from [kaggle](https://www.kaggle.com/datasets/arenagrenade/the-complete-pokemon-images-data-set?resource=download), and missing images (mainly new ones around pokedex_id 900) downloaded manually from official pokedex sarch.
+small images (`image_small`, in `./input/bulbapedia_image/`) are from [bulbapedia](https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_National_Pok%C3%A9dex_number).
+use cmd+i > media to download. it fails for some of the files though... :(
+
+tips: create [leading zeros](https://stackoverflow.com/questions/8266915/format-number-as-fixed-width-with-leading-zeros)
+
+
+```{r, echo = FALSE}
+image_file_names <- list.files("./input/image_kaggle", pattern = "png")
+# new_names <- image_file_names |> str_remove("70px-") |> str_remove("(?<=[:digit:]{3}).+(?=\\.)")
+new_names <-
+  image_file_names %>% 
+  if_else(
+    str_detect(., pattern = "mime|mr-|hakamo|ho-oh|-o\\.|porygon-z|^tapu-|^type-"), 
+    ., 
+    str_remove(., pattern = "-.+(?=\\.png)")
+  ) 
+file.rename(
+  paste0("./input/image_kaggle/",image_file_names),
+  to = paste0("./input/image_kaggle/", new_names)
+) |> invisible()
+```
+
+
+```{r}
+df_names <-
+  names_df2 |> 
+  filter(!is.na(pokedex_id)) |>  # remove gen 9 pokemons
+  mutate(
+    pokemon_name_simplified = tolower(pokemon_name) |> 
+      str_replace("\\. ", "-") |> 
+      str_remove("\\.") |> 
+      str_remove("\\'") |> 
+      str_replace("mime jr", "mime-jr") |> 
+      str_replace("tapu ", "tapu-") |> 
+      str_replace("type: null", "type-null") |> 
+      stri_trans_general("Latin-ASCII"), 
+    image_large = paste0("./input/image_kaggle/", pokemon_name_simplified, ".png"),
+    image_small = paste0(
+    "./input/bulbapedia_image/",
+    sprintf("%03d", pokedex_id),
+    # pokemon_name,
+    ".png"
+    )
+  )
+```
+
+### plot all 905 pokemons
+```{r}
+# df_names |> 
+#   # filter(pokedex_id < 100) |> 
+#   ggplot(
+#     aes(x = pokedex_id %/% 30, y = pokedex_id %% 30, image = image_small)) +
+#   geom_image(size = .04) +
+#   theme_pokemon +
+#   theme(
+#     aspect.ratio = 1
+#   )
+# ggsave("./output/pokemons.png", width = 5000, height = 5000, units = "px")
+
+```
+
+## pokemon sequencing
+
+```{r}
+df_gene_pokemon <- df_card |> # from 02 
+  rowid_to_column(var = "card_id") |> 
+  filter(is_pokemon) |>
+  mutate(
+    nm = card_name
+  ) |> 
+  mutate(
+    is_gx = 
+      str_detect(
+        nm,
+        "gx$|GX$"
+      ),
+    nm = # remove GX from name
+      str_replace(
+        nm,
+        "GX$",
+        ""
+      ),
+    nm = # remove "L" from legend team poke's and them only
+      str_replace( 
+      nm,
+      "(?<=\\&\\s[:alpha:]{3,13})L$",
+      ""
+    ),
+    is_team = 
+      str_detect(
+        nm,
+        "\\s\\&\\s"),
+    is_tag_team = is_team & is_gx,
+    # though not properly named, Entei & Raikou is Legend
+    # https://bulbapedia.bulbagarden.net/wiki/Entei_%26_Raikou_LEGEND_(Unleashed_90)
+    is_legend = is_team & !is_gx, 
+    
+    ) |>
+  separate(
+    col = nm,
+    sep = "\\s\\&\\s",
+    into = c("nm", "team_buddy1", "team_buddy2")
+           ) |> 
+  mutate(
+    is_extra = str_detect(nm, "\\sex$|\\sex"),
+    nm = str_replace(nm, "\\sex$|\\sex", ""),
+    is_ex = str_detect(nm, "EX$"),
+    nm = str_replace(nm, "EX$", ""),
+    has_master = str_detect(nm, "^.+\\'s\\s"),
+    master = str_extract(nm, "^.+(?=\\'s\\s)"),
+    nm = str_replace(nm, "^.+\\'s\\s", ""),
+    is_dark = str_detect(nm, "Dark\\s"),
+    nm = str_replace(nm, "Dark\\s", ""),
+    is_delta = str_detect(nm, "\\sδ"), 
+    nm = str_replace(nm, "\\s{0,3}δ", ""),
+    is_light = str_detect(nm, "^Light\\s"),
+    nm = str_replace(nm, "^Light\\s", ""),
+    is_star = str_detect(nm, "\\*$"),
+    nm = str_replace(nm, "\\*$", ""),
+    is_bros = str_detect(nm, "\\sBros\\.$"),
+    nm = str_replace(nm, "\\sBros\\.$", ""),
+    is_levelten = str_detect(nm, "\\s?LV\\.X"),
+    nm = str_replace(nm, "\\s?LV\\.X", ""),
+    is_ginga = str_detect(nm, "\\s?G$"),
+    nm = str_replace(nm, "\\s?G$", ""),
+    is_gymleader = str_detect(nm, "\\s?GL$"),
+    nm = str_replace(nm, "\\s?GL$", ""),
+    is_elitefour = str_detect(nm, "\\s?4$"),
+    nm = str_replace(nm, "\\s?4$", ""),
+    is_champion = str_detect(nm, "C$"),
+    nm = str_replace(nm, "\\s?C$", ""),
+    is_frontierbrain = str_detect(nm, "\\s?FB$"),
+    nm = str_replace(nm, "\\s?FB$", ""),
+    is_break = str_detect(nm, "\\s?BREAK"),
+    nm = str_replace(nm, "\\s?BREAK", ""),
+    is_primal = str_detect(nm, "^Primal\\s"),
+    nm = str_replace(nm, "^Primal\\s", ""),
+    is_alolan = str_detect(nm, "^Alolan\\s"),
+    nm = str_replace(nm, "^Alolan\\s", ""),
+    is_galarian = str_detect(nm, "^Galarian\\s"),
+    nm = str_replace(nm, "^Galarian\\s", ""),
+    is_hisuian = str_detect(nm, "^Hisuian\\s"),
+    nm = str_replace(nm, "^Hisuian\\s", ""),
+    is_v_family = str_detect(nm, "V$|VMAX$|VUNION$|VSTAR$"),
+    is_v = str_detect(nm, "(?<=[:lower:])V$"),
+    nm = str_replace(nm, "(?<=[:lower:])V$", ""), # avoid "Unown V"
+    is_vmax = str_detect(nm, "VMAX$"),
+    nm = str_replace(nm, "VMAX$", ""),
+    is_vunion = str_detect(nm, "VUNION$"),
+    nm = str_replace(nm, "VUNION$", ""),
+    is_vstar = str_detect(nm, "VSTAR$"),
+    nm = str_replace(nm, "VSTAR$", ""),
+    is_prismstar = str_detect(nm, "♦$"),
+    nm = str_replace(nm, "♦$", ""),
+    is_mega = str_detect(nm, "^M(?=[:upper:])|^Mega\\s"),
+    nm = str_replace(nm, "^M(?=[:upper:])|^Mega\\s", ""),
+    
+    is_originform = str_detect(nm, "^Origin\\sForme\\s"),
+    nm = str_replace(nm, "^Origin\\sForme\\s", ""),
+    is_shining = str_detect(nm, "^Shining\\s"),
+    nm = str_replace(nm, "^Shining\\s", ""),
+    is_specialdelivery = str_detect(nm, "^Special\\sDelivery\\s"),
+    nm = str_remove(nm, "^Special\\sDelivery\\s"),
+    # LEGEND, L and LEGEND 
+    is_legend = is_legend | str_detect(nm, "LEGEND$"),
+    nm = str_replace(nm, "LEGEND$", ""),
+    
+    # extract formes
+    # kyurem_colour = 
+    # Unown includes ! and 
+    forme_variant = 
+      str_extract(
+        nm, 
+        "(?<=Shellos).+|(?<=Gastrodon).+|(?<=Wormadam).+|(?<=Burmy).+|(?<=Unown).+|(?<=Castform).+|.+(?=Castform)|(?<=Ditto).+|(?<=Deoxys).+|.+(?=Necrozma$)|.+(?=Porygon$)|.+(?=Greninja$)|.+(?=Mewtwo$)|.+(?=Urshifu$)|.+(?=Calyrex$)|.+(?=Kyurem)|.+(?=Rotom)|Detective\\s|Radiant\\s|\\sLibre|Sunny\\s|Surfing\\s|Flying\\s") |> 
+      str_remove("^\\s|\\s$"), # remove spaces before and after formes
+    nm =
+      str_remove(
+        nm, 
+        "(?<=Shellos).+|(?<=Gastrodon).+|(?<=Wormadam).+|(?<=Burmy).+|(?<=Unown).+|(?<=Castform).+|.+(?=Castform)|(?<=Ditto).+|(?<=Deoxys).+|.+(?=Necrozma$)|.+(?=Porygon$)|.+(?=Greninja$)|.+(?=Mewtwo$)|.+(?=Urshifu$)|.+(?=Calyrex$)|.+(?=Kyurem)|.+(?=Rotom)|Detective\\s|Radiant\\s|\\sLibre|Sunny\\s|Surfing\\s|Flying\\s"
+    ),
+  ) |> 
+  left_join(df_names, by = c("nm" = "pokemon_name")) |> 
+  rename(pokemon_name = nm) |> 
+  rowwise() |> 
+  mutate(
+    pokemon_deco = str_remove(
+      card_name, 
+      pattern = paste(pokemon_name)
+    )
+  ) |> 
+  select(
+    card_id, 
+    card_name, 
+    pokedex_id, 
+    pokemon_name,
+    pokemon_name_ja, 
+    pokemon_deco, 
+    pokemon_gen, 
+    card_type2,
+    team_buddy1, 
+    team_buddy2, 
+    set, 
+    series,
+    release_date, 
+    everything(),
+    starts_with("is_"), 
+    starts_with("has_"), 
+  ) |> 
+  ungroup()
+```
+warnings
+
+> Warning: Expected 3 pieces. Missing pieces filled with `NA` in 12713 rows [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+
+are for GX tag team buddies, ignore them.
+
+## remove pokemon name from original name to extract subgenes
+
+subgene or subpokemon or parasites or decorations or whatever
+
+```{r}
+df_gene_pokemon # 12325 x 56
+df_gene <- bind_rows(
+  df_gene_pokemon,
+  df_card |> rowid_to_column(var = "card_id") |> filter(!is_pokemon)
+  ) |>
+  arrange(card_id)
+  
+```
+### summary of the data
+紀要掲載予定
+
+```{r}
+df_gene |> count() # 14565
+df_gene |> count(is_pokemon) # 12325, non-2240
+df_gene |> 
+  group_by(series) |> 
+  count() # 125 series
+df_gene |> 
+  filter(series_class != "Black Star Promo") |> 
+  filter(release_date == max(release_date) )
+
+```
+
