@@ -26,7 +26,20 @@ sim_emp_1on1_count_temporal_df <- sim_emp_1on1_df |>
   arrange(release_date) |> 
   group_by(pokedex_id, condition) |> 
   mutate(cumsum = cumsum(n)) |> 
-  left_join(df_names, by = "pokedex_id")
+  left_join(df_names, by = "pokedex_id") |> 
+  ungroup() |> 
+  mutate(
+    game_gen_era = case_when(
+      release_date < df_game_gen$game_release_date[2] ~ 1,
+      release_date < df_game_gen$game_release_date[3] ~ 2,
+      release_date < df_game_gen$game_release_date[4] ~ 3,
+      release_date < df_game_gen$game_release_date[5] ~ 4,
+      release_date < df_game_gen$game_release_date[6] ~ 5,
+      release_date < df_game_gen$game_release_date[7] ~ 6,
+      release_date < df_game_gen$game_release_date[8] ~ 7,
+      release_date < df_game_gen$game_release_date[9] ~ 8
+    ) # あほだけどもううまくやる気力がない
+  )
 ```
 
 facetのせいでx axisのticksがおかしくなるので、[ggplot2 change axis limits for each individual facet panel](https://stackoverflow.com/questions/51735481/ggplot2-change-axis-limits-for-each-individual-facet-panel)を参考に（なんかバグ多いっぽいし古いし不安だが）：と思ったら案の定[動きませんでした](https://github.com/zeehio/facetscales/issues/13)

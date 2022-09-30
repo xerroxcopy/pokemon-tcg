@@ -14,12 +14,122 @@
 nested dfでやるかmatrixでやるかはたまたdfでやるか。毎回population_sizeが違うのでnested dfがいいのかな
 
 
+
 ```{r}
 series_gen_df3 <- series_gen_df2 |> 
   left_join(df_game_gen |> select(game_gen, pokemon_cumulative_n), by = "game_gen") |> 
   filter(!is.na(pokemon_data_count))
 # series_gen_df3
 ```
+
+## actual gen of releases
+
+実際には新しいgameがリリースされてすぐにそのGenのポケカがでてくるわけではない（たとえば第二世代10/15の翌日のポケカリリースGym Challenge 2000-10-16は第一世代のものばかり）。それにのっとったシミュレーションをまわさないとtotal debutantsのデータがおかしくなる。
+
+まずは実データから、最大どのPokedex_idのカードがでているのかをみる：
+
+```{r}
+df_gene |> 
+  filter(is_pokemon) |> 
+  group_by(release_date) |> 
+  mutate(
+    n = n()
+  ) |> 
+  # filter(n > 40) |> # 一度に４０枚以上リリースされているもののみ
+  filter(pokedex_id == max(pokedex_id)) |> 
+  ggplot(aes(release_date, pokedex_id)) +
+  geom_point(size = .3) +
+   geom_text(
+    aes(label = series),
+    size = 4 * pt_convert,
+    colour = pokemon_blue,
+    hjust = 0
+  ) +
+  geom_point(
+    data = df_game_gen,
+    aes(game_release_date, pokemon_cumulative_n),
+    colour = "red"
+  ) +
+ 
+  geom_hline(
+    data = df_game_gen,
+    aes(yintercept = pokemon_cumulative_n),
+    colour = "red",
+    size = .2
+  ) +
+  theme_pokemon
+```
+やっぱりだいぶありますね。２０１７年？くらいのEvolutionsなどは第１世代しかいない。cumulative nを頼りに、たとえばmax pokedex idが251以下151以上であればGen II（までのポケモンからはとれたはずだよね）とみなす、というのがよさそう。
+そのデータを作ろう：
+
+```{r}
+series_gen_actual_df1 <-
+# df_view <- 
+  df_gene |> 
+  filter(is_pokemon) |> 
+  group_by(release_date) |> 
+  mutate(
+    n = n()
+  ) |> 
+  filter(pokedex_id == max(pokedex_id)) |> 
+  mutate(
+    # mapを使えばもう少しスマートに書けそうだが、８個ならいいよね？
+    actual_release_gen = case_when( 
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[1] ~ 1,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[2] ~ 2,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[3] ~ 3,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[4] ~ 4,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[5] ~ 5,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[6] ~ 6,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[7] ~ 7,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[8] ~ 8,
+    )
+  ) |> 
+  select(series, release_date, actual_release_gen) |> 
+  distinct()
+
+  series_gen_df2 |> 
+  left_join(df_game_gen |> select(game_gen, pokemon_cumulative_n), by = "game_gen") |> 
+  filter(!is.na(pokemon_data_count))
+```
+→ゲームがリリースされ、Eraが更新されたとしても、ポケカは常に第一世代からその最新世代までのポケモンをもとに作られるわけではないことがわかる。しかし、たとえばEvolutionsとかもすでにたくさんの新しい世代があるのに、それを無視して古い世代をやろうとしたわけで、まさに変異のバイアスといえる。そのバイアスまでランダムモデルに反映させてしまうのはよくない。あくまで反映させるべきは「ゲームがでて翌日に新しいポケカがだせるわけではない」点なので、新しい世代のポケモンが登場したポケカシリーズ以降はその世代からランダムどろーできるものとする、とするのがよいだろう。つまり、
+```{r}
+series_gen_actual_df2 <-
+  series_gen_actual_df1 |> 
+  ungroup() |> 
+  group_by(actual_release_gen) |> 
+  filter(release_date == min(release_date))
+  
+```
+この日付以降。
+```{r}
+series_gen_df4_actual_release_gen <-
+# df_view <-
+  series_gen_df2 |> 
+  mutate(
+    actual_release_gen = case_when(
+      release_date < series_gen_actual_df2$release_date[2] ~ 1,
+      release_date < series_gen_actual_df2$release_date[3] ~ 2,
+      release_date < series_gen_actual_df2$release_date[4] ~ 3,
+      release_date < series_gen_actual_df2$release_date[5] ~ 4,
+      release_date < series_gen_actual_df2$release_date[6] ~ 5,
+      release_date < series_gen_actual_df2$release_date[7] ~ 6,
+      release_date < series_gen_actual_df2$release_date[8] ~ 7,
+      TRUE ~ 8,
+    )
+  ) |> 
+  left_join(
+    df_game_gen |> select(game_gen, pokemon_cumulative_n), 
+    by = c("actual_release_gen" = "game_gen")) |> 
+  filter(!is.na(pokemon_data_count))
+  
+```
+
+
+
+
+
+
 [Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
 ```{r}
 
@@ -37,7 +147,7 @@ sim_random_df <- tibble(
 simulation_runs <- 1000
 
 for (simulation_run in 1:simulation_runs) {
-  single_sim_result_df <- series_gen_df3 |>
+  single_sim_result_df <- series_gen_df4_actual_release_gen |>
   mutate(
     pokedex_id =  map2( # rowwise() does not work...?
       .x = pokemon_data_count,
@@ -64,19 +174,22 @@ sim_random_df |> dim() # 1 2325 000 x 9
 df_empirical_count_id <- 
   df_gene |> 
   filter(is_pokemon) |> # filter only pokemons. is_
-  group_by(pokedex_id) |> 
-  summarise(n = n()) %>% 
+  count(pokedex_id) |> 
+  complete(pokedex_id = 1:905, fill = list(n = 0)) |> 
   mutate(
-    condition = rep("empirical", nrow(.))
+    condition = "empirical"
   )
 sim_random_count_pokemon_df <- 
   sim_random_df |> 
   # left_join(df_names, by = "id") |> 
-  group_by(pokedex_id, run) |> 
-  summarise(n = n()) |> 
-  ungroup() %>%
+  count(pokedex_id, run) |> 
+  complete(
+    pokedex_id = 1:905,
+    run = 1:simulation_runs, 
+    fill = list(n = 0)
+  ) |> 
   mutate(
-    condition = rep("simulation", nrow(.))
+    condition = "simulation"
   ) 
 
 
@@ -89,7 +202,8 @@ emp_sim_count_id_df <-
     df_empirical_count_id, 
     sim_random_count_pokemon_df
   ) |> 
-  left_join(df_names, by = "pokedex_id")
+  left_join(df_names, by = "pokedex_id") 
+  
 emp_sim_count_id_df |> colnames()
 ```
 
@@ -111,40 +225,38 @@ emp_sim_count_id_annotate_df <-
   filter(condition == "empirical") |> 
   group_by(pokemon_gen) |> 
   mutate(rank = rank(-n, ties.method = "min")) |> 
-  filter(rank <= 3)
+  filter(rank <= 3 | n > 41 | rank == max(rank))
+  
 ```
 これ↓を掲載予定
 geom_quasirandomをつかっていると非常にプロットが重い（最終的に70MBとかになる）。実データに関してはviolinを使うか、pngで書き出して扱ったほうがよさそう
 ```{r}
-aspect_ratio = 1
-# p_emp_sim_count_id <-
+aspect_ratio <- 1/1.5
+p_emp_sim_count_id <-
   emp_sim_count_id_df |> 
-  # filter(condition == "simulation") |>
-  ggplot(aes(x = pokemon_gen, y = n)) +
+  ggplot(aes(x = fct_rev(as.factor(pokemon_gen)), y = n, group = pokemon_gen, fill = condition)) +
   geom_violin(
-    data = emp_sim_count_id_df |> filter(condition == "simulation"),
-    aes(group = pokemon_gen, fill = condition),
-    alpha = .3,
+    data = emp_sim_count_id_df |>
+      filter(condition == "simulation"),
     colour = "transparent",
     scale = "width",
-    bw = 1
+    bw = .5,
   ) +
-geom_quasirandom(
+  geom_quasirandom(
     data = emp_sim_count_id_df |> filter(condition == "empirical"),
     aes(group = pokemon_gen, fill = condition),
     pch = 21,
     size = .7,
-    alpha = .8,
     # dodge.width = .8,
     stroke = 0,
     colour = "transparent"
     ) +
 geom_pointrange(
-    data = emp_sim_count_id_summary_df, 
+    data = emp_sim_count_id_summary_df,
     aes(
-      y = mean, 
-      ymin = mean-sd, 
-      ymax = mean+sd, 
+      y = mean,
+      ymin = mean-sd,
+      ymax = mean+sd,
       group = condition,
       colour = condition
     ),
@@ -153,47 +265,38 @@ geom_pointrange(
     stroke = 1,
     size = .2
   ) +
-  # aesthetic line for readability
-  geom_segment(
-    data = emp_sim_count_id_annotate_df,
-    aes(
-      xend = pokemon_gen, 
-      x = pokemon_gen + .4,
-      yend = n
-    ),
-    size = .05,
-    # lineend = "butt",
-    # linejoin = "mitre",
-    # arrow = arrow(length = unit(.5, "mm")),
-    colour = pokemon_blue
-  ) +
   geom_image(
     data = emp_sim_count_id_annotate_df,
-    aes(x = pokemon_gen, y = n, image = image_large),
-    size = .08,
+    aes(image = image_large),
+    size = .06,
     height = .05,
     by = "width",
-    asp = aspect_ratio,
+    asp = 1/aspect_ratio,
     nudge_x = .4,
   ) +
-  
   scale_colour_manual(
-    values= c("simulation" = pokemon_yellow, "empirical" = pokemon_blue)
+    values= c("simulation" = pokemon_yellow_stronger, "empirical" = pokemon_blue)
   ) +
   scale_fill_manual(
-    values= c("simulation" = pokemon_yellow |> lighten(.4), "empirical" = pokemon_blue |> darken(.4))
+    values= c(
+      "simulation" = pokemon_yellow |> lighten(.5), 
+      "empirical" = pokemon_blue |> darken(.4)
+    )
   ) +
-  scale_x_continuous(
+  scale_x_discrete(
     breaks = 1:8,
     labels = 1:8 |> as.roman(),
+    expand = c(.1, .1),
     name = "Pokémon Generation"
   ) +
   scale_y_continuous(
-    limits = c(0, 85), # ignore pikachu!
-    breaks = c(0, 40, 80),
-    name = "Freqeuncy of Cards",
+    limits = c(1, 80), # ignore pikachu!
+    breaks = c(1, 40, 80),
+    expand = c(0, 0),
+    name = "Freqeuncy of Pokémon Cards",
     # trans = "log10"
   ) +
+  coord_flip() +
   theme_pokemon +
   theme(
     legend.position = c(.8, .7),
@@ -216,7 +319,6 @@ Caption:
 
 #### variations (ignore)
 
-まずは全部のIDについてテスト
 ```{r}
 sim_random_count_pokemon_df |> 
   filter(run < 10) |> 

@@ -25,7 +25,7 @@ series_gen_df2 <- map_dfr(
   ) 
 series_gen_df2
 series_gen_df2 |> filter(series == "Dragon Vault")
-series_gen_df2$pokemon_data_count |> na.omit() |> sum() # 15029
+series_gen_df2$pokemon_data_count |> na.omit() |> sum() # 12325
 ```
 
 Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
@@ -212,4 +212,5 @@ df_gene |>
   theme_pokemon
 ggsave("./output/p_deco.png", width = 83, height = 60, unit = "mm", dpi = 72) 
 ```
+
 

@@ -33,7 +33,7 @@ top_pokemons_paths_df <-
 [scale_size_identity](# https://stackoverflow.com/questions/47479779/can-geom-image-from-the-ggimage-package-be-made-to-preserve-the-image-aspect-r) ただしaspect.ratioを使う方法[here](https://themockup.blog/posts/2020-10-11-embedding-images-in-ggplot/)だと関係ない気がする。
 ```{r}
 aspect_ratio <- 1
-# p_temporal_change_per_gen <-
+p_temporal_change_per_gen <-
   temporal_change_per_gen_df |> 
   filter(condition == "simulations") |> 
   ggplot(aes(x = n,y = ecdf)) +

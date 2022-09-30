@@ -129,25 +129,9 @@ df_umap_gene_type_prop <- umap_gene_type_prop |>
 p_df_umap_gene_type_prop <- 
 df_umap_gene_type_prop |> 
   ggplot(aes(x,y, colour = main_type)) +
-  # stat_density_2d(
-  #   geom = "raster",
-  #   aes(fill = after_stat(density)),
-  #   contour = FALSE,
-  # ) +
-  # geom_point(
-  #   data = df_umap_gene_type_prop |> select(-pokemon_gen, -main_type),
-  #   colour = "grey80",
-  #   # alpha = .05,
-  #   size = .1
-  # ) +
   geom_point( size = .5) +
-  # geom_text(aes(label = pokemon_name), size = 4 * pt_convert) +
   scale_colour_manual(values = c_named_colour, "Type") +
   scale_fill_viridis_c(option = "A") +
-  # facet_wrap(
-  # vars(pokemon_gen),
-  # # cols = vars(pokemon_gen)
-  # ) +
   theme_pokemon +
   theme( 
     aspect.ratio = 1

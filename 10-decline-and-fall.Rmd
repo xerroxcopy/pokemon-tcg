@@ -304,7 +304,7 @@ df_no_appearance_residual |>
 
 これはプロットが難しいな…ggridgesするときがきた？
 ```{r}
-# p_pandoras_ridges <-
+p_pandoras_ridges <-
 df_no_appearance_residual |> 
   # mutate(game_gen_era = )) |> 
   ggplot(aes(
@@ -332,210 +332,210 @@ df_no_appearance_residual |>
 第４世代までは新しく登場したばかりのポケモンも昔からのポケモンも大した差はなく平等にとられていた（し、ランダムよりもずっとあますところなくとられていた）が、第５世代では明らかに第５世代が優遇されており、そのアオリを昔の世代たちがくっている
 
 
-### 
+<!-- ###  -->
 
-ここ以降は微妙でした
+<!-- ここ以降は微妙でした -->
 
-`average_relative_rank`全Eraつうじてのランクの高さ。数値が低いほど上位を維持している。人気どあい。0.5以上であれば中央以上に人気といっていい。多分。
-`rank()`関数じたいは少ないほうから順にランク１位！としてしまう。nが多いほどランクが上位（小さい）になってほしいので、[ここ](https://stats.stackexchange.com/questions/3321/rank-in-r-descending-order)を参考に逆にする。
-```{r}
-decline_and_fall_of_pokemon_empire_df <- temporal_change_per_gen_df |> 
-  filter(run == 1 | is.na(run)) |> 
-  filter(condition %in% c("pokemon name", "simulations")) |>
-  # right_join(empty_rank_df) |> 
-  group_by(condition, run, game_gen_era) |> 
-  # arrange(desc(n)) |> 
-  # mutate(n = replace_na(n, 0)) |> # NAを放置すると次のrank()でNAのやつらの順位が一緒にならん
-  mutate(rank = rank(-n, ties.method = "min")) |>  # higher n -> smaller rank with -n
-  # mutate(rank = rank(-n, ties.method = "random")) |>  # higher n -> smaller rank with -n
-  ungroup() |> 
-  select(condition, run, game_gen_era, pokemon_gen,  pokedex_id,n, rank, ecdf, ) |> 
-  group_by(condition, run, game_gen_era) |> 
-  mutate(relative_rank = rank/max(rank, na.rm = TRUE)) |> 
-  filter(!is.na(relative_rank)) |> 
-  ungroup() |> 
-  group_by(condition, run, pokedex_id) |> 
-  mutate(
-    average_relative_rank = ave(relative_rank, na.rm = TRUE), # 5., 6.
-    # delta = 
-  ) # 30 sec
-decline_and_fall_of_pokemon_empire_df # 8731 x 10
-```
-
-
-```{r}
-decline_and_fall_of_pokemon_empire_df |> 
-  ggplot(aes(y = relative_rank, x = pokedex_id, colour = condition)) +
-  geom_point()
-```
-なんでPokedex_idによって変な線が見えるんじゃー！面白いけど絶対なんかの都合なので取り除く。→鳥のアゾけましたね
-minでもrandomでも取り除けた。randomとminで違いすぎやろ。まあminがよかろう。
-
-### ポケモンそれぞれの人気の入れ替わり
+<!-- `average_relative_rank`全Eraつうじてのランクの高さ。数値が低いほど上位を維持している。人気どあい。0.5以上であれば中央以上に人気といっていい。多分。 -->
+<!-- `rank()`関数じたいは少ないほうから順にランク１位！としてしまう。nが多いほどランクが上位（小さい）になってほしいので、[ここ](https://stats.stackexchange.com/questions/3321/rank-in-r-descending-order)を参考に逆にする。 -->
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df <- temporal_change_per_gen_df |>  -->
+<!--   filter(run == 1 | is.na(run)) |>  -->
+<!--   filter(condition %in% c("pokemon name", "simulations")) |> -->
+<!--   # right_join(empty_rank_df) |>  -->
+<!--   group_by(condition, run, game_gen_era) |>  -->
+<!--   # arrange(desc(n)) |>  -->
+<!--   # mutate(n = replace_na(n, 0)) |> # NAを放置すると次のrank()でNAのやつらの順位が一緒にならん -->
+<!--   mutate(rank = rank(-n, ties.method = "min")) |>  # higher n -> smaller rank with -n -->
+<!--   # mutate(rank = rank(-n, ties.method = "random")) |>  # higher n -> smaller rank with -n -->
+<!--   ungroup() |>  -->
+<!--   select(condition, run, game_gen_era, pokemon_gen,  pokedex_id,n, rank, ecdf, ) |>  -->
+<!--   group_by(condition, run, game_gen_era) |>  -->
+<!--   mutate(relative_rank = rank/max(rank, na.rm = TRUE)) |>  -->
+<!--   filter(!is.na(relative_rank)) |>  -->
+<!--   ungroup() |>  -->
+<!--   group_by(condition, run, pokedex_id) |>  -->
+<!--   mutate( -->
+<!--     average_relative_rank = ave(relative_rank, na.rm = TRUE), # 5., 6. -->
+<!--     # delta =  -->
+<!--   ) # 30 sec -->
+<!-- decline_and_fall_of_pokemon_empire_df # 8731 x 10 -->
+<!-- ``` -->
 
 
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df |>  -->
+<!--   ggplot(aes(y = relative_rank, x = pokedex_id, colour = condition)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
+<!-- なんでPokedex_idによって変な線が見えるんじゃー！面白いけど絶対なんかの都合なので取り除く。→鳥のアゾけましたね -->
+<!-- minでもrandomでも取り除けた。randomとminで違いすぎやろ。まあminがよかろう。 -->
 
-```{r}
-decline_and_fall_of_pokemon_empire_df |> 
-  ggplot(aes(x = game_gen_era,  y = relative_rank, group = pokedex_id, colour = pokedex_id)) +
-  geom_line() +
-  geom_point() +
-  facet_grid(
-    cols = vars(pokemon_gen), 
-    rows = vars(condition), 
-    scales = "free"
-    ) +
-  theme_pokemon
-  # scale_y_continuous(trans = "log10") 
-# ggsave("./output/p_emp_decline_journey.svg", width = 166, height = 90, unit = "mm", dpi = 1200)
-```
-
-## 栄枯盛衰をなんとかデルタ的な感じで数値にする
-
-まずは平均的な、全期をつうじての人気、`average_relative_rank`でやってみるか…
-Aveでいいのかわからんし、relativeでいいのかもわからん、なんもわからん
-Gen8のものはあまりにサンプルサイズが少ないので（Averageの意味がないので）除く。
-
- setting `pch = 21` points `colour = "transparent"` is better better than setting `stroke = 0`, [source](https://stackoverflow.com/questions/38081159/slight-point-strokes-in-ggplot-points)
-```{r}
-p_average_relative_rank <-
-  decline_and_fall_of_pokemon_empire_df |> 
-  filter(pokemon_gen < 8) |> 
-  select(average_relative_rank, pokedex_id) |> 
-  distinct() |> 
-  left_join(df_names, by = "pokedex_id") |>
-  ggplot(aes(x = pokemon_gen, y = average_relative_rank, colour = condition)) +
-  geom_quasirandom(
-    dodge.width = .8, 
-    alpha = .7, 
-    colour = "transparent",
-    stroke = 0,
-    pch = 21, aes(fill = condition)) +
-  geom_smooth(se = FALSE) +
-  scale_colour_manual(
-    values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow)
-  ) +
-  scale_fill_manual(
-    values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow)
-  ) +
-  labs(
-    x = "Pokémon Generation",
-    y = "Average Relative Rank",
-  ) +
-  facet_grid(
-    cols = vars(condition)
-  ) +
-  theme_pokemon +
-  theme(
-    legend.position = "none"
-  )
-  
-```
-ちょっと最近のやつに甘すぎる基準ですねこれは…。
-振り幅でかいやつは誰だ→０からいきなり１位とかになったやつに決まっているので微妙やな
-とはいえ、Simと比べるとずいぶん傾向がある。ようにも思う。とにかく基準がちょっと適当というか、とりあえず作ったものだからなんともいえんな。rankじゃだめかなあ　ふつうにnでやってもいいかも。標準化して…。
+<!-- ### ポケモンそれぞれの人気の入れ替わり -->
 
 
-やっぱり振り幅の合計かなー　ジャーニーがよ
-```{r}
-decline_and_fall_of_pokemon_empire_df2 <- 
-  decline_and_fall_of_pokemon_empire_df |>  # click game_gen_era, pokedex_id then condition
-  ungroup() |> 
-  group_by(condition, pokedex_id) |> 
-  mutate(
-    previous_relative_rank = lead(relative_rank, order_by = game_gen_era),
-    delta = relative_rank - previous_relative_rank,
-    sum_delta = sum(abs(delta), na.rm = TRUE), # total journey
-    ave_sum_delta = sum_delta  / ( 8 - pokemon_gen) # average journey per game gen change
-  ) |> 
-  select(pokemon_gen, pokedex_id, ave_sum_delta) |>
-  distinct()
-decline_and_fall_of_pokemon_empire_df2 |> 
-  ggplot(aes(x = pokemon_gen, ave_sum_delta)) +
-  geom_quasirandom()
-```
-なんかあかんわ
+
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df |>  -->
+<!--   ggplot(aes(x = game_gen_era,  y = relative_rank, group = pokedex_id, colour = pokedex_id)) + -->
+<!--   geom_line() + -->
+<!--   geom_point() + -->
+<!--   facet_grid( -->
+<!--     cols = vars(pokemon_gen),  -->
+<!--     rows = vars(condition),  -->
+<!--     scales = "free" -->
+<!--     ) + -->
+<!--   theme_pokemon -->
+<!--   # scale_y_continuous(trans = "log10")  -->
+<!-- # ggsave("./output/p_emp_decline_journey.svg", width = 166, height = 90, unit = "mm", dpi = 1200) -->
+<!-- ``` -->
+
+<!-- ## 栄枯盛衰をなんとかデルタ的な感じで数値にする -->
+
+<!-- まずは平均的な、全期をつうじての人気、`average_relative_rank`でやってみるか… -->
+<!-- Aveでいいのかわからんし、relativeでいいのかもわからん、なんもわからん -->
+<!-- Gen8のものはあまりにサンプルサイズが少ないので（Averageの意味がないので）除く。 -->
+
+<!--  setting `pch = 21` points `colour = "transparent"` is better better than setting `stroke = 0`, [source](https://stackoverflow.com/questions/38081159/slight-point-strokes-in-ggplot-points) -->
+<!-- ```{r} -->
+<!-- p_average_relative_rank <- -->
+<!--   decline_and_fall_of_pokemon_empire_df |>  -->
+<!--   filter(pokemon_gen < 8) |>  -->
+<!--   select(average_relative_rank, pokedex_id) |>  -->
+<!--   distinct() |>  -->
+<!--   left_join(df_names, by = "pokedex_id") |> -->
+<!--   ggplot(aes(x = pokemon_gen, y = average_relative_rank, colour = condition)) + -->
+<!--   geom_quasirandom( -->
+<!--     dodge.width = .8,  -->
+<!--     alpha = .7,  -->
+<!--     colour = "transparent", -->
+<!--     stroke = 0, -->
+<!--     pch = 21, aes(fill = condition)) + -->
+<!--   geom_smooth(se = FALSE) + -->
+<!--   scale_colour_manual( -->
+<!--     values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow) -->
+<!--   ) + -->
+<!--   scale_fill_manual( -->
+<!--     values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow) -->
+<!--   ) + -->
+<!--   labs( -->
+<!--     x = "Pokémon Generation", -->
+<!--     y = "Average Relative Rank", -->
+<!--   ) + -->
+<!--   facet_grid( -->
+<!--     cols = vars(condition) -->
+<!--   ) + -->
+<!--   theme_pokemon + -->
+<!--   theme( -->
+<!--     legend.position = "none" -->
+<!--   ) -->
+
+<!-- ``` -->
+<!-- ちょっと最近のやつに甘すぎる基準ですねこれは…。 -->
+<!-- 振り幅でかいやつは誰だ→０からいきなり１位とかになったやつに決まっているので微妙やな -->
+<!-- とはいえ、Simと比べるとずいぶん傾向がある。ようにも思う。とにかく基準がちょっと適当というか、とりあえず作ったものだからなんともいえんな。rankじゃだめかなあ　ふつうにnでやってもいいかも。標準化して…。 -->
 
 
-```{r}
-decline_and_fall_of_pokemon_empire_df3 <- 
-decline_and_fall_of_pokemon_empire_df2 |> 
-  ungroup() |> 
-  group_by(condition, game_gen_era) |> 
-  mutate(standardized_n = n / max(n)) |> 
-  ungroup() |> 
-  group_by(condition, pokedex_id) |> 
-  mutate(avg_std_n = ave(standardized_n))
-decline_and_fall_of_pokemon_empire_df3 |> 
-  ggplot(aes(pokemon_gen, avg_std_n,  group = pokedex_id, colour = average_relative_rank)) +
-  geom_quasirandom() +
-  # geom_ridgeline() +
-  facet_wrap(
-    vars(condition)
-  ) +
-  scale_colour_viridis_c() +
-  theme_pokemon +
-  theme(
-    legend.position = "none"
-  )
-```
+<!-- やっぱり振り幅の合計かなー　ジャーニーがよ -->
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df2 <-  -->
+<!--   decline_and_fall_of_pokemon_empire_df |>  # click game_gen_era, pokedex_id then condition -->
+<!--   ungroup() |>  -->
+<!--   group_by(condition, pokedex_id) |>  -->
+<!--   mutate( -->
+<!--     previous_relative_rank = lead(relative_rank, order_by = game_gen_era), -->
+<!--     delta = relative_rank - previous_relative_rank, -->
+<!--     sum_delta = sum(abs(delta), na.rm = TRUE), # total journey -->
+<!--     ave_sum_delta = sum_delta  / ( 8 - pokemon_gen) # average journey per game gen change -->
+<!--   ) |>  -->
+<!--   select(pokemon_gen, pokedex_id, ave_sum_delta) |> -->
+<!--   distinct() -->
+<!-- decline_and_fall_of_pokemon_empire_df2 |>  -->
+<!--   ggplot(aes(x = pokemon_gen, ave_sum_delta)) + -->
+<!--   geom_quasirandom() -->
+<!-- ``` -->
+<!-- なんかあかんわ -->
 
-```{r}
-decline_and_fall_of_pokemon_empire_df3 |> 
-  select(ave_sum_delta, avg_std_n, pokemon_gen) |> 
-  distinct() |> 
-  ggplot(aes(ave_sum_delta, avg_std_n, colour = pokemon_gen)) +
-  geom_point(size = 1, alpha = .3) +
-  scale_colour_viridis_c() +
-  facet_wrap(
-    vars(pokemon_gen)
-  )
-```
 
-もうあかんわ。こういうのじゃなくて、とりあえずプロットでハイライトするポケモンを決めたいだけなので、やっぱり各時代の３位くらいまでの動向を調べるだけでかなりいいと思う。
-少なくとも１つ、rankが3以下の行を含むグループを返す、というのは[kore](https://stackoverflow.com/questions/40825037/select-groups-which-have-at-least-one-of-a-certain-value)でできると思う。
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df3 <-  -->
+<!-- decline_and_fall_of_pokemon_empire_df2 |>  -->
+<!--   ungroup() |>  -->
+<!--   group_by(condition, game_gen_era) |>  -->
+<!--   mutate(standardized_n = n / max(n)) |>  -->
+<!--   ungroup() |>  -->
+<!--   group_by(condition, pokedex_id) |>  -->
+<!--   mutate(avg_std_n = ave(standardized_n)) -->
+<!-- decline_and_fall_of_pokemon_empire_df3 |>  -->
+<!--   ggplot(aes(pokemon_gen, avg_std_n,  group = pokedex_id, colour = average_relative_rank)) + -->
+<!--   geom_quasirandom() + -->
+<!--   # geom_ridgeline() + -->
+<!--   facet_wrap( -->
+<!--     vars(condition) -->
+<!--   ) + -->
+<!--   scale_colour_viridis_c() + -->
+<!--   theme_pokemon + -->
+<!--   theme( -->
+<!--     legend.position = "none" -->
+<!--   ) -->
+<!-- ``` -->
 
-```{r}
-decline_and_fall_of_pokemon_empire_df3_background <- decline_and_fall_of_pokemon_empire_df3 |> 
-  filter(condition == "pokemon name") |> 
-  ungroup() |> 
-  select(n, pokedex_id, game_gen_era, pokemon_gen) |> distinct()
-  
-# df_top_pokemon <- 
-#   decline_and_fall_of_pokemon_empire_df3 |> 
-#   ungroup() |> 
-#   group_by(condition, pokedex_id) |> 
-#   filter(any(rank <= 1)) |> 
-#   # filter(pokedex_id %in% top_three$pokedex_id & condition == )
-#   left_join(df_names, by = c("pokedex_id", "pokemon_gen")) |> 
-#   filter(condition == "pokemon name")
-df_top_pokemon |> 
-  ggplot(aes(x = game_gen_era, y = n)) +
-  geom_quasirandom(
-    data = decline_and_fall_of_pokemon_empire_df3_background, 
-    aes(colour = pokemon_gen, group = pokemon_gen |> as.factor()),
-    size = .2,
-    dodge.width = .8
-    ) +
-  geom_line(aes(colour = pokemon_gen, group = pokedex_id,), size = .3, alpha = .5) +
-  geom_image(aes(image = image_large), height= .05, by = "width", asp = 1.5) +
-  # scale_size_identity() +
-  geom_text_repel(
-    aes(label = paste0(pokemon_name, ":r=", rank, "n=", n)),
-    min.segment.length = 0,
-    family = "Rotis SemiSans Std Light",
-    segment.size = .1,
-    max.overlaps = 50,
-    size = 3 * pt_convert,
-    hjust = 0
-    ) +
-  scale_colour_viridis_c() +
-  facet_wrap(vars(condition)) +
-  scale_y_continuous(trans = "log10") +
-  theme_pokemon +
-  theme(
-    aspect.ratio = 1/1.5,
-    legend.position = "none")
-ggsave("./output/p_emp_vs_sim_top_three_decline_and_fall.svg", height = 80, width = 80 * 1.5, units = "mm")
-```
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df3 |>  -->
+<!--   select(ave_sum_delta, avg_std_n, pokemon_gen) |>  -->
+<!--   distinct() |>  -->
+<!--   ggplot(aes(ave_sum_delta, avg_std_n, colour = pokemon_gen)) + -->
+<!--   geom_point(size = 1, alpha = .3) + -->
+<!--   scale_colour_viridis_c() + -->
+<!--   facet_wrap( -->
+<!--     vars(pokemon_gen) -->
+<!--   ) -->
+<!-- ``` -->
+
+<!-- もうあかんわ。こういうのじゃなくて、とりあえずプロットでハイライトするポケモンを決めたいだけなので、やっぱり各時代の３位くらいまでの動向を調べるだけでかなりいいと思う。 -->
+<!-- 少なくとも１つ、rankが3以下の行を含むグループを返す、というのは[kore](https://stackoverflow.com/questions/40825037/select-groups-which-have-at-least-one-of-a-certain-value)でできると思う。 -->
+
+<!-- ```{r} -->
+<!-- decline_and_fall_of_pokemon_empire_df3_background <- decline_and_fall_of_pokemon_empire_df3 |>  -->
+<!--   filter(condition == "pokemon name") |>  -->
+<!--   ungroup() |>  -->
+<!--   select(n, pokedex_id, game_gen_era, pokemon_gen) |> distinct() -->
+
+<!-- # df_top_pokemon <-  -->
+<!-- #   decline_and_fall_of_pokemon_empire_df3 |>  -->
+<!-- #   ungroup() |>  -->
+<!-- #   group_by(condition, pokedex_id) |>  -->
+<!-- #   filter(any(rank <= 1)) |>  -->
+<!-- #   # filter(pokedex_id %in% top_three$pokedex_id & condition == ) -->
+<!-- #   left_join(df_names, by = c("pokedex_id", "pokemon_gen")) |>  -->
+<!-- #   filter(condition == "pokemon name") -->
+<!-- df_top_pokemon |>  -->
+<!--   ggplot(aes(x = game_gen_era, y = n)) + -->
+<!--   geom_quasirandom( -->
+<!--     data = decline_and_fall_of_pokemon_empire_df3_background,  -->
+<!--     aes(colour = pokemon_gen, group = pokemon_gen |> as.factor()), -->
+<!--     size = .2, -->
+<!--     dodge.width = .8 -->
+<!--     ) + -->
+<!--   geom_line(aes(colour = pokemon_gen, group = pokedex_id,), size = .3, alpha = .5) + -->
+<!--   geom_image(aes(image = image_large), height= .05, by = "width", asp = 1.5) + -->
+<!--   # scale_size_identity() + -->
+<!--   geom_text_repel( -->
+<!--     aes(label = paste0(pokemon_name, ":r=", rank, "n=", n)), -->
+<!--     min.segment.length = 0, -->
+<!--     family = "Rotis SemiSans Std Light", -->
+<!--     segment.size = .1, -->
+<!--     max.overlaps = 50, -->
+<!--     size = 3 * pt_convert, -->
+<!--     hjust = 0 -->
+<!--     ) + -->
+<!--   scale_colour_viridis_c() + -->
+<!--   facet_wrap(vars(condition)) + -->
+<!--   scale_y_continuous(trans = "log10") + -->
+<!--   theme_pokemon + -->
+<!--   theme( -->
+<!--     aspect.ratio = 1/1.5, -->
+<!--     legend.position = "none") -->
+<!-- ggsave("./output/p_emp_vs_sim_top_three_decline_and_fall.svg", height = 80, width = 80 * 1.5, units = "mm") -->
+<!-- ``` -->
 

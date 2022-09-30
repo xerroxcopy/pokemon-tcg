@@ -31,7 +31,8 @@ library(patchwork)
 library(colorspace) # darken/lighten
 library(FactoMineR) # PCA()
 library(showtext)
-
+# devtools::install_github("psyteachr/introdataviz")
+library(introdataviz)
 # devtools::install_github("zeehio/facetscales")
 # library(facetscales)
 
@@ -71,8 +72,9 @@ theme_pokemon <-
       face = "bold"
     )
   )
-# pokemon_yellow <- "#FFCB03" # from logo svg, mainly for sim data
+pokemon_yellow_stronger <- "#FFCB03" # from logo svg, mainly for sim data
 pokemon_yellow <- "#F9E000"
+
 pokemon_blue <- "#3267B0" # from logo svg, mainly for emp data
 pt_convert <- .352777778
 
@@ -83,12 +85,12 @@ pt_convert <- .352777778
 ```{r}
 era_labeller <- 1:8 |>
   as.roman() %>%
-  paste0(., " Era") |> 
+  paste0("Era ", .) |> 
   setNames(1:8) |> 
   as_labeller()
 pokemon_gen_labeller <- 1:8 |>
-  as.roman() %>%
-  paste0(., "s") |> 
+  as.roman() |> 
+  as.character() |> 
   setNames(1:8) |> 
   as_labeller()
 ```
