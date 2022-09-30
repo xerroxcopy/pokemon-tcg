@@ -225,14 +225,17 @@ pb9 <-
   ) +
   guides(size = "none") +
   theme_pokemon
+```
 
+
+```{r fig.width = 2.97, fig.height= 3, warnings = FALSE, message = FALSE}
 #3
 
 # 5mb 8in1, image, aspect_ratio = 1, requires large space
 # p_emp_sim_count_id 
 
 aspect_ratio2 <- 1/1.5
-pb8 <-
+# pb8 <-
   emp_sim_count_id_df |> 
   ggplot(aes(x = fct_rev(as.factor(pokemon_gen)), y = n, group = pokemon_gen, fill = condition)) +
   geom_hline(yintercept = 0, size = .1/.75, colour = "grey50") +
@@ -303,6 +306,10 @@ geom_pointrange(
     legend.position = c(.8, .7),
     aspect.ratio = aspect_ratio2
   )
+```
+
+
+```{r fig.width = 2.97, fig.height= 3, warnings = FALSE, message = FALSE}
 pb4/(pb9|pb8) +
   plot_layout(
     heights = c(4,2),
@@ -421,6 +428,10 @@ df_debut_sim_emp |>
     labeller = era_labeller
   ) +
   theme_pokemon
+```
+
+
+```{r fig.width = 2.97, fig.height= 2}
 pb6 <-
   #p_no_appearance # 1x8
   df_no_appearance_summary |> 
@@ -553,11 +564,11 @@ decline_and_fall_of_pokemon_empire_df |>
 
 
 ```{r fig.width = 2.97, fig.height= 2}
-pb12 <- 
+# pb12 <- 
   #p_pandoras_aggregate # 1x1, x=8, 8000 points maybe convert to violin?
 df_no_appearance2 |> 
   filter(condition == "simulations") |> 
-  ggplot(aes(x = game_gen_era, y = sum, fill = game_gen_era)) +
+  ggplot(aes(x = series_gen_era, y = sum, fill = game_gen_era)) +
   geom_quasirandom(size = .1, pch = 21,colour = "transparent", stroke = 0) +
   geom_line(
     data = df_no_appearance2 |> filter(condition == "pokemon name"),

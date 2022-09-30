@@ -1,5 +1,12 @@
 # random draw
 
+## I/O
+
+- in: `df_gene` etc.
+- out: `sim_random_df` etc.
+
+## summary
+
 ここでの目的は、株式会社ポケモンのデザイナーの思考パターンをランダムでどこまで模せるかを調べること。そのためにはいくつかのpresumptionが必要になる。まず、あるタイムステップ（具体的には`release_date`のどこか）`t = t_n`で、すでにリリースされているポケモンのゲーム・すでに公開されているポケモンのリストがあるとする。`t_n`においてリリースする枚数は興味がないので、すでに決定しているとする（`release_date`における`total_cards`に相当する）。そのとき、デザイナーは次のように適当にポケモンを選ぶことが考えられる：
 
 1. すでに発表されているポケモンのプールの中からランダムに枚数ぶん選ぶ。重複を許す。
@@ -94,76 +101,84 @@ series_gen_actual_df1 <-
 ```
 →ゲームがリリースされ、Eraが更新されたとしても、ポケカは常に第一世代からその最新世代までのポケモンをもとに作られるわけではないことがわかる。しかし、たとえばEvolutionsとかもすでにたくさんの新しい世代があるのに、それを無視して古い世代をやろうとしたわけで、まさに変異のバイアスといえる。そのバイアスまでランダムモデルに反映させてしまうのはよくない。あくまで反映させるべきは「ゲームがでて翌日に新しいポケカがだせるわけではない」点なので、新しい世代のポケモンが登場したポケカシリーズ以降はその世代からランダムどろーできるものとする、とするのがよいだろう。つまり、
 ```{r}
-series_gen_actual_df2 <-
+df_series_gen_date <-
   series_gen_actual_df1 |> 
   ungroup() |> 
   group_by(actual_release_gen) |> 
-  filter(release_date == min(release_date))
+  filter(release_date == min(release_date)) |> 
+  rename(series_gen = actual_release_gen, first_series = series)
   
 ```
 この日付以降。
 ```{r}
-series_gen_df4_actual_release_gen <-
+# df_series_gen <-
 # df_view <-
   series_gen_df2 |> 
   mutate(
-    actual_release_gen = case_when(
-      release_date < series_gen_actual_df2$release_date[2] ~ 1,
-      release_date < series_gen_actual_df2$release_date[3] ~ 2,
-      release_date < series_gen_actual_df2$release_date[4] ~ 3,
-      release_date < series_gen_actual_df2$release_date[5] ~ 4,
-      release_date < series_gen_actual_df2$release_date[6] ~ 5,
-      release_date < series_gen_actual_df2$release_date[7] ~ 6,
-      release_date < series_gen_actual_df2$release_date[8] ~ 7,
+    series_gen = case_when(
+      release_date < df_release_gen$release_date[2] ~ 1,
+      release_date < df_release_gen$release_date[3] ~ 2,
+      release_date < df_release_gen$release_date[4] ~ 3,
+      release_date < df_release_gen$release_date[5] ~ 4,
+      release_date < df_release_gen$release_date[6] ~ 5,
+      release_date < df_release_gen$release_date[7] ~ 6,
+      release_date < df_release_gen$release_date[8] ~ 7,
       TRUE ~ 8,
     )
   ) |> 
   left_join(
     df_game_gen |> select(game_gen, pokemon_cumulative_n), 
-    by = c("actual_release_gen" = "game_gen")) |> 
+    by = c("series_gen" = "game_gen")) |> 
   filter(!is.na(pokemon_data_count))
   
 ```
 
 
 
-
+## run
 
 
 [Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
 ```{r}
+sim_conditions_df <- series_gen_df4_actual_release_gen |> 
+  select(
+    series_gen, series, release_date, game_gen,
+    pokemon_data_count, pokemon_cumulative_n
+    )
+
+# initialize
 
 sim_random_df <- tibble(
-  series_gen = integer(),
   series = character(),
   release_date = Date(),
-  cards_total = integer(),
-  pokemon_data_count = integer(),
   game_gen = integer(),
+  series_gen = integer(),
   pokemon_cumulative_n = integer(),
   pokedex_id = integer(), 
   run = integer()
 )
 simulation_runs <- 1000
 
+  
 for (simulation_run in 1:simulation_runs) {
-  single_sim_result_df <- series_gen_df4_actual_release_gen |>
-  mutate(
-    pokedex_id =  map2( # rowwise() does not work...?
-      .x = pokemon_data_count,
-      .y = pokemon_cumulative_n,
-      ~ runif(
-        n = .x,
-        min = 1,
-        max = .y + 1
-      ) |> floor()
-    ),
-    run = rep(simulation_run, nrow(series_gen_df3))
-  ) |> 
-  unnest_longer(pokedex_id)
+  single_sim_result_df <- sim_conditions_df |> 
+    mutate(
+      pokedex_id =  map2( # rowwise() does not work...?
+        .x = pokemon_data_count,
+        .y = pokemon_cumulative_n,
+        ~ runif(
+          n = .x,
+          min = 1,
+          max = .y + 1
+        ) |> floor()
+      ),
+      run = simulation_run
+    ) |> 
+    unnest_longer(pokedex_id)
+  
   sim_random_df <- bind_rows(sim_random_df, single_sim_result_df)
 } #  7min? for 1000 runs
-sim_random_df |> dim() # 1 2325 000 x 9
+sim_random_df |> dim() # 1 2325 000 x 8
 ```
 
 

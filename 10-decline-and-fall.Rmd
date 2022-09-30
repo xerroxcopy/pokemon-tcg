@@ -1,10 +1,12 @@
----
-title: "R Notebook"
-output: html_notebook
----
 
 # decline and fall of pokemon empire
 
+## I/O
+
+- input: 
+- output: `p_pandoras_aggregate`
+
+## summary
 昔は人気なかったやつが人気でたり、逆だったり、の極端なやつらをいくつか経時的に追ってったほうがいい気がしてきた。
 そういうやつを見つけてみよう：
 
@@ -36,7 +38,7 @@ COUNT ABSENT
 
 でてくるポケモンではなく、でてこないポケモンに着目してみる。
 でてこないポケモンの数もシミュレーションと違う。
-prepare all possible entries of pokemons, in that specific era. for example, pokedex 152, gen 2 pokemon cannot appear in game_gen_era == 1 period.
+prepare all possible entries of pokemons, in that specific era. for example, pokedex 152, gen 2 pokemon cannot appear in series_gen_era == 1 period.
 
 ```{r}
 # empty_rank_df <-
@@ -46,7 +48,7 @@ prepare all possible entries of pokemons, in that specific era. for example, pok
 #       ~ 1:df_game_gen$pokemon_cumulative_n[.x]
 #     ) |> 
 #       unlist(),
-#     game_gen_era = map(
+#     series_gen_era = map(
 #       .x = 1:8,
 #       ~ rep(.x, df_game_gen$pokemon_cumulative_n[.x])
 #     ) |> 
@@ -64,16 +66,19 @@ df_no_appearance_emp <-
   filter(condition == "pokemon name") |> 
   # right_join(empty_rank_df) |> 
   filter(n == 0) |> 
-  count(game_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across(), name = "count_no_shows")
+  count(series_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across(), name = "count_no_shows")
 df_no_appearance_emp |> 
-  ggplot(aes(x = game_gen_era, pokedex_id)) +
+  ggplot(aes(x = series_gen_era, pokedex_id)) +
   # geom_point() +
   geom_text(
     aes(label = pokemon_name),
     size = 6 * pt_convert
   )
 ```
-↑たとえばgame_gen_era == 1 のころには151のミュウだけカードが一度も登場してない。アンノーンにいたっては一時期ものすごく多かったのに、ゼロになってる。ほんとかよ？第2世代の時期で最も多く（1位）、第3世代でゼロ枚、第4世代でまた一位…？まじ？
+
+
+
+↑たとえばseries_gen_era == 1 のころには151のミュウだけカードが一度も登場してない。アンノーンにいたっては一時期ものすごく多かったのに、ゼロになってる。ほんとかよ？第2世代の時期で最も多く（1位）、第3世代でゼロ枚、第4世代でまた一位…？まじ？
 
 ```{r}
 df_gene |> 
@@ -88,8 +93,21 @@ df_gene |>
   )
 ```
 たしかにぽっかりあいてますね…。
+kadabraニキは？そんなに人気ないの？
+```{r}
+df_gene |> 
+  filter(pokemon_name == "Kadabra") |> 
+  count(release_date) |> 
+  ggplot(aes(x = release_date, n)) +
+  geom_col() +
+  geom_vline(
+    data = df_game_gen,
+    aes(xintercept = game_release_date),
+    inherit.aes = FALSE
+  )
+```
 
-game_gen_era == 8ともなると非常にポケモンが多いので一度も登場していないカードも相当ありそう。
+series_gen_era == 8ともなると非常にポケモンが多いので一度も登場していないカードも相当ありそう。→２ひきかな
 
 これもかなりランダムとは違う気がするし、測れる気がする。
 
@@ -98,10 +116,10 @@ game_gen_era == 8ともなると非常にポケモンが多いので一度も登
 ↓とりあえずシミュレーションで一度も登場しなかったポケモンの名前をrun==1に限定してプロットしてみる。
 ```{r}
 temporal_change_per_gen_df |> 
-  filter(condition == "simulations", run == 1) |> 
+  filter(condition == "simulations", run == 128) |> 
   filter(n == 0) |> 
-  count(game_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across(), name = "count_no_shows") |> 
-  ggplot(aes(x = game_gen_era, pokedex_id)) +
+  count(series_gen_era, pokedex_id, pokemon_name, pokemon_name_ja, across(), name = "count_no_shows") |> 
+  ggplot(aes(x = series_gen_era, pokedex_id)) +
   # geom_point() +
   geom_text(
     aes(label = pokemon_name),
@@ -118,101 +136,115 @@ temporal_change_per_gen_df |>
 
 Game-gen-eraごとに集計して、その数がどれくらいシミュレーションと違うかみてみよう
 ただしrunすべてについて行うので、right_joinが全部に起きないといけないので難しそう
-
+まずはシミュレーションについて。
 ```{r}
-df_no_appearance_sim <- temporal_change_per_gen_df |> 
+df_no_appearance_sim <-
+# df_view <- 
+  temporal_change_per_gen_df |> 
   filter(condition == "simulations") |> 
   filter(n == 0) |> 
-  count(run, game_gen_era, pokemon_gen, name = "count_no_shows") |> 
-  mutate(condition = "simulations")
+  count(run, series_gen_era, pokemon_gen, name = "count_no_shows") |> 
+  complete(
+    run = 1:1000, 
+    series_gen_era = 1:8, 
+    pokemon_gen = 1:8, 
+    fill = list(count_no_shows = 0)
+  ) |> # create all combinations
+  filter(series_gen_era >= pokemon_gen) |> # filter out impossible, excessive combos
+  mutate(condition = "simulations") 
 ```
 
-`df_no_appearance_emp2`は名前の情報なく、とにかくどの世代のポケモンがそれぞれの時期に何人登場していないかがわかる。すべてのありうる組み合わせについて集計したいので、completeと直後のfilterでなんとかした。もっと集計すれば、それぞれの時期に（世代関係なく）何人登場していないかデータになるだろうけど、一旦ここで止めている。
+`df_no_appearance_emp2`は`df_no_appearance_emp`をもとにしているが、名前の情報をなくしている。とにかくどの世代のポケモンがそれぞれの時期に何人登場していないかがわかる。すべてのありうる組み合わせについて集計したいので、completeと直後のfilterでなんとかした。もっと集計すれば、それぞれの時期に（世代関係なく）何人登場していないかデータになるだろうけど、一旦ここで止めている。
 ```{r}
 # align emp data to match with sim df
 df_no_appearance_emp2 <-
 # df_view <- 
   df_no_appearance_emp |> 
-  count(game_gen_era, pokemon_gen, name = "count_no_shows") |> 
+  count(series_gen_era, pokemon_gen, name = "count_no_shows") |> 
   complete(
-    game_gen_era = 1:8, 
+    series_gen_era = 1:8, 
     pokemon_gen = 1:8, 
     fill = list(
       count_no_shows = 0
     )
   ) |> # create all combinations
-  filter(game_gen_era >= pokemon_gen) |> # filter out impossible, excessive combos
+  filter(series_gen_era >= pokemon_gen) |> # filter out impossible, excessive combos
   mutate(condition = "pokemon name")
 ```
 
-いくら第３世代登場直後でも確率的には、ランダムにとれば少しは登場しない奴らがいてもおかしくないのに、全然「一回も登場しないようなポケモンがいない」ということで、正の新奇バイアス…というか、Debutant Biasの傍証といえましょう。第５世代がでるころともなるとその御利益もなくなり、かなりの数が未登場。
+いくら第３世代登場直後でも確率的には、ランダムにとれば少しは登場しない奴らがいてもおかしくないのに、全然「一回も登場しないようなポケモンがいない」ということで、正の新奇バイアス…というか、Positive Debutant Biasの傍証といえましょう。第５世代がでるころともなるとその御利益もなくなり、かなりの数が未登場。
 ちょっとポケモンじたいの世代は忘れて、時期ごとのAbsenteeの数だけでみてみましょう：
 
 ```{r}
-# summarise by pokemon_gen & game_gen_era
+# summarise by pokemon_gen & series_gen_era
 df_no_appearance_summary <- bind_rows(
   df_no_appearance_emp2, df_no_appearance_sim
   ) |> 
-  group_by(game_gen_era, pokemon_gen, condition) |> 
+  group_by(series_gen_era, pokemon_gen, condition) |> 
   summarise(mean_count_no_shows = mean(count_no_shows))
 # note that `mean_count_no_shows` is 
 # exactly the same as the count_no_shows. 
 # using the same name just for plotting purposes.
 
-# summarise by game_gen_era only
+# summarise by series_gen_era only
 df_no_appearance2 <- bind_rows(
   df_no_appearance_emp2, df_no_appearance_sim
   ) |> 
-  group_by(game_gen_era, condition, run) |> 
+  group_by(series_gen_era, condition, run) |> 
   summarise(sum = sum(count_no_shows)) |>
   ungroup() |> 
-  complete(game_gen_era, condition, fill = list(sum = 0))
+  complete(series_gen_era, condition, fill = list(sum = 0))
 ```
-### ちょっとしたらここ消す
-Era１においてsimパンドラ数が偶数だけ？ってのはおかしい気がするんですが。実際empでは１だし。
+<!-- ### ちょっとしたらここ消す -->
+<!-- Era１においてsimパンドラ数が偶数だけ？ってのはおかしい気がするんですが。実際empでは１だし。 -->
 
-```{r}
-df_view <- df_no_appearance2 |> 
-  filter(
-    condition == "simulations",
-    game_gen_era == 1
-  )
-```
-偶数だけですね…。
+<!-- ```{r} -->
+<!-- df_view <- df_no_appearance2 |>  -->
+<!--   filter( -->
+<!--     condition == "simulations", -->
+<!--     series_gen_era == 1 -->
+<!--   ) -->
+<!-- ``` -->
+<!-- 偶数だけですね…。 -->
 
-```{r}
-df_no_appearance_sim　|> filter(
-    condition == "simulations",
-    game_gen_era == 1
-  )
+<!-- ```{r} -->
+<!-- df_no_appearance_sim　|> filter( -->
+<!--     condition == "simulations", -->
+<!--     series_gen_era == 1 -->
+<!--   ) -->
 
-temporal_change_per_gen_df |> 
-  filter(
-    condition == "simulations",
-    run == 125, 
-    game_gen_era == 1,
-  n == 0) 
-```
-全部みごとに重複してますね。ほかのgame_gen_eraならないのだろうか：
-```{r}
-df_view <- temporal_change_per_gen_df |> 
-  filter(
-    condition == "simulations",
-    run == 125, 
-    game_gen_era == 2,
-  n == 0) 
-```
-重複ないですね。
-もう一度`temporal_change_per_gen_df`を計算し直したらうまくいった。後でこの部分は消す。
+<!-- temporal_change_per_gen_df |>  -->
+<!--   filter( -->
+<!--     condition == "simulations", -->
+<!--     run == 125,  -->
+<!--     series_gen_era == 1, -->
+<!--   n == 0)  -->
+<!-- ``` -->
+<!-- 全部みごとに重複してますね。ほかのseries_gen_eraならないのだろうか： -->
+<!-- ```{r} -->
+<!-- df_view <- temporal_change_per_gen_df |>  -->
+<!--   filter( -->
+<!--     condition == "simulations", -->
+<!--     run == 125,  -->
+<!--     series_gen_era == 2, -->
+<!--   n == 0)  -->
+<!-- ``` -->
+<!-- 重複ないですね。 -->
+<!-- もう一度`temporal_change_per_gen_df`を計算し直したらうまくいった。後でここまでの部分は消す。 -->
 
 ### plot
 
 ```{r}
-# p_pandoras_aggregate <-
+p_pandoras_aggregate <-
 df_no_appearance2 |> 
   filter(condition == "simulations") |> 
-  ggplot(aes(x = game_gen_era, y = sum, fill = game_gen_era)) +
-  geom_quasirandom(size = .1, pch = 21,colour = "transparent", stroke = 0) +
+  ggplot(aes(x = series_gen_era, y = sum, fill = series_gen_era)) +
+  geom_quasirandom(
+    size = .1, 
+    pch = 21,
+    colour = "transparent",
+    stroke = 0
+  ) +
   geom_line(
     data = df_no_appearance2 |> filter(condition == "pokemon name"),
     colour = pokemon_blue,
@@ -228,10 +260,10 @@ df_no_appearance2 |>
   ) +
   scale_fill_viridis_c() +
   theme_pokemon
-ggsave("./output/p_pandoras_aggregate.png")
+ggsave("./output/p_pandoras_aggregate.png", width = 100, height = 100, units = "mm", dpi = 600)
 ```
 第４世代までは全部登場させるようなバイアスがかかっていて、５世代以降はかなり「もう諦めようぜ、もう多すぎだから全部作ろうと思わないでいいよ」みたいになってることが一目瞭然である。もちろん５世代目以降はランダムでも多いのであれだけど、ランダムの値からのハズレをみても。
-
+変になった〜〜〜〜
 
 ### plot simVSemp, zansa
 
@@ -240,10 +272,10 @@ ggsave("./output/p_pandoras_aggregate.png")
 ```{r}
 p_no_appearance <- 
   df_no_appearance_summary |> 
-  ggplot(aes(x = game_gen_era, y = mean_count_no_shows, colour = condition)) +
+  ggplot(aes(x = series_gen_era, y = mean_count_no_shows, colour = condition)) +
   geom_violin(
     data = df_no_appearance_sim,
-    aes(group = game_gen_era, y = count_no_shows),
+    aes(group = series_gen_era, y = count_no_shows),
     scale = "count",
     fill = pokemon_yellow |> lighten(0.6),
     colour = "transparent",
@@ -284,7 +316,7 @@ ggsave("./output/p_count_absent.pdf", width = 166, height = 166/4, unit = "mm", 
 ## 残差
 ```{r}
 df_no_appearance_residual <- full_join(
-  df_no_appearance_emp2 |> select(-condition), df_no_appearance_sim |> select(-condition), by = c("game_gen_era", "pokemon_gen")
+  df_no_appearance_emp2 |> select(-condition), df_no_appearance_sim |> select(-condition), by = c("series_gen_era", "pokemon_gen")
   ) |> 
   mutate(count_no_shows.x = replace_na(count_no_shows.x, 0)) |> 
   rename(empirical = "count_no_shows.x", simulations = "count_no_shows.y") |> 
@@ -292,7 +324,7 @@ df_no_appearance_residual <- full_join(
 
 df_no_appearance_residual |> 
   # filter(condition == "simulations") |>
-  ggplot(aes(x = game_gen_era, y = residual, colour = pokemon_gen - game_gen_era)) +
+  ggplot(aes(x = series_gen_era, y = residual, colour = pokemon_gen - series_gen_era)) +
   geom_hline(yintercept = 1, colour = "blue", alpha = .4) +
   geom_jitter(size = .3, alpha = .3) +
   scale_colour_viridis_c() +
@@ -306,12 +338,12 @@ df_no_appearance_residual |>
 ```{r}
 p_pandoras_ridges <-
 df_no_appearance_residual |> 
-  # mutate(game_gen_era = )) |> 
+  # mutate(series_gen_era = )) |> 
   ggplot(aes(
-    y =fct_rev(as.factor(game_gen_era)),
-    # y = paste0("Gen", game_gen_era,"Era, Gen", pokemon_gen, "pokemons"),
+    y =fct_rev(as.factor(series_gen_era)),
+    # y = paste0("Gen", series_gen_era,"Era, Gen", pokemon_gen, "pokemons"),
     x = residual, 
-    fill = (pokemon_gen - game_gen_era) |> as.factor()
+    fill = (pokemon_gen - series_gen_era) |> as.factor()
     # group = pokemon_gen
   )) +
   geom_vline(xintercept = 0) +
@@ -343,14 +375,14 @@ df_no_appearance_residual |>
 <!--   filter(run == 1 | is.na(run)) |>  -->
 <!--   filter(condition %in% c("pokemon name", "simulations")) |> -->
 <!--   # right_join(empty_rank_df) |>  -->
-<!--   group_by(condition, run, game_gen_era) |>  -->
+<!--   group_by(condition, run, series_gen_era) |>  -->
 <!--   # arrange(desc(n)) |>  -->
 <!--   # mutate(n = replace_na(n, 0)) |> # NAを放置すると次のrank()でNAのやつらの順位が一緒にならん -->
 <!--   mutate(rank = rank(-n, ties.method = "min")) |>  # higher n -> smaller rank with -n -->
 <!--   # mutate(rank = rank(-n, ties.method = "random")) |>  # higher n -> smaller rank with -n -->
 <!--   ungroup() |>  -->
-<!--   select(condition, run, game_gen_era, pokemon_gen,  pokedex_id,n, rank, ecdf, ) |>  -->
-<!--   group_by(condition, run, game_gen_era) |>  -->
+<!--   select(condition, run, series_gen_era, pokemon_gen,  pokedex_id,n, rank, ecdf, ) |>  -->
+<!--   group_by(condition, run, series_gen_era) |>  -->
 <!--   mutate(relative_rank = rank/max(rank, na.rm = TRUE)) |>  -->
 <!--   filter(!is.na(relative_rank)) |>  -->
 <!--   ungroup() |>  -->
@@ -377,7 +409,7 @@ df_no_appearance_residual |>
 
 <!-- ```{r} -->
 <!-- decline_and_fall_of_pokemon_empire_df |>  -->
-<!--   ggplot(aes(x = game_gen_era,  y = relative_rank, group = pokedex_id, colour = pokedex_id)) + -->
+<!--   ggplot(aes(x = series_gen_era,  y = relative_rank, group = pokedex_id, colour = pokedex_id)) + -->
 <!--   geom_line() + -->
 <!--   geom_point() + -->
 <!--   facet_grid( -->
@@ -439,11 +471,11 @@ df_no_appearance_residual |>
 <!-- やっぱり振り幅の合計かなー　ジャーニーがよ -->
 <!-- ```{r} -->
 <!-- decline_and_fall_of_pokemon_empire_df2 <-  -->
-<!--   decline_and_fall_of_pokemon_empire_df |>  # click game_gen_era, pokedex_id then condition -->
+<!--   decline_and_fall_of_pokemon_empire_df |>  # click series_gen_era, pokedex_id then condition -->
 <!--   ungroup() |>  -->
 <!--   group_by(condition, pokedex_id) |>  -->
 <!--   mutate( -->
-<!--     previous_relative_rank = lead(relative_rank, order_by = game_gen_era), -->
+<!--     previous_relative_rank = lead(relative_rank, order_by = series_gen_era), -->
 <!--     delta = relative_rank - previous_relative_rank, -->
 <!--     sum_delta = sum(abs(delta), na.rm = TRUE), # total journey -->
 <!--     ave_sum_delta = sum_delta  / ( 8 - pokemon_gen) # average journey per game gen change -->
@@ -461,7 +493,7 @@ df_no_appearance_residual |>
 <!-- decline_and_fall_of_pokemon_empire_df3 <-  -->
 <!-- decline_and_fall_of_pokemon_empire_df2 |>  -->
 <!--   ungroup() |>  -->
-<!--   group_by(condition, game_gen_era) |>  -->
+<!--   group_by(condition, series_gen_era) |>  -->
 <!--   mutate(standardized_n = n / max(n)) |>  -->
 <!--   ungroup() |>  -->
 <!--   group_by(condition, pokedex_id) |>  -->
@@ -499,7 +531,7 @@ df_no_appearance_residual |>
 <!-- decline_and_fall_of_pokemon_empire_df3_background <- decline_and_fall_of_pokemon_empire_df3 |>  -->
 <!--   filter(condition == "pokemon name") |>  -->
 <!--   ungroup() |>  -->
-<!--   select(n, pokedex_id, game_gen_era, pokemon_gen) |> distinct() -->
+<!--   select(n, pokedex_id, series_gen_era, pokemon_gen) |> distinct() -->
 
 <!-- # df_top_pokemon <-  -->
 <!-- #   decline_and_fall_of_pokemon_empire_df3 |>  -->
@@ -510,7 +542,7 @@ df_no_appearance_residual |>
 <!-- #   left_join(df_names, by = c("pokedex_id", "pokemon_gen")) |>  -->
 <!-- #   filter(condition == "pokemon name") -->
 <!-- df_top_pokemon |>  -->
-<!--   ggplot(aes(x = game_gen_era, y = n)) + -->
+<!--   ggplot(aes(x = series_gen_era, y = n)) + -->
 <!--   geom_quasirandom( -->
 <!--     data = decline_and_fall_of_pokemon_empire_df3_background,  -->
 <!--     aes(colour = pokemon_gen, group = pokemon_gen |> as.factor()), -->
