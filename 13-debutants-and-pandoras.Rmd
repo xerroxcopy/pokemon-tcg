@@ -95,14 +95,14 @@ p_sim_emp_debut_cumsum <-
   sim_random_df_first_seen |> 
   ggplot(aes(x = release_date, y = cumsum)) +
   geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date),
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
         colour = "grey80",
     # linetype = "dotted",
     size = .05/.751
   ) +
   geom_hline(
-    data = df_game_gen,
+    data = df_series_gen,
     aes(yintercept = pokemon_cumulative_n),
     size = .05/.751,
     colour = "grey80"
@@ -143,8 +143,7 @@ p_sim_emp_debut_cumsum <-
     name = "Total Debutant"
   ) +
   theme_pokemon
-ggsave("./output/p_total_debutant.png", width = 166/4, height = 100/4, unit = "mm", dpi = 1200)
-ggsave("./output/p_total_debutant.pdf", width = 166/4, height = 100/4, unit = "mm", dpi = 1200) # pdf renders violin better than svg
+ggsave("./output/p_total_debutant.png", width = 166/4, height = 100/4, unit = "mm", dpi = 1200) # pdf renders violin better than svg
 ```
 ### residual plot
 
@@ -194,7 +193,7 @@ df_debut_sim_emp <- df_debut_sim |>
   left_join(df_debut_emp, by = "release_date") |> 
   rename(cumsum_sim = cumsum.x, cumsum_emp = cumsum.y) |> 
   mutate(residual = cumsum_emp - cumsum_sim) |> 
-  left_join(df_series3, by = c("release_date"))
+  left_join(df_series_gen, by = c("release_date"))
 
 ```
 `residual` = the amount of excess debutants.
@@ -205,7 +204,7 @@ df_debut_sim_emp <- df_debut_sim |>
 ```{r}
 df_debut_mean <- df_debut_sim_emp |> 
       group_by(release_date) |> 
-      summarise(mean_residual = mean(residual), release_gen) |>
+      summarise(mean_residual = mean(residual), series_gen) |>
       distinct()
 
 # p_sim_emp_debut_residual <-

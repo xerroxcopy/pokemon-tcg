@@ -1,8 +1,3 @@
----
-title: "R Notebook"
-output: html_notebook
----
-
 # temporal change of pokemon count
 
 ピカチュウのcumsumとかどうのびてるの？ランダムとどれくらい違う？ガクンガクンしてない？最初はするするとのびて、そこから一気にpositive frequency dependentになってない？
@@ -21,24 +16,26 @@ sim_emp_1on1_df <- sim_random_df |>
 
 
 ```{r}
-sim_emp_1on1_count_temporal_df <- sim_emp_1on1_df |> 
+sim_emp_1on1_count_temporal_df <-
+  sim_emp_1on1_df |> 
   count(release_date, pokedex_id, condition) |> 
   arrange(release_date) |> 
   group_by(pokedex_id, condition) |> 
   mutate(cumsum = cumsum(n)) |> 
   left_join(df_names, by = "pokedex_id") |> 
   ungroup() |> 
-  mutate(
-    game_gen_era = case_when(
-      release_date < df_game_gen$game_release_date[2] ~ 1,
-      release_date < df_game_gen$game_release_date[3] ~ 2,
-      release_date < df_game_gen$game_release_date[4] ~ 3,
-      release_date < df_game_gen$game_release_date[5] ~ 4,
-      release_date < df_game_gen$game_release_date[6] ~ 5,
-      release_date < df_game_gen$game_release_date[7] ~ 6,
-      release_date < df_game_gen$game_release_date[8] ~ 7,
-      release_date < df_game_gen$game_release_date[9] ~ 8
-    ) # あほだけどもううまくやる気力がない
+  left_join(df_series_gen, by = "release_date")
+  # mutate(
+  #   game_gen_era = case_when(
+  #     release_date < df_game_gen$game_release_date[2] ~ 1,
+  #     release_date < df_game_gen$game_release_date[3] ~ 2,
+  #     release_date < df_game_gen$game_release_date[4] ~ 3,
+  #     release_date < df_game_gen$game_release_date[5] ~ 4,
+  #     release_date < df_game_gen$game_release_date[6] ~ 5,
+  #     release_date < df_game_gen$game_release_date[7] ~ 6,
+  #     release_date < df_game_gen$game_release_date[8] ~ 7,
+  #     release_date < df_game_gen$game_release_date[9] ~ 8
+  #   ) # あほだけどもううまくやる気力がない
   )
 ```
 
@@ -98,13 +95,14 @@ date_breaks_fun <- function(x) {
 ```
 
 ```{r}
-p_sim_emp_1on1_count_temporal <-sim_emp_1on1_count_temporal_df |> 
+# p_sim_emp_1on1_count_temporal <-
+  sim_emp_1on1_count_temporal_df |> 
   ggplot(aes(release_date, cumsum, colour = pokemon_gen)) +
   geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date),
-    colour = "grey80",
-    size = .05/.751
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
+    size = .05/.751,
+    colour = "grey20"
   ) +
   geom_line(aes(group = pokemon_name,), alpha = .2, size = .2,) +
   geom_count(alpha = .4) +
@@ -121,10 +119,101 @@ p_sim_emp_1on1_count_temporal <-sim_emp_1on1_count_temporal_df |>
   facet_grid(
     cols = vars(pokemon_gen),
     rows = vars(condition),
-    scales = "free_x"
+    # scales = "free_x"
     # scales = list(x = l_facet_scales_dates_per_gen)
   ) +
   guides(size = "none") +
   theme_pokemon 
+```
+
+開始点をそろえたらどうなる？少なくとも中立モデルにおいては傾きはgen 8でなだらかになってるはずだが
+```{r}
+sim_emp_1on1_count_temporal_df2 <- sim_emp_1on1_count_temporal_df |> 
+  left_join(
+    df_series_first_release_date_corrected |> 
+      select(gen_start_date = release_date, series_gen),
+    by = c("pokemon_gen" = "series_gen")
+  ) |> 
+  mutate(
+    period_since_gen_release = interval(gen_start_date, release_date) |> as.period()
+  ) 
+
+interval(as.Date("2022-01-02"), as.Date("2022-04-02")) |> as.period()
+```
+
+
+```{r}
+sim_emp_1on1_count_temporal_df2 |> 
+ggplot(aes(period_since_gen_release, cumsum, colour = pokemon_gen)) +
+  # geom_vline(
+  #   data = df_series_first_release_date_corrected,
+  #   aes(xintercept = release_date),
+  #   size = .05/.751,
+  #   colour = "grey20"
+  # ) +
+  geom_count(
+    data = sim_emp_1on1_count_temporal_df2 |> select(-pokemon_gen),
+    colour = "grey80", alpha = .1, max_size = 2
+  ) +
+  geom_line(aes(group = pokemon_name,), alpha = .2, size = .2,) +
+  geom_count(alpha = .1) +
+  scale_size_area(max_size = 2) +
+  # scale_x_date(
+  #   breaks = date_breaks_fun,
+  #   labels = label_date(format = "%y")
+  #   # labels =  paste0("’", formatC(0:14 * 2, width = 2, flag = "0")),
+  # #   expand = c(.01, .01),
+  # #   name = NULL
+  # ) +
+  scale_x_time() +
+  scale_y_continuous() +
+  scale_colour_viridis_c() +
+  facet_grid(
+    cols = vars(pokemon_gen),
+    rows = vars(condition),
+    # scales = "free_x"
+    # scales = list(x = l_facet_scales_dates_per_gen)
+  ) +
+  guides(size = "none") +
+  theme_pokemon +
+  theme(
+    # aspect.ratio = 1
+  )
+```
+
+```{r fig.width = 4, fig.height = 2}
+sim_emp_1on1_count_temporal_df2 |> 
+  filter(condition == "simulation") |> 
+  ggplot(aes(period_since_gen_release, cumsum, colour = pokemon_gen)) +
+  # geom_count(
+  #   # colour = "grey60", 
+  #   colour = "red",
+  #   max_size = 2,
+  # ) +
+  geom_line( 
+    colour = pokemon_yellow_stronger,
+  aes(group = pokemon_name,), alpha = .2, size = .2,) +
+  geom_count(
+    data = sim_emp_1on1_count_temporal_df2 |> 
+  filter(condition == "empirical"),
+    alpha = .3,
+  colour =  pokemon_blue,
+  max_size = 1
+  ) +
+  geom_smooth() +
+  
+  scale_size_area(max_size = 2) +
+  scale_x_time() +
+  # scale_y_continuous(trans = "log10") +
+  scale_colour_viridis_c() +
+  facet_grid(
+    cols = vars(pokemon_gen),
+    # rows = vars(condition),
+  ) +
+  guides(size = "none") +
+  theme_pokemon +
+  theme(
+    # aspect.ratio = 1
+  )
 ```
 

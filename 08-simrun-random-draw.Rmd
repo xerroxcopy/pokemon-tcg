@@ -3,7 +3,7 @@
 ## I/O
 
 - in: `df_gene` etc.
-- out: `sim_random_df` etc.
+- out: `sim_random_df` `df_series_gen`: それぞれのシリーズのgenつきのdf_series, etc.
 
 ## summary
 
@@ -38,24 +38,26 @@ series_gen_df3 <- series_gen_df2 |>
 ```{r}
 df_gene |> 
   filter(is_pokemon) |> 
-  group_by(release_date) |> 
-  mutate(
-    n = n()
-  ) |> 
   # filter(n > 40) |> # 一度に４０枚以上リリースされているもののみ
-  filter(pokedex_id == max(pokedex_id)) |> 
+  # filter(pokedex_id == max(pokedex_id)) |> 
   ggplot(aes(release_date, pokedex_id)) +
   geom_point(size = .3) +
    geom_text(
-    aes(label = series),
-    size = 4 * pt_convert,
+     data = df_gene |> 
+       filter(is_pokemon) |> 
+       group_by(release_date) |> 
+       filter(pokedex_id == max(pokedex_id)),
+    aes(label = series, y = pokedex_id),
+    size = 2 * pt_convert,
     colour = pokemon_blue,
-    hjust = 0
+    hjust = 0,
+    # angle = 90
   ) +
   geom_point(
     data = df_game_gen,
     aes(game_release_date, pokemon_cumulative_n),
-    colour = "red"
+    colour = "red",
+    size = .2
   ) +
  
   geom_hline(
@@ -64,23 +66,30 @@ df_gene |>
     colour = "red",
     size = .2
   ) +
-  theme_pokemon
+  # scale_x_date(
+  #   limits = c(as.Date("2016-01-01"), NA)
+  # ) +
+  # scale_y_continuous(
+  #   limits = c(600, NA)
+  # ) +
+  coord_flip() +
+  theme_pokemon 
+ggsave("./output/max_pokedex_id.svg", width = 200, height = 100, units = "mm")
 ```
 やっぱりだいぶありますね。２０１７年？くらいのEvolutionsなどは第１世代しかいない。cumulative nを頼りに、たとえばmax pokedex idが251以下151以上であればGen II（までのポケモンからはとれたはずだよね）とみなす、というのがよさそう。
-そのデータを作ろう：
 
+そのデータを作ろう：
+このやり方だとEvolutionsがactual_release_genが１になってしまい、まあそうなんだけど、それこそがバイアスのある作り方・drawの仕方なので、、、、、
 ```{r}
-series_gen_actual_df1 <-
+series_gen_actual_df1_too_accurate <-
 # df_view <- 
   df_gene |> 
   filter(is_pokemon) |> 
   group_by(release_date) |> 
-  mutate(
-    n = n()
-  ) |> 
   filter(pokedex_id == max(pokedex_id)) |> 
   mutate(
     # mapを使えばもう少しスマートに書けそうだが、８個ならいいよね？
+    # 最大のpokedex_idがある世代の合計のポケモン数以下であればその世代を割り振る
     actual_release_gen = case_when( 
       pokedex_id <= df_game_gen$pokemon_cumulative_n[1] ~ 1,
       pokedex_id <= df_game_gen$pokemon_cumulative_n[2] ~ 2,
@@ -88,7 +97,9 @@ series_gen_actual_df1 <-
       pokedex_id <= df_game_gen$pokemon_cumulative_n[4] ~ 4,
       pokedex_id <= df_game_gen$pokemon_cumulative_n[5] ~ 5,
       pokedex_id <= df_game_gen$pokemon_cumulative_n[6] ~ 6,
-      pokedex_id <= df_game_gen$pokemon_cumulative_n[7] ~ 7,
+      release_date <= df_game_gen$game_release_date[7] ~ 6,
+      pokedex_id <= df_game_gen$pokemon_cumulative_n[7] ~ 7, 
+      # マギアナのいるSteam Siegeは~6を満たさず~7を満たしてしまう。~6を満たすようにする
       pokedex_id <= df_game_gen$pokemon_cumulative_n[8] ~ 8,
     )
   ) |> 
@@ -97,22 +108,26 @@ series_gen_actual_df1 <-
 
   series_gen_df2 |> 
   left_join(df_game_gen |> select(game_gen, pokemon_cumulative_n), by = "game_gen") |> 
-  filter(!is.na(pokemon_data_count))
+  filter(!is.na(pokemon_data_count)) 
 ```
 →ゲームがリリースされ、Eraが更新されたとしても、ポケカは常に第一世代からその最新世代までのポケモンをもとに作られるわけではないことがわかる。しかし、たとえばEvolutionsとかもすでにたくさんの新しい世代があるのに、それを無視して古い世代をやろうとしたわけで、まさに変異のバイアスといえる。そのバイアスまでランダムモデルに反映させてしまうのはよくない。あくまで反映させるべきは「ゲームがでて翌日に新しいポケカがだせるわけではない」点なので、新しい世代のポケモンが登場したポケカシリーズ以降はその世代からランダムどろーできるものとする、とするのがよいだろう。つまり、
 ```{r}
-df_series_gen_date <-
+df_series_first_release_date <-
   series_gen_actual_df1 |> 
   ungroup() |> 
   group_by(actual_release_gen) |> 
   filter(release_date == min(release_date)) |> 
-  rename(series_gen = actual_release_gen, first_series = series)
+  rename(series_gen = actual_release_gen, first_series = series) 
   
 ```
-この日付以降。
+この日付以降。ただし、このdfには２つの問題がある。
+
+1. まず、あまりに実態にあわせている。Evolutionsはgen 1ということになっていて、まあ正しいといえば正しいのだがRandom drawのNull modelにはあわない。
+1. これが`df_game_gen$release_date`よりも早ければ、そちらを優先する。なぜなら、Steam Siegeに関してはマギアナが例外的に第７世代登場以前に出ており、ここを基準にすると大変なことになるので、変える必要がある。
+
+これらを勘案して、次のように調整する。それぞれのシリーズにGenを付与したものを`df_series_gen`と、最初のリリースを`df_series_first_release_date_corrected`としよう。
 ```{r}
-# df_series_gen <-
-# df_view <-
+df_series_gen <-
   series_gen_df2 |> 
   mutate(
     series_gen = case_when(
@@ -121,7 +136,7 @@ df_series_gen_date <-
       release_date < df_release_gen$release_date[4] ~ 3,
       release_date < df_release_gen$release_date[5] ~ 4,
       release_date < df_release_gen$release_date[6] ~ 5,
-      release_date < df_release_gen$release_date[7] ~ 6,
+      release_date <= df_release_gen$release_date[7] ~ 6, # magiana taisaku de <=
       release_date < df_release_gen$release_date[8] ~ 7,
       TRUE ~ 8,
     )
@@ -129,10 +144,16 @@ df_series_gen_date <-
   left_join(
     df_game_gen |> select(game_gen, pokemon_cumulative_n), 
     by = c("series_gen" = "game_gen")) |> 
-  filter(!is.na(pokemon_data_count))
-  
-```
+  filter(!is.na(pokemon_data_count)) |> 
+  select(series, series_gen, release_date, everything()) |> 
+  arrange(release_date)
 
+df_series_first_release_date_corrected <- df_series_gen |> 
+  group_by(series_gen) |> 
+  rename(first_series = series) |> 
+  filter(release_date == min(release_date))
+```
+Steam Siegeのseries_genが6になっていることをかくにん！よかった。その直後があのEvolutionsなので困りますがまあこれで正しい。エッジケースの対処としては非常にマニュアルで、あまり良くないが時間がないので仕方ない。
 
 
 ## run
@@ -140,26 +161,14 @@ df_series_gen_date <-
 
 [Unnest a list of vectors in a data frame in R](https://stackoverflow.com/questions/66819613/unnest-a-list-of-vectors-in-a-data-frame-in-r)
 ```{r}
-sim_conditions_df <- series_gen_df4_actual_release_gen |> 
+sim_conditions_df <- df_series_gen |> 
   select(
     series_gen, series, release_date, game_gen,
     pokemon_data_count, pokemon_cumulative_n
     )
 
-# initialize
-
-sim_random_df <- tibble(
-  series = character(),
-  release_date = Date(),
-  game_gen = integer(),
-  series_gen = integer(),
-  pokemon_cumulative_n = integer(),
-  pokedex_id = integer(), 
-  run = integer()
-)
 simulation_runs <- 1000
 
-  
 for (simulation_run in 1:simulation_runs) {
   single_sim_result_df <- sim_conditions_df |> 
     mutate(
@@ -176,6 +185,18 @@ for (simulation_run in 1:simulation_runs) {
     ) |> 
     unnest_longer(pokedex_id)
   
+  # initialize before bind_rows
+  if (simulation_run == 1) {
+    sim_random_df <- tibble(
+      series = character(),
+      release_date = Date(),
+      game_gen = integer(),
+      series_gen = integer(),
+      pokemon_cumulative_n = integer(),
+      pokedex_id = integer(), 
+      run = integer()
+    )
+  }
   sim_random_df <- bind_rows(sim_random_df, single_sim_result_df)
 } #  7min? for 1000 runs
 sim_random_df |> dim() # 1 2325 000 x 8
@@ -219,7 +240,7 @@ emp_sim_count_id_df <-
   ) |> 
   left_join(df_names, by = "pokedex_id") 
   
-emp_sim_count_id_df |> colnames()
+# emp_sim_count_id_df |> colnames()
 ```
 
 ### plot the sim~emp difference
@@ -319,7 +340,6 @@ geom_pointrange(
   )
 ggsave("./output/p_emp_sim_count_id.png", width = 1000, height = 1000, unit = "px", dpi = 600)
 ggsave("./output/p_emp_sim_count_id.svg", width = 83, height = 45, unit = "mm", dpi = 600) 
-ggsave("./output/p_emp_sim_count_id.pdf", width = 83, height = 45, unit = "mm", dpi = 600) 
 
 
 ```
@@ -344,7 +364,5 @@ sim_random_count_pokemon_df |>
 ggsave("./output/count_emp_vs_sim_total_individual_ID.png", width = 83, height = 35, unit = "mm", dpi = 600)
 
 ```
-
-
 
 

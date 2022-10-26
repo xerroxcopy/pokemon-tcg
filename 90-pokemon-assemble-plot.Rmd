@@ -2,6 +2,21 @@
 [patchwork manual](https://patchwork.data-imaginist.com/articles/guides/layout.html)
 [arranging plots with patchwork](https://ggplot2-book.org/arranging-plots.html)
 プロットの微調整はここでやるべきな気がしてきた。ある程度できたらこっちに持ってきて、リンクを貼りつつ一気に見た目を編集したい。どこにあるかわかんなくなるからね。
+```{r}
+pb1 <- NULL
+pb2 <- NULL
+pb3 <- NULL
+pb4 <- NULL
+pb5 <- NULL
+pb6 <- NULL
+pb7 <- NULL
+pb8 <- NULL
+pb9 <- NULL
+pb10 <- NULL
+pb11 <- NULL
+pb12 <- NULL
+
+```
 
 まずは概要てきなもの、シミュレーションが関係ないもの。
 ```{r, fig.width = 2.97, fig.height= 1.5, warnings = FALSE, message = FALSE}
@@ -10,10 +25,10 @@
 pb1 <-  df_cum |>
   ggplot(aes(x = release_date, y = cumsum,)) +
   geom_vline(
-    data = df_game_gen,
-    aes(xintercept = game_release_date),
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
     size = .05/.751,
-    colour = "grey50"
+    colour = "grey20"
   ) +
   geom_area(aes(fill = fct_reorder2(card_type3, release_date, cumsum))) +
   geom_line(
@@ -65,10 +80,10 @@ pb2 <- set_releases_df |>
     aes(release_bin, cards_total, group_by = series, fill = series_class)
   ) +
   geom_vline(
-    data = df_game_gen,
-    aes(xintercept = game_release_date),
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
     size = .05/.751,
-    colour = "grey50"
+    colour = "grey20"
   ) +
   geom_col(colour = "white", size = .2) +
   scale_fill_paletteer_d("NineteenEightyR::sunset1") +  # https://github.com/EmilHvitfeldt/r-color-palettes
@@ -127,12 +142,12 @@ pb4 <-
   ggplot(aes(x = n,y = ecdf)) +
   geom_vline(xintercept = 0, size = .03, colour = "#5C747A") +
   geom_line(
-    aes(group = paste(game_gen_era, run)),
+    aes(group = paste(series_gen_era, run)),
     size = .1, alpha = .01, colour = pokemon_yellow_stronger,) + # 8 * 1000 lines
   geom_point(
     data = temporal_change_per_gen_df |> 
       filter(condition == "pokemon name") |> 
-      select(n, ecdf, game_gen_era) |> distinct(),
+      select(n, ecdf, series_gen_era) |> distinct(),
     colour = "#3267B0", size = .5,
   ) +
   geom_image(
@@ -142,7 +157,7 @@ pb4 <-
     height = .3,
     by = "width",
     asp = 1/aspect_ratio1,
-    nudge_x = 3
+    # nudge_x = 3
   ) +
   scale_size_identity() + 
   scale_x_continuous(
@@ -159,7 +174,7 @@ pb4 <-
     labels = trans_format("log10", math_format(10^.x))
     ) +
   facet_wrap(
-    vars(game_gen_era),
+    vars(series_gen_era),
     nrow = 2,
     scales = "free",
     labeller = era_labeller
@@ -173,12 +188,12 @@ pb4 <-
 # p_sim_emp_1on1_count_temporal # 17 2x8 original.
 pb9 <-
   sim_emp_1on1_count_temporal_df |> 
-  ggplot(aes(release_date, cumsum, colour = game_gen_era |> as.factor())) +
+  ggplot(aes(release_date, cumsum, colour = series_gen |> as.factor())) +
   geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date),
-    colour = "grey80",
-    size = .05/.751
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
+    size = .02/.751,
+    colour = "grey70"
   ) +
   geom_line(aes(group = pokemon_name,), alpha = .2, size = .2,) +
   geom_point(alpha = .4, pch = 21,  fill = "black", colour = "transparent", stroke = .05, size = .2) +
@@ -187,21 +202,9 @@ pb9 <-
     colour = "black",
     size = .4,
     fill = "red",
-    # method = "glm",
-    # method.args = list(
-    #   family = "poisson"
-    # )
+
   ) +
-  # mean line
-  # geom_line(
-  #   data = sim_emp_1on1_count_temporal_df |> 
-  #     group_by(release_date, game_gen_era, condition, pokemon_gen) |> 
-  #     summarise(mean_cumsum = mean(cumsum)),
-  #   aes(y = mean_cumsum),
-  #   colour = "black",
-  #   size = .5,
-  # ) +
-  # scale_size_area(max_size = 2) +
+
   scale_x_date(
     breaks = date_breaks_fun,
     labels = label_date(format = "’%y")
@@ -235,7 +238,7 @@ pb9 <-
 # p_emp_sim_count_id 
 
 aspect_ratio2 <- 1/1.5
-# pb8 <-
+pb8 <-
   emp_sim_count_id_df |> 
   ggplot(aes(x = fct_rev(as.factor(pokemon_gen)), y = n, group = pokemon_gen, fill = condition)) +
   geom_hline(yintercept = 0, size = .1/.75, colour = "grey50") +
@@ -316,11 +319,10 @@ pb4/(pb9|pb8) +
     # guides = "collect"
     ) +
   plot_annotation(
-    tag_levels = "A", # temporarily 1, change to A eventually
+    tag_levels = "A",
   ) &
   theme(
     legend.position = "bottom",
-    # legend.direction = "vertical"
   )
 
 ggsave(paste0("./output/", Sys.Date(), "-bulletin_fig2.png"), height = 160, width = 166, units = "mm", dpi = 300)
@@ -328,6 +330,7 @@ ggsave(paste0("./output/", Sys.Date(), "-bulletin_fig2.svg"), height = 160, widt
 
 ```
 
+## fig . 3
 
 ```{r fig.width = 2.97, fig.height= 2}
 #p_sim_emp_debut_cumsum # 1x1 lines 
@@ -335,14 +338,13 @@ pb3 <-
  sim_random_df_first_seen |> 
   ggplot(aes(x = release_date, y = cumsum)) +
   geom_vline(
-    data = df_game_gen |> filter(game_gen != 9),
-    aes(xintercept = game_release_date),
-        colour = "grey80",
-    # linetype = "dotted",
-    size = .05/.751
+    data = df_series_first_release_date_corrected,
+    aes(xintercept = release_date),
+    size = .05/.751,
+    colour = "grey80"
   ) +
   geom_hline(
-    data = df_game_gen,
+    data = df_series_first_release_date_corrected,
     aes(yintercept = pokemon_cumulative_n),
     size = .05/.751,
     colour = "grey80"
@@ -376,8 +378,8 @@ pb3 <-
     name = "Year"
   ) +
   scale_y_continuous(
-    breaks = c(0, 500, 1000),
-    labels = c(0, "", 1000),
+    breaks = c(0, 500, 905, 1000),
+    labels = c(0, "", 905, ""),
     expand = c(0,0),
     limits = c(0, 1000),
     name = "Total Debutants"
@@ -387,13 +389,15 @@ pb3 <-
 
 
 ```{r fig.width = 2.97, fig.height= 2}
-#p_sim_emp_debut_residual  #1x8
+# p_sim_emp_debut_residual  #1x8
+# 13 debutants and pandoras
+
 pb5 <-
 df_debut_sim_emp |>
   ggplot(aes(x = release_date, y = residual)) +
-  geom_hline(yintercept = 0, colour = "grey80") +
+  geom_hline(yintercept = 0, colour = "grey80", size = .05 / .75) +
   geom_violin(
-    aes(fill = release_gen, group = release_date),
+    aes(fill = series_gen, group = release_date),
     alpha = .3,
     colour = "transparent",
     scale = "width",
@@ -401,13 +405,13 @@ df_debut_sim_emp |>
   ) + 
   geom_line(
     data = df_debut_mean,
-    aes(y =  mean_residual, colour = release_gen),
+    aes(y =  mean_residual, colour = series_gen |> as.factor()),
     size = .1/.75,
   ) +
   geom_point(
     data = df_debut_mean,
-    aes(y =  mean_residual, colour = release_gen),
-    size = .5
+    aes(y =  mean_residual, colour = series_gen |> as.factor()),
+    size = .3
   ) +
   scale_x_date(
     breaks = seq(as.Date("1999-01-01"), by = "1 years", length.out = 25),
@@ -416,81 +420,26 @@ df_debut_sim_emp |>
     name = "Year"
   ) +
   scale_y_continuous(
-    breaks= -2:2 * 25,
-    name = "Residual, Sim - Empirical Data",
+    breaks = 0:2 * 50,
+    labels = c(0, "", 100),
+    name = "Residual",
+  ) +
+  coord_cartesian(
+    ylim = c(0, NA)
   ) +
   scale_fill_viridis_c() + 
-  scale_colour_viridis_c() +
+  scale_colour_viridis_d() +
   facet_wrap(
-    vars(release_gen), 
-    scales = "free",
+    vars(series_gen), 
+    scales = "free_x",
     nrow = 1,
     labeller = era_labeller
   ) +
   theme_pokemon
 ```
-
+Era VIIが最初低いのは、Era VIIの最初のリリースがEvolutionsだから。
 
 ```{r fig.width = 2.97, fig.height= 2}
-pb6 <-
-  #p_no_appearance # 1x8
-  df_no_appearance_summary |> 
-    mutate(condition = factor(condition, levels = c("simulations", "pokemon name"))) |> 
-  ggplot(aes(x = game_gen_era, y = mean_count_no_shows, colour = condition)) +
-  geom_violin(
-    data = df_no_appearance_sim,
-    aes(group = game_gen_era, y = count_no_shows),
-    scale = "width",
-    fill = pokemon_yellow |> lighten(0.6),
-    colour = "transparent",
-    bw = .8,
-    # width = 1.5,
-    trim = FALSE
-  ) +
-  geom_point(
-    size = .5,
-    # stroke = .05
-  ) +
-  geom_line(
-    size = .5
-  ) +
- 
-  scale_colour_manual(
-    values = c("simulations" = pokemon_yellow_stronger, "pokemon name" = pokemon_blue)
-  ) +
-  scale_x_continuous(
-    breaks = 1:8,
-    labels = c("", "II", "", "IV", "", "VI", "", "VIII")
-  ) +
-  scale_y_continuous(
-    breaks = function(x) {
-      if (max(x) < 20) {
-        0:5 * 10
-      } else {
-        0:5 * 20
-      }
-    },
-    expand = c(0, 0)
-  ) +
-  labs(
-      x = "Era",
-      y = "Absent Pokémons",
-    ) +
-  coord_cartesian(
-    ylim = c(0, NA)
-  ) +
-  facet_wrap(
-     vars(pokemon_gen),
-     nrow = 1,
-     scales = "free",
-     labeller = pokemon_gen_labeller
-  ) +
-  theme_pokemon +
-  theme(
-    # aspect.ratio = 1,
-    # legend.position = "none"
-  )
-
 pb7 <-
   #p_average_relative_rank # 1x2, can be fit 1x1
 decline_and_fall_of_pokemon_empire_df |> 
@@ -498,46 +447,55 @@ decline_and_fall_of_pokemon_empire_df |>
   select(average_relative_rank, pokedex_id) |> 
   distinct() |> 
   left_join(df_names, by = "pokedex_id") |>
-  ggplot(aes(x = pokemon_gen, y = average_relative_rank, colour = pokemon_gen)) +
+  ggplot(aes(x = pokemon_gen, y = average_relative_rank, fill = pokemon_gen)) +
   geom_quasirandom(
     size = .2,
     dodge.width = .8, 
-    # alpha = .7, 
-    colour = "black",
-    stroke = 0.05,
+    alpha = .7,
+    colour = "transparent",
+    stroke = 0,
     pch = 21) +
-  geom_smooth(fill = "white", aes(colour = condition)) +
+  geom_smooth( aes(colour = condition), size = .5) +
   scale_colour_manual(
     values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow)
   ) +
   # scale_fill_manual(
   #   values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow)
   # ) +
-  scale_fill_viridis_c() +
+  scale_x_continuous(
+    breaks = 1:7,
+    labels = c("I", "", "", "", "", "", "VII")
+  ) +
+  scale_y_continuous(
+    breaks = 0:10 * .1,
+    labels = c("0.0", "", "", "", "", "0.5", "", "", "", "", "1.0")
+  ) +
+  scale_fill_viridis_c(limits = c(1, 8)) +
   labs(
     x = "Pokémon Generation",
-    y = "Average Relative Rank",
+    y = "Ave. Rank",
   ) +
   facet_grid(
-    cols = vars(condition)
+    cols = vars(condition),
+    labeller = as_labeller(
+      c("pokemon name" = "emp", "simulations" = "sim")
+    )
   ) +
   theme_pokemon +
   theme(
-    legend.position = "none"
+    # legend.position = "none"
   )
 ```
 
 
 ```{r fig.width = 2.97, fig.height= 2}
 #p_pandoras_ridges # 10 decline and fall 1*1, y=8
-# pb11 <-
+pb11 <-
   df_no_appearance_residual |> 
-  # mutate(game_gen_era = )) |> 
   ggplot(aes(
-    y =fct_rev(as.factor(game_gen_era)),
-    # y = paste0("Gen", game_gen_era,"Era, Gen", pokemon_gen, "pokemons"),
+    y =fct_rev(as.factor(series_gen_era)),
     x = residual, 
-    fill = (pokemon_gen - game_gen_era) |> as.factor()
+    fill = (pokemon_gen - series_gen_era) |> as.factor()
     # group = pokemon_gen
   )) +
   geom_vline(xintercept = 0, size = .1 / .75, colour = "grey50") +
@@ -545,12 +503,12 @@ decline_and_fall_of_pokemon_empire_df |>
     rel_min_height = .01,
     bandwidth = .6,
     alpha = .8,
-    size = .2
+    size = .1
     ) +
   scale_x_continuous(
     "Residual",
-    breaks = -2:2 * 25,
-    labels = c(-50, "", 0, "", 50)
+    breaks = -2:2 * 20,
+    labels = c(-40, -20, 0, 20, 40)
   ) +
   scale_y_discrete(
     "Era",
@@ -564,12 +522,77 @@ decline_and_fall_of_pokemon_empire_df |>
 
 
 ```{r fig.width = 2.97, fig.height= 2}
-# pb12 <- 
-  #p_pandoras_aggregate # 1x1, x=8, 8000 points maybe convert to violin?
+#p_no_appearance # 1x8
+
+pb6 <-
+  df_no_appearance_summary |>
+    mutate(condition = factor(condition, levels = c("simulations", "pokemon name"))) |> 
+  ggplot(aes(x = series_gen_era, y = mean_count_no_shows, colour = condition)) +
+  geom_violin(
+    data = df_no_appearance_sim,
+    aes(group = series_gen_era, y = count_no_shows),
+    scale = "width",
+    fill = pokemon_yellow |> lighten(0.6),
+    colour = "transparent",
+    bw = .8,
+    # width = 1.5,
+    trim = FALSE
+  ) +
+  geom_point(
+    size = .5,
+    # stroke = .05
+  ) +
+  geom_line(
+    size = .25
+  ) +
+ 
+  scale_colour_manual(
+    values = c("pokemon name" = pokemon_blue, "simulations" = pokemon_yellow_stronger)
+  ) +
+  scale_x_continuous(
+    breaks = 1:8,
+    labels = c("", "II", "", "IV", "", "VI", "", "VIII")
+  ) +
+  scale_y_continuous(
+  breaks = c(0, 25, 50),
+  labels = c(0, "", 50)
+  ) +
+  coord_cartesian(
+    ylim = c(0, NA),
+    # expand = 
+  ) +
+  labs(
+      x = "Era",
+      y = "Absent Pokémons",
+    ) +
+  facet_wrap(
+     vars(pokemon_gen),
+     nrow = 1,
+     scales = "free_x",
+     labeller = pokemon_gen_labeller
+  ) +
+  theme_pokemon +
+  theme(
+    # aspect.ratio = 1,
+    # legend.position = "none"
+  )
+
+```
+
+
+```{r fig.width = 2.97, fig.height= 2}
+#p_pandoras_aggregate # 1x1, x=8, 8000 points maybe convert to violin?
+pb12 <-
 df_no_appearance2 |> 
   filter(condition == "simulations") |> 
-  ggplot(aes(x = series_gen_era, y = sum, fill = game_gen_era)) +
-  geom_quasirandom(size = .1, pch = 21,colour = "transparent", stroke = 0) +
+  ggplot(aes(x = series_gen_era, y = sum, fill = series_gen_era)) +
+  geom_quasirandom(
+    size = .4,
+    pch = 21,
+    colour = "transparent",
+    alpha = .7,
+    stroke = 0
+    ) +
   geom_line(
     data = df_no_appearance2 |> filter(condition == "pokemon name"),
     colour = pokemon_blue,
@@ -580,16 +603,27 @@ df_no_appearance2 |>
     data = df_no_appearance2 |> filter(condition == "pokemon name"),
     fill = pokemon_blue,
     pch = 21,
-    colour = "black",
-    stroke = .1
+    size = .3,
+    colour = "white",
+    stroke = .05
   ) +
   scale_fill_viridis_c() +
+  scale_x_continuous(
+    breaks =  1:8,
+    labels = c("I", "", "", "", "", "", "", "VIII")
+  ) +
+  labs(
+    x = "Era",
+    y = "Absentees"
+  ) +
   theme_pokemon
+```
 
-
+### plot
+```{r fig.width = 2.97, fig.height= 2}
 (pb7|pb11|pb12|pb3) /pb5 / pb6 +
   plot_layout(
-    heights = c(4,2,2),
+    heights = c(4,4,4),
     guides = "collect"
     ) +
   plot_annotation(
@@ -598,28 +632,8 @@ df_no_appearance2 |>
   theme(
     legend.position = "bottom",
   ) 
-ggsave(paste0("./output/", Sys.Date(), "-bulletin_fig3.png"), height = 160, width = 166, units = "mm", dpi = 300)
+ggsave(paste0("./output/", Sys.Date(), "-bulletin_fig3.png"), height = 130, width = 166, units = "mm", dpi = 300)
 ggsave(paste0("./output/", Sys.Date(), "-bulletin_fig3.svg"), height = 130, width = 166, units = "mm", dpi = 300)
-```
-### test layouts with lighter plots 
-
-
-```{r fig.width = 2.97, fig.height= 4.438}
-(pbA|pbA|pbA)/pbE/pbE/pbE/(pbA|pbA) +
-  plot_layout(
-    guides = "collect"
-  ) +
-  plot_annotation(
-    tag_levels = "A",
-  ) &
-  theme(
-    legend.position = "bottom",
-    legend.direction = "vertical"
-  )
-ggsave("./output/frutiger-test2.svg", height = 166, width = 200, units = "mm")
-# pdf -> no plot tags, no legends
-# svg -> frutiger doesn't work
-# png -> frutiger doesn't work
 ```
 
 

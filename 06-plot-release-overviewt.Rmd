@@ -28,7 +28,7 @@ series_gen_df2 |> filter(series == "Dragon Vault")
 series_gen_df2$pokemon_data_count |> na.omit() |> sum() # 12325
 ```
 
-Neo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
+English: December 16, 2000のNeo Genesisは[例外的に](https://bulbapedia.bulbagarden.net/wiki/Neo_Genesis_(TCG))速いが、他は基本的に新世代の発表からちょっと遅れて？登場してそう
 "Black Star Promo"がおかしいことがわかる。
 
 初出最終dfを用意

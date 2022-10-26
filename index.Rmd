@@ -143,7 +143,7 @@ font_add(
 )
 
 showtext_auto()
-showtext_opts(dpi = 300) # https://community.rstudio.com/t/font-gets-really-small-when-saving-to-png-using-ggsave-and-showtext/147029/7, #10
+showtext_opts(dpi = 600) # https://community.rstudio.com/t/font-gets-really-small-when-saving-to-png-using-ggsave-and-showtext/147029/7, #10
 # match the dpi to the one in png output!
 ```
 
@@ -151,4 +151,9 @@ showtext_opts(dpi = 300) # https://community.rstudio.com/t/font-gets-really-smal
 ## chapters
 
 `data-genes`: create pokemon list(`df_names`), and connect each row to the images of pokémon, pokemon sequencing (`is_vmax` etc) for `df_gene`.
+
+## 
+
+[イラストの企画では10名以上のチームメンバーとブレストを行う](https://new-graduate.creatures.co.jp/cr_people/pokemon_tcg_illustration_production/index.html)[カードは自分一人で黙々と作るわけではありません。デザイナーも企画も、多くの人が関わって完成させる](https://new-graduate.creatures.co.jp/cr_people/pokemon_tcg_cross_talk/index.html)[商品企画の方針を基に、全体のゲーム設計を行い、カードのラインナップ選定、HPやワザ、およびそのテキストの作成など、ポケモンカードのゲーム内容に関わる部分を作り上げます](https://new-graduate.creatures.co.jp/job/introduction/)[企画では、最初にどのポケモンが登場するか、どんなテーマの商品にするかを決めます。次に、ポケモンの強さを決めるデータ制作、カードに登場するポケモンのイラスト制作があり、データとイラストが完成したら、デザイナーがカードのフォーマットに落とし込みます。そのカードに間違いがないか校正を行い、問題なければ印刷、発売となります](https://www.cinra.net/article/job-shigoto-pokemon-card)絵が先で、それを読み解いてわざを決めたりするんですね…。[普段は注目が集まりにくいポケモンをあえてピックアップして、いろんなポケモンに活躍の場ができるように工夫していることもあります。また、株式会社ポケモン（以下、TPC）ともやりとりをします。過去の実績やユーザーからの反響を元にした提案をしていただくことが多いですが、それに対して、具体的にどうやって面白い商品に作り上げるのかを考えるのが、クリーチャーズの役割です](https://new-graduate.creatures.co.jp/cr_people/pokemon_tcg_production_progress_management/index.html)
+
 

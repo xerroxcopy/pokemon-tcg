@@ -25,6 +25,7 @@ df_game_gen
 これをもとに、各リリースがどのGenerationまでのポケモンを使えたのかを書いておきたい（temporal_change_each_release_dfをプロットする際にgenerationでfacet gridしたいため）。
 game_release_dateとgame_end_dateに挟まれてるrelease_dateのgame_genを書きたいだけなんだ！！どうやる！！
 できたけどrelease_dateがからっぽな日本リリースは除かれるよ。問題ないと思うけど。
+→series_genを使ってね
 
 ```{r}
 df_series3 <-

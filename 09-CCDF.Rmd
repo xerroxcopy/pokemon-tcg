@@ -156,7 +156,7 @@ ggsave("./output/p_emp_vs_sim_cumulative_ccdf_semilog.png", width = 86, height =
 
 ```{r}
 # c_game_release_dates <- df_game_gen$game_release_date # inaccurate
-c_series_gen_dates <- c(df_series_gen_date$release_date, "2022-11-18")
+c_series_gen_dates <- c(df_series_first_release_date_corrected$release_date, "2022-11-18")
 ```
 シリーズのわけめで回す。第1世代、第2世代、でわけるのが一番いいわということで。`c_series_gen_dates`に関しては、第９世代より前ですよという日付が必要なので追加している。
 こちらを主体にしている。上のもやってもいいけど…。
@@ -250,6 +250,102 @@ temporal_change_per_gen_df |>
     series_gen_era == 1
   ) 
 ```
+### temporal change per gen, CCDF for each pokemon_gen
+
+新世代がどれくらいバイアスかかってるかみてみたい
+
+```{r}
+# run
+for (i in 1:(length(c_series_gen_dates) - 1)) { 
+  # i from 1 to 8
+  
+  sim_random_df_in_threshold_duration <-
+    sim_random_df |> 
+    filter(
+      release_date < c_series_gen_dates[i + 1] & 
+      release_date >= c_series_gen_dates[i] 
+    ) 
+  
+  emp_df_in_threshold_duration <- df_gene |> 
+    filter(is_pokemon) |> 
+    filter(
+      release_date < c_series_gen_dates[i + 1] & 
+      release_date >= c_series_gen_dates[i] 
+    )
+  
+  # 第１，２，３，。。。世代のポケモンの総数
+  pokemon_max_pokedex_id <- df_game_gen$pokemon_cumulative_n[i] 
+  sim_df <-
+  # df_view <- 
+    sim_random_df_in_threshold_duration |> 
+    count(run, pokedex_id) |> 
+    complete(
+      pokedex_id = 1:pokemon_max_pokedex_id, 
+      run = 1:1000,
+      fill = list(n = 0)
+      ) |> 
+    mutate(
+      condition ="simulations"
+    ) |> 
+    left_join(
+      df_names |> select(pokedex_id, pokemon_gen), 
+      by = "pokedex_id"
+    ) |> 
+    group_by(pokemon_gen, run) |> 
+    arrange(desc(n)) |>
+    mutate(ecdf = 1 - ecdf(n)(n - .01)) 
+  
+  emp_poke_df <-
+  # df_view <-
+    emp_df_in_threshold_duration |> 
+    count(pokedex_id) |> 
+    complete(
+      pokedex_id = 1:pokemon_max_pokedex_id,
+      fill = list(n = 0)
+    ) |> 
+    mutate(condition = "pokemon name") |> 
+    left_join(
+      df_names |> select(pokedex_id, pokemon_gen), 
+      by = "pokedex_id"
+    ) |> 
+    ungroup() |> 
+    group_by(pokemon_gen) |> 
+    arrange(desc(n)) |>
+    mutate(
+      # rank = rank(-n, ties.method = "max"),
+      ecdf = 1 - ecdf(n)(n - .01)
+    ) 
+  # merge and calculate ECDF here
+  
+  merge_df <-
+  # df_view <- 
+    bind_rows(sim_df, emp_poke_df) |> 
+    mutate(series_gen_era = i) 
+  if (i == 1) {
+    # initialize
+    temporal_change_per_gen_per_pokemon_gen_df <- tibble(
+      n = integer(),
+      ecdf = double(),
+      run = integer(),
+      series_gen_era = integer(),
+      pokemon_gen = integer()
+    )
+  } 
+    temporal_change_per_gen_per_pokemon_gen_df <- bind_rows(
+      temporal_change_per_gen_per_pokemon_gen_df,
+      merge_df
+    )
+} # 1min?
+```
+
+```{r}
+temporal_change_per_gen_per_pokemon_gen_df |> 
+  filter(condition == "pokemon name", pokemon_gen == 1, series_gen_era == 2)
+temporal_change_per_gen_per_pokemon_gen_df |> 
+  filter(condition == "pokemon name", pokemon_gen == 2, series_gen_era == 2)
+```
+
+
 
 ### temporal change, temporal
 
